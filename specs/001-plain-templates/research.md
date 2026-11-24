@@ -16,8 +16,9 @@ and against `main`.
 - **The browser test tooling exists.** `main` already carries `pytest-playwright` in its dev group
   and a `chromium` fixture in `tests/conftest.py`. The prototype's `tests/test_layout_js.py` runs in
   Chromium on the same tooling. Holds.
-- **A TypeScript checker for `tsc --noEmit`.** Neither branch's `package.json` has `typescript`.
-  The build adds it as a development dependency.
+- **A TypeScript checker for `tsc --noEmit`.** `main` has no `package.json`, and the prototype's
+  carries only the demo's stylesheet tooling. The build adds `typescript` through a pre-commit hook
+  that installs its own node environment.
 
 ## Planning notes answered
 
@@ -76,8 +77,9 @@ says so in each place a side is named. No public name changes, so FS-002 builds 
 - **Type check**: `// @ts-check` and JSDoc in `layout.js`, a `tsconfig.json` with `checkJs` and
   `noEmit`, and a local pre-commit hook of `language: node` with `typescript` as its additional
   dependency, so the hook installs its own compiler in CI and in the shared Code Quality job with no
-  `npm ci`. `forge verify`'s lint step is `pre-commit run --all-files`, so the type check is one of
-  the repository's checks.
+  `npm ci`. the Code Quality job in CI runs `pre-commit run --all-files`, so the type check is one of the
+  repository's checks. The compiler is pinned to one version in the hook, and it lives in the hook
+  rather than the shared development bundle because no Python package ships `tsc`.
 - **Focus trap in a contained layout**: a `keydown` handler on Tab inside an open drawer wraps
   focus between the drawer's first and last focusable elements. The inert siblings alone do not
   stop focus leaving a contained layout, because the browser's own chrome and the rest of the page
@@ -105,3 +107,27 @@ says so in each place a side is named. No public name changes, so FS-002 builds 
 - Long-task measurement: the browser's `PerformanceObserver` (the browser).
 - Container queries for the breakpoints: CSS (the browser). Nothing is scripted.
 - Cookie writing: `document.cookie`. Nothing new.
+- Tab trap in an open drawer (FR-013) and the error for an id that names no layout (US3 scenario
+  7): new code. Neither the platform nor the tree has an equivalent. `inert` keeps focus out of the
+  layout's other areas but does not wrap Tab inside the drawer, and the prototype's functions return
+  `null` for an unknown id.
+- Keeping host rules ahead of the package's: CSS cascade layers (the browser). The stylesheet is
+  one `@layer mvpl` block, so a host's unlayered rule wins at any specificity.
+
+## Changes the design review required
+
+- **Every data attribute starts with `mvpl` (FR-022).** The prototype writes `data-side`,
+  `data-collapse`, `data-breakpoint`, `data-behavior`, `data-state`, `data-persist`,
+  `data-overlay` and `data-mode`. They become `data-mvpl-side` and so on in the tags, the generated
+  stylesheet and the script. Nothing is redrawn: the computed styles are the same, and the
+  side-by-side comparison with the prototype proves it.
+- **A host's rules on the package's classes take effect (US1 scenario 11).** The prototype's rules
+  are unlayered and several have high specificity, so a host's `.mvpl-sidebar { … }` loses. The
+  generator wraps its output in `@layer mvpl`, and the base template links the stylesheet before
+  its `styles` block so the host's own layers come after the package's.
+- **The package depends on Django and django-cotton and nothing else at runtime (FR-023,
+  Article XII).** `main` still lists django-mvp as a dependency, which pulls in daisy-cotton and
+  the rest of that stack. The prototype settled this, and this feature takes its dependency list.
+  django-mvp moves to the development group, because the demo project still runs on its shell.
+- **The width transition is measured with `long-animation-frame` entries**, not `longtask`.
+  Long tasks leave out rendering work, which is where a width transition's cost falls.
