@@ -1,0 +1,172 @@
+{% extends "demo/base.html" %}
+{% load demo_icons %}
+{% block aside %}
+  <c-demo.reference />
+{% endblock aside %}
+{% block content %}
+  <style>
+    .lp-frame { resize: horizontal; overflow: hidden; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
+    .lp-frame::after { content: ""; }
+    .lp-handle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 0.75rem; display: grid; place-items: center; pointer-events: none; }
+    .lp-handle::before { content: ""; width: 0.25rem; height: 2.5rem; border-radius: 9999px; background: var(--color-base-300); }
+  </style>
+  <div class="flex flex-col gap-6">
+    <form class="flex flex-col gap-5" id="lp-form" action="{% url 'playground' %}" method="get">
+      <div class="flex flex-col gap-2">
+        <label for="lp-code" class="font-medium">Layout code</label>
+        <div class="flex flex-wrap items-center gap-3">
+          <input id="lp-code"
+                 name="view"
+                 value="{{ code }}"
+                 class="input input-lg w-56 font-mono tracking-widest"
+                 spellcheck="false"
+                 autocomplete="off"
+                 autocapitalize="off"
+                 maxlength="15"
+                 aria-describedby="lp-msg"
+                 {% if error %}aria-invalid="true"{% endif %} />
+          <div class="flex flex-wrap gap-2" role="group" aria-label="Examples">
+            {% for example, label in examples %}
+              <button type="button" class="btn btn-sm" data-lp-example="{{ example }}" aria-pressed="{% if example == code %}true{% else %}false{% endif %}" title="{{ example }}">{{ label }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        <c-demo.message :error="error" />
+      </div>
+      <div class="grid gap-4 md:grid-cols-2">
+        {% for side, opts in sides %}
+          <fieldset class="fieldset rounded-box border border-base-300 p-4">
+            <legend class="fieldset-legend">{{ side|capfirst }} sidebar</legend>
+            <div class="grid gap-3 sm:grid-cols-3 md:grid-cols-1 2xl:grid-cols-3">
+              <label class="flex flex-col gap-1">
+                <span class="text-sm">When closed</span>
+                <select name="{{ side }}_collapse" class="select select-sm">
+                  {% for key, label in collapses %}<option value="{{ key }}" {% if key == opts.collapse %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="text-sm">Drawer below</span>
+                <select name="{{ side }}_breakpoint" class="select select-sm">
+                  {% for key, label in breakpoints %}<option value="{{ key }}" {% if key == opts.breakpoint %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="text-sm">Behaviour</span>
+                <select name="{{ side }}_behavior" class="select select-sm">
+                  {% for key, label in behaviors %}<option value="{{ key }}" {% if key == opts.behavior %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+              </label>
+            </div>
+          </fieldset>
+        {% endfor %}
+      </div>
+    </form>
+    <section class="flex flex-col gap-3" aria-label="Preview">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="join" role="group" aria-label="Preview width">
+          <button type="button" class="btn btn-sm join-item" data-lp-width="" aria-pressed="true">Full</button>
+          <button type="button" class="btn btn-sm join-item" data-lp-width="1024" aria-pressed="false">1024</button>
+          <button type="button" class="btn btn-sm join-item" data-lp-width="768" aria-pressed="false">768</button>
+          <button type="button" class="btn btn-sm join-item" data-lp-width="390" aria-pressed="false">390</button>
+        </div>
+        <p id="lp-status" class="text-sm text-base-content/70" aria-live="polite"></p>
+      </div>
+      <div id="lp-frame" class="lp-frame relative">
+        {% if view %}<c-demo.preview-layout :view="view" :left="left" :right="right" :nav="nav" :paragraphs="paragraphs" />{% else %}<div id="lp-preview"></div>{% endif %}
+        <span class="lp-handle" aria-hidden="true"></span>
+      </div>
+      <p class="text-sm text-base-content/60">Drag the frame's right edge, or pick a width, to see the sidebars change at their breakpoints.</p>
+    </section>
+    {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div>{% endif %}
+  </div>
+  <script>
+    (function () {
+      var input = document.getElementById("lp-code");
+      var frame = document.getElementById("lp-frame");
+      var status = document.getElementById("lp-status");
+      function markExamples() {
+        var value = input.value.trim().replace(/\s+/g, " ");
+        document.querySelectorAll("[data-lp-example]").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.lpExample === value));
+          b.classList.toggle("btn-primary", b.dataset.lpExample === value);
+        });
+      }
+      function describe(s) {
+        if (!s.present) return "none";
+        if (s.mode === "overlay") return s.visible ? "drawer, open" : "drawer, closed";
+        if (s.collapse === "none") return "beside the page";
+        if (s.state === "open") return "beside the page, open";
+        return s.rail ? "icon rail" : "closed";
+      }
+      function report() {
+        var root = document.getElementById("lp-layout");
+        if (!root || !window.MvpLayout) return;
+        var s = window.MvpLayout.state(root);
+        status.textContent = Math.round(root.getBoundingClientRect().width) + "px wide · Left: " + describe(s.left) + " · Right: " + describe(s.right);
+      }
+      document.querySelectorAll("[data-lp-example]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          input.value = b.dataset.lpExample;
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          markExamples();
+        });
+      });
+      input.addEventListener("input", markExamples);
+      markExamples();
+      document.querySelectorAll("[data-lp-width]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          frame.style.width = b.dataset.lpWidth ? b.dataset.lpWidth + "px" : "";
+          document.querySelectorAll("[data-lp-width]").forEach(function (o) {
+            o.setAttribute("aria-pressed", String(o === b));
+            o.classList.toggle("btn-primary", o === b);
+          });
+        });
+      });
+      document.querySelector('[data-lp-width=""]').classList.add("btn-primary");
+      document.addEventListener("mvpl:change", function (e) {
+        if (e.target.id === "lp-layout") report();
+      });
+      // Ask the page for the parts that change, and swap them in.
+      var form = document.getElementById("lp-form");
+      var pending = null;
+      var timer = null;
+      function refresh() {
+        var query = new URLSearchParams(new FormData(form)).toString();
+        var url = form.action + "?" + query;
+        if (pending) pending.abort();
+        pending = new AbortController();
+        fetch(url, { headers: { "X-Preview": "1" }, signal: pending.signal })
+          .then(function (r) { return r.text(); })
+          .then(function (html) {
+            var doc = new DOMParser().parseFromString(html, "text/html");
+            document.getElementById("lp-msg").replaceWith(doc.getElementById("lp-msg"));
+            var ok = !document.querySelector("#lp-msg.text-error");
+            input.setAttribute("aria-invalid", String(!ok));
+            if (ok) {
+              var preview = doc.getElementById("lp-preview");
+              var details = doc.getElementById("lp-details");
+              // Scripts parsed by DOMParser don't run. The new layout is mounted by the MutationObserver.
+              document.getElementById("lp-preview").replaceWith(document.importNode(preview, true));
+              document.getElementById("lp-details").replaceWith(document.importNode(details, true));
+              history.replaceState(null, "", url);
+            }
+            report();
+          })
+          .catch(function () {});
+      }
+      form.addEventListener("submit", function (e) { e.preventDefault(); refresh(); });
+      form.addEventListener("change", function (e) { if (e.target.tagName === "SELECT") refresh(); });
+      input.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(refresh, 200); });
+      document.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-lp-copy]");
+        if (!b) return;
+        var text = document.getElementById(b.dataset.lpCopy).innerText;
+        var done = function () { var s = b.querySelector("span"); s.textContent = "Copied"; setTimeout(function () { s.textContent = "Copy"; }, 1500); };
+        if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done); return; }
+        var area = document.createElement("textarea"); area.value = text; document.body.appendChild(area); area.select();
+        try { document.execCommand("copy"); done(); } finally { area.remove(); }
+      });
+      report();
+    })();
+  </script>
+{% endblock content %}

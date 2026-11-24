@@ -21,3 +21,6 @@ class TestTheStylesheet:
         assert built == STYLESHEET.read_text(), (
             "Run `uv run python scripts/build_css.py` and commit the result."
         )
+
+    def test_the_stylesheet_puts_a_hosts_base_layer_below_the_package(self) -> None:
+        assert STYLESHEET.read_text().startswith("@layer base, mvpl;\n")

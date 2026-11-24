@@ -95,12 +95,10 @@ uv run pytest
 uv run pre-commit install
 ```
 
-`demo/` is a Django project on django-mvp's application shell, for looking at
-this package in a browser while working on it:
+`demo/` is a Django project that shows the layouts in a browser while you work on this package,
+with an overview, a playground, a nested-layouts page and a Without Cotton page:
 
 ```bash
-uv run python manage.py migrate
-uv run python manage.py seed_demo
 uv run python manage.py runserver
 ```
 

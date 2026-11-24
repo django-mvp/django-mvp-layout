@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static demo_icons %}
+{% comment %}
+  This page extends docs/examples/base.html, the base template the docs give
+  for a project that doesn't use django-cotton. Nothing on it is a component.
+{% endcomment %}
+{% block title %}Without Cotton · django-mvp-layout{% endblock title %}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'demo/demo.css' %}" />
+  <script>document.documentElement.dataset.theme = localStorage.getItem("demo-theme") || "light";</script>
+  <style>#app { --mvpl-sidebar-bg: var(--color-base-200); }</style>
+{% endblock styles %}
+{% block header %}
+  <div class="flex h-14 items-center gap-2 bg-base-100 px-3">
+    <button type="button" class="mvpl-toggle btn btn-ghost btn-sm btn-square" data-mvpl-toggle="left" aria-label="Navigation">{% icon "layout" %}</button>
+    <span class="font-semibold">Without Cotton</span>
+    <button type="button" class="mvpl-toggle btn btn-ghost btn-sm btn-square ms-auto" data-mvpl-toggle="right" aria-label="On this page">{% icon "sidebar-right" %}</button>
+  </div>
+{% endblock header %}
+{% block navigation %}<ul class="menu w-full gap-1 p-2">
+    <li><a href="{% url 'home' %}">{% icon "house" %}<span>Overview</span></a></li>
+    <li><a href="{% url 'playground' %}">{% icon "layout" %}<span>Playground</span></a></li>
+    <li><a href="{% url 'nested' %}">{% icon "layers" %}<span>Nested layouts</span></a></li>
+    <li><a href="{% url 'plain' %}" class="menu-active" aria-current="page">{% icon "code" %}<span>Without Cotton</span></a></li>
+  </ul>{% endblock navigation %}
+{% block aside %}<div class="flex flex-col gap-2 p-4 text-sm">
+    <p class="font-semibold">On this page</p>
+    <ul class="menu menu-sm w-full p-0">
+      <li><a href="#how">How it's built</a></li>
+      <li><a href="#source">The base template</a></li>
+    </ul>
+  </div>{% endblock aside %}
+{% block content %}
+  <div class="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-6 md:px-8">
+    <h1 class="text-3xl font-bold">A layout without Cotton</h1>
+    <section id="how" class="flex flex-col gap-3 text-base-content/80">
+      <p>This page's base template is plain Django: an element per area, with classes the stylesheet knows. Two template tags write the attributes that come from options.</p>
+      <ul class="list-disc ps-5">
+        <li><code>{% templatetag openblock %} layout_attrs "hHh LpR fFf" {% templatetag closeblock %}</code> on the root reads the layout code.</li>
+        <li><code>{% templatetag openblock %} sidebar_attrs "left" persist="nav" {% templatetag closeblock %}</code> on each <code>&lt;aside&gt;</code> sets how it collapses, where it becomes a drawer and the state it was left in.</li>
+        <li>A button with <code>data-mvpl-toggle="left"</code> anywhere inside the layout opens and closes the left sidebar.</li>
+      </ul>
+      <p>The sidebars, toggles and drawers behave exactly as they do on the pages built with components. Close the left sidebar and reload: it stays closed.</p>
+    </section>
+    <section id="source" class="flex flex-col gap-3">
+      <h2 class="text-xl font-semibold">The base template</h2>
+      <p class="text-base-content/80">Copy it into your project, change the code and the sidebars' options, and extend it.</p>
+      <pre class="overflow-x-auto rounded-box bg-base-200 p-4 text-sm"><code>{{ base_source }}</code></pre>
+    </section>
+  </div>
+{% endblock content %}
+{% block footer %}
+  <div class="border-t border-base-300 px-4 py-3 text-sm text-base-content/60 md:px-8">django-mvp-layout demo.</div>
+{% endblock footer %}

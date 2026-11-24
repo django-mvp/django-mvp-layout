@@ -6,7 +6,6 @@ from html.parser import HTMLParser
 import pytest
 from django import template as dj_template
 from django.template import Context
-from django.urls import reverse
 from django_cotton.compiler_regex import CottonCompiler
 
 
@@ -75,11 +74,6 @@ def render():
         return template.render(Context({"request": request, **context}))
 
     return render_source
-
-
-@pytest.fixture
-def overview_page(client, db):
-    return client.get(reverse("overview")).content.decode()
 
 
 @pytest.fixture(scope="session")

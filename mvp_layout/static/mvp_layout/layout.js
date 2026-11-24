@@ -45,6 +45,8 @@
   var openers = new WeakMap();
   /** @type {HTMLElement[]} */
   var stack = [];
+  /** @type {WeakMap<HTMLElement, string>} */
+  var announced = new WeakMap();
 
   /**
    * @param {HTMLElement} root
@@ -195,7 +197,12 @@
     });
     measure(root);
     lockPage();
-    root.dispatchEvent(new CustomEvent("mvpl:change", { bubbles: true, detail: state(root) }));
+    // A resize or a repeated sync that changes nothing is not a change.
+    var detail = state(root);
+    var key = JSON.stringify(detail);
+    if (announced.get(root) === key) return;
+    announced.set(root, key);
+    root.dispatchEvent(new CustomEvent("mvpl:change", { bubbles: true, detail: detail }));
   }
 
   /**

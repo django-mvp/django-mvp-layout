@@ -32,38 +32,36 @@ that introduced it.
 
 ## The demo project
 
-`demo/` is a Django project running on django-mvp's application shell. It is
-how this package is looked at while it is being written, and it is never
-deployed. Nothing in it is distributed — `pyproject.toml` packages
-`mvp_layout` alone.
+`demo/` is a Django project on Django, django-cotton and this package alone. It
+is how this package is looked at while it is being written, and it is never
+deployed. Nothing in it is distributed: `pyproject.toml` packages `mvp_layout`
+alone. It has four pages: an overview, a playground, a nested-layouts page and a
+Without Cotton page that extends `docs/examples/base.html` itself.
 
 `tests/settings.py` inherits `demo/settings.py` rather than restating it, so
-there is one description of the shell.
+there is one description of the demo.
+
+The demo has no database and no accounts. Its stylesheet is Tailwind and
+daisyUI, built from `demo/assets/demo.css` into `demo/static/demo/demo.css`,
+which is committed. After a change to the classes a demo template uses, run
+`npm install` once and `npm run build:css`.
 
 Everything in the demo fails quietly. A Cotton component that cannot be
-resolved renders as empty output, a Tailwind class the packaged stylesheet does
-not emit does nothing, and a menu entry whose URL will not resolve is dropped
-from the tree. None of them raise, which is why `tests/test_demo.py` asserts
+resolved renders as empty output, and a Tailwind class the built stylesheet does
+not emit does nothing. Neither raises, which is why `tests/test_demo.py` asserts
 against the rendered page rather than against the objects behind it.
 
-**Adding a page** takes four things: a view in `demo/views.py` on
-`mvp.views.MVPTemplateView`, a route in `demo/urls.py`, a template extending
-`page_view.html` and filling `{% block page.content %}`,
-and a `MenuItem` in `demo/menus.py`.
-
-**Signing in.** `uv run python manage.py seed_demo` creates three accounts —
-`regular.user@example.com`, `staff.user@example.com` and
-`super.user@example.com`, all with the password `password`. The shell renders
-differently for each, so all three exist rather than one. The command refuses
-to run unless `DEBUG` is on.
+**Adding a page** takes three things: a view in `demo/views.py`, a route in
+`demo/urls.py` and a template extending `demo/base.html` that fills its
+`content` block. The demo's own pieces are Cotton components in
+`demo/templates/cotton/demo/`, never `{% include %}` partials. The page's entry
+in the sidebar is written in `demo/base.html`.
 
 ## Components
 
-Components live at
-`mvp_layout/templates/cotton/mvp_layout/<name>.html`.
-Cotton maps a tag's first segment onto that directory, so
-`<c-mvp_layout.example>` resolves to
-`cotton/mvp_layout/example.html`.
+Components live at `mvp_layout/templates/cotton/layout/<name>.html`. Cotton
+maps a tag's first segment onto that directory, so `<c-layout.sidebar>` resolves
+to `cotton/layout/sidebar.html`, and `<c-layout>` to `cotton/layout/index.html`.
 
 The directory name is load-bearing and fails quietly: a component Cotton cannot
 resolve renders as empty output rather than raising, so renaming the directory
