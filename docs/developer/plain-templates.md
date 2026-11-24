@@ -99,10 +99,19 @@ first. Pass them as `css_class` and `style` instead.
 
 A `view` that is not a layout code raises `LayoutViewError`.
 
+## `{% layout_uid %}`
+
+```
+{% layout_uid "app" as id %}
+```
+
+Returns the prefix and a random suffix, such as `app-3f9a1c0b2d4e`. Use it to give each layout and
+sidebar of a page an id of its own when layouts are nested or a template is included more than once.
+
 ## `{% sidebar_attrs %}`
 
 ```
-{% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width css_class %}
+{% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width css_class style %}
 ```
 
 Every argument is optional and can be given by name. The tag writes the sidebar's `class` and
@@ -119,6 +128,7 @@ Every argument is optional and can be given by name. The tag writes the sidebar'
 | `width` | The sidebar's open width, as a CSS length. | `16rem` left, `18rem` right |
 | `rail_width` | The width of its icon rail, as a CSS length. | `4rem` |
 | `css_class` | Classes added to the sidebar's own. | none |
+| `style` | Declarations added after the sidebar's own. | none |
 
 A value outside the choices raises `LayoutOptionError`, and its message names the choices.
 

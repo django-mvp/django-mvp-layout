@@ -39,4 +39,4 @@ class TestNestedLayouts:
         page = visit("components-nested")
 
         for selector in (OUTER, INNER):
-            assert page.locator(selector).get_attribute("data-mvpl-behavior")
+            assert page.locator(selector).get_attribute("data-mvpl-mode")

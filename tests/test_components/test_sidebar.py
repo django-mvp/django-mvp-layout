@@ -4,7 +4,7 @@ import pytest
 from django.template import Context, Template
 from django.test import RequestFactory
 
-from mvp_layout.templatetags.mvp_layout import LayoutOptionError
+from mvp_layout.templatetags.mvp_layout import LayoutOptionError, Sidebar
 from tests.conftest import elements_of, with_data
 
 # Each row is a sidebar written both ways: the component's attributes and the
@@ -51,16 +51,30 @@ class TestSidebar:
         assert with_data(markup)[0] == with_data(plain_sidebar(tag_args))[0]
 
     @pytest.mark.parametrize(
-        "attributes",
-        ['side="up"', 'collapse="slide"', 'breakpoint="huge"', 'behavior="never"'],
+        ("attributes", "choices"),
+        [
+            ('side="up"', Sidebar.SIDES),
+            ('collapse="slide"', Sidebar.COLLAPSES),
+            ('breakpoint="huge"', Sidebar.BREAKPOINTS),
+            ('behavior="never"', Sidebar.BEHAVIORS),
+        ],
     )
     def test_an_option_outside_its_choices_fails_with_the_tags_error(
-        self, render, attributes
+        self, render, attributes, choices
     ):
         with pytest.raises(LayoutOptionError) as refusal:
             render(f"<c-layout.sidebar {attributes}>x</c-layout.sidebar>")
 
-        assert "Choose one of" in str(refusal.value)
+        assert all(choice in str(refusal.value) for choice in choices)
+
+    def test_a_style_is_written_beside_the_width_in_one_attribute(self, render):
+        markup = render(
+            '<c-layout.sidebar width="20rem" style="color: red">x</c-layout.sidebar>'
+        )
+
+        assert markup.count("style=") == 1
+        assert "--mvpl-w: 20rem;" in markup
+        assert "color: red" in markup
 
     @pytest.mark.parametrize("remembered", ["open", "closed"])
     def test_it_is_drawn_in_the_state_a_remembered_cookie_gives(

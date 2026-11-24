@@ -10,13 +10,14 @@
 {# @prop label:text | description:"Its accessible name, such as Main navigation." #}
 {# @prop id:text | description:"The sidebar's id. Generated when not given." #}
 {# @prop class:text | description:"Classes added to the sidebar's own." #}
+{# @prop style:text | description:"Declarations added after the sidebar's own." #}
 {# The defaults for side, collapse, breakpoint and behavior are left empty so the sidebar tag's are the only ones. #}
 {% load mvp_layout %}
-<c-vars side="" collapse="" breakpoint="" behavior="" width="" rail-width="" closed="" persist="" label="" id="" class="" />
+<c-vars side="" collapse="" breakpoint="" behavior="" width="" rail-width="" closed="" persist="" label="" id="" class="" style="" />
 {% if slot.strip %}
   {% if not id %}{% layout_uid "sidebar" as id %}{% endif %}
   <aside id="{{ id }}"
-         {% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width class %}
+         {% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width class style %}
          {% if label %}aria-label="{{ label }}"{% endif %}
          {{ attrs }}>
     <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>

@@ -25,8 +25,7 @@ class TestPageOfComponents:
     def test_each_layout_is_mounted_before_the_page_finishes_loading(self, visit):
         page = visit("components-overview")
 
-        assert page.locator("#demo[data-mvpl]").count() == 1
-        assert page.evaluate("typeof MvpLayout") == "function"
+        assert page.locator(LEFT).get_attribute("data-mvpl-mode")
 
     def test_a_toggle_closes_and_opens_the_sidebar_it_controls(self, visit):
         page = visit("components-overview")
