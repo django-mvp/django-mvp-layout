@@ -142,3 +142,13 @@ later feature that needs one adds it.
 extend the documented base template, keeping the entries already there.
 **Why**: the base template lives under `docs/examples/` and must be exercised where it is. No
 assertion or test was removed or weakened.
+
+## The layout-code test page does not extend the base template
+
+**Decision**: the placement tests read their layout code from `?view=` on `tests/templates/layouts/code.html`,
+which repeats the base template's markup instead of extending it. Every other test page extends
+`examples/base.html`.
+**Why**: the documented base template writes its layout code as a literal, with no block to
+override it, and adding a variable there would change the markup the documentation says has to be
+exactly this. Sixteen corner choices need sixteen codes on one route.
+**Revisit if**: the base template gains a way to set its layout code.
