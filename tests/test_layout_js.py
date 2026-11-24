@@ -772,6 +772,54 @@ class TestDrawerFocus:
         assert not drawer_open(page, inner)
 
 
+class TestTheWheel:
+    def test_a_fixed_sidebar_at_the_end_of_its_scrolling_passes_the_wheel_on(
+        self, visit
+    ) -> None:
+        page = visit("layouts-default", DESKTOP)
+        panel = viewport_rect(page, f"{LEFT} > .mvpl-panel")
+        assert page.evaluate("scrollY") == 0
+        page.mouse.move(panel["left"] + 20, panel["top"] + 40)
+        page.mouse.wheel(0, 600)
+        page.wait_for_function("scrollY > 0")
+
+    def test_a_contained_layout_at_the_end_of_its_scrolling_passes_the_wheel_on(
+        self, visit
+    ) -> None:
+        page = visit("layouts-contained", DESKTOP)
+        page.evaluate(
+            "const g = document.querySelector('#contained > .mvpl-grid');"
+            "g.scrollTop = g.scrollHeight"
+        )
+        box = viewport_rect(page, "#contained")
+        page.mouse.move(box["left"] + box["width"] / 2, box["top"] + 200)
+        page.mouse.wheel(0, 600)
+        page.wait_for_function("scrollY > 0")
+
+    def test_an_open_whole_page_drawer_keeps_the_wheel(self, visit) -> None:
+        page = visit("layouts-default", PHONE)
+        page.locator("[data-mvpl-toggle='left']").first.click()
+        assert drawer_open(page, LEFT)
+        settle(page)
+        panel = viewport_rect(page, f"{LEFT} > .mvpl-panel")
+        page.mouse.move(panel["left"] + 20, panel["top"] + 40)
+        page.mouse.wheel(0, 600)
+        settle(page)
+        assert page.evaluate("scrollY") == 0
+
+    def test_an_open_contained_drawer_keeps_the_wheel(self, visit) -> None:
+        page = visit("layouts-contained", PHONE)
+        drawer = '#contained > .mvpl-grid > [data-mvpl-side="left"]'
+        page.locator("#contained [data-mvpl-toggle='left']").click()
+        assert drawer_open(page, drawer)
+        settle(page)
+        panel = viewport_rect(page, f"{drawer} > .mvpl-panel")
+        page.mouse.move(panel["left"] + 20, panel["top"] + 40)
+        page.mouse.wheel(0, 600)
+        settle(page)
+        assert page.evaluate("scrollY") == 0
+
+
 class SidebarStates(HTMLParser):
     """Collect each sidebar's side and drawn state, in document order."""
 
