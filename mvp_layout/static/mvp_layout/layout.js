@@ -38,7 +38,7 @@
 
   var ROOT = "[data-mvpl]";
   var FOCUSABLE =
-    'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [contenteditable]:not([contenteditable="false"]), [tabindex]:not([tabindex="-1"])';
   /** @type {WeakMap<HTMLElement, ResizeObserver>} */
   var observers = new WeakMap();
   /** @type {WeakMap<HTMLElement, HTMLElement | null>} */

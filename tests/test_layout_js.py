@@ -852,6 +852,19 @@ class TestDrawerFocus:
             links,
         )
 
+    def test_tab_from_a_closing_summary_stays_in_the_drawer(self, visit) -> None:
+        page = visit("layouts-focus", DESKTOP)
+        page.locator("#inner-toggle").click()
+        page.evaluate(
+            "(s) => document.querySelector(s + ' nav').insertAdjacentHTML("
+            "'beforeend', '<details><summary id=\"group\">Group</summary>"
+            '<a href="#x">x</a></details>\')',
+            self.INNER,
+        )
+        page.locator("#group").focus()
+        page.keyboard.press("Tab")
+        assert focus_is_in(page, self.INNER)
+
     def test_focus_outside_an_open_drawer_is_pulled_back_in(self, visit) -> None:
         page = visit("layouts-focus", DESKTOP)
         page.locator("#inner-toggle").click()
