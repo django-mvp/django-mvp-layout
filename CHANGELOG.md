@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The stylesheet now opens with `@layer base, mvpl;`, so a host's `base` layer, where Tailwind's
+  preflight goes, sorts below the package's layer. Before, that reset removed the sidebar borders in
+  a Tailwind project. Layers a host declares after the package's stylesheet still sort above it.
 - A sidebar tag given an empty `persist` now means none was given, where it used to raise.
 - django-mvp is no longer a runtime dependency, and django-cotton (2.9 or later) is. A project
   that relied on this package to install django-mvp must now depend on it directly.

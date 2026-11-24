@@ -6,7 +6,10 @@ its width from a custom property, so the drawer rules are written out once for
 each breakpoint here rather than by hand.
 
 The whole stylesheet is one cascade layer, ``mvpl``, so the host's own rules win
-at any specificity and in any order.
+at any specificity and in any order. It opens with the statement
+``@layer base, mvpl;`` so that a host's ``base`` layer, where Tailwind puts its
+preflight, sorts below ``mvpl`` and cannot remove the package's borders. Layers the
+host declares later sort above ``mvpl``.
 """
 
 import sys
@@ -14,6 +17,10 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 TARGET = HERE.parent / "mvp_layout" / "static" / "mvp_layout" / "layout.css"
+
+# Declares the order of two layers before the package's own: a host's ``base`` layer
+# (a host without one gets an empty layer) sorts below ``mvpl``.
+LAYER_ORDER = "@layer base, mvpl;\n"
 
 BREAKPOINTS = {
     "sm": "40rem",
@@ -119,7 +126,7 @@ def build() -> str:
             f"\n/* Below {width} of layout width, a sidebar with breakpoint {name} "
             f"is a drawer. */\n@container mvpl (width < {width}) {{\n{indented}}}\n"
         )
-    return "@layer mvpl {\n" + "".join(parts) + "}\n"
+    return LAYER_ORDER + "@layer mvpl {\n" + "".join(parts) + "}\n"
 
 
 def main() -> None:

@@ -22,6 +22,14 @@ The package styles only its own elements. Every rule reaches an area through the
 structure (`.mvpl-grid > .mvpl-sidebar`), so a rule of yours on a bare `aside` or `header` is not
 changed, and the package changes nothing outside a layout.
 
+## Where the layer sits among yours
+
+The stylesheet starts with `@layer base, mvpl;`, which fixes the order of two layers before any
+rule is read. A layer of yours named `base`, which is where Tailwind puts its preflight, sorts
+below `mvpl`, so the reset cannot remove the package's borders. Layers you declare after the
+package's stylesheet, such as Tailwind's `theme`, `components` and `utilities` and daisyUI's, sort
+above `mvpl`. A project with no `base` layer gets an empty one, which does nothing.
+
 ## Change a colour
 
 | Variable | Default | |
