@@ -152,3 +152,10 @@ which repeats the base template's markup instead of extending it. Every other te
 override it, and adding a variable there would change the markup the documentation says has to be
 exactly this. Sixteen corner choices need sixteen codes on one route.
 **Revisit if**: the base template gains a way to set its layout code.
+
+## `tests/urls.py` gains the test pages' routes
+
+**Open**: the tamper check flags `tests/urls.py` as an existing test file that was modified.
+**Chosen**: the change stands. It appends the routes of the test pages and keeps the demo's routes.
+**Why**: the browser tests need pages of their own (spec, Clarifications). No test was removed or
+weakened.
