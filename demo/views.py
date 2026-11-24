@@ -69,8 +69,10 @@ def plain_snippet(code, left, right):
     def sidebar(side, opts):
         return (
             f'    <aside {{% sidebar_attrs "{side}" collapse="{opts["collapse"]}" '
-            f'breakpoint="{opts["breakpoint"]}" behavior="{opts["behavior"]}" %}} aria-label="…">\n'
-            '      <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>\n'
+            f'breakpoint="{opts["breakpoint"]}" '
+            f'behavior="{opts["behavior"]}" %}} aria-label="…">\n'
+            '      <div class="mvpl-backdrop" data-mvpl-close '
+            'aria-hidden="true"></div>\n'
             '      <div class="mvpl-panel">…</div>\n'
             "    </aside>\n"
         )
@@ -80,7 +82,8 @@ def plain_snippet(code, left, right):
         f'<div id="app" {{% layout_attrs "{code}" %}}>\n'
         '  <div class="mvpl-grid">\n'
         '    <header class="mvpl-header">\n'
-        '      <button type="button" class="mvpl-toggle" data-mvpl-toggle="left" aria-label="Navigation">…</button>\n'
+        '      <button type="button" class="mvpl-toggle" data-mvpl-toggle="left" '
+        'aria-label="Navigation">…</button>\n'
         "    </header>\n"
         + sidebar("left", left)
         + '    <main class="mvpl-page">…</main>\n'
@@ -283,28 +286,32 @@ class NestedView(TemplateView):
                     (
                         "Ana Ruiz",
                         "Field season schedule",
-                        "The boats are booked for the second week of June, weather permitting.",
+                        "The boats are booked for the second week of June, "
+                        "weather permitting.",
                         "09:14",
                         True,
                     ),
                     (
                         "Kofi Mensah",
                         "Re: core samples",
-                        "I've logged the last six cores. Two need re-labelling before they go to the lab.",
+                        "I've logged the last six cores. Two need re-labelling "
+                        "before they go to the lab.",
                         "08:52",
                         True,
                     ),
                     (
                         "Lena Vogt",
                         "Budget for the spring workshop",
-                        "Attached is the draft. The catering line is still an estimate.",
+                        "Attached is the draft. The catering line is still "
+                        "an estimate.",
                         "Yesterday",
                         False,
                     ),
                     (
                         "Sam Patel",
                         "Instrument calibration",
-                        "The thermistor string reads 0.2 °C high at depth. Logged in the notes.",
+                        "The thermistor string reads 0.2 °C high at depth. "
+                        "Logged in the notes.",
                         "Yesterday",
                         False,
                     ),
