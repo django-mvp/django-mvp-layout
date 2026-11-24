@@ -14,6 +14,7 @@ installation
 :maxdepth: 1
 
 layout-code
+cotton
 plain-templates
 scripting
 styling

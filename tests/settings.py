@@ -29,3 +29,6 @@ TEMPLATES[0]["DIRS"] = [  # noqa: F405
     # A test page extends examples/base.html.
     BASE_DIR / "docs",  # noqa: F405
 ]
+
+# The component test pages draw icons with a tag library in tests/templatetags.
+INSTALLED_APPS = [*INSTALLED_APPS, "tests"]  # noqa: F405

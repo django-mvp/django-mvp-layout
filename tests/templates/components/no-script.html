@@ -1,0 +1,17 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Components without the script</title>
+    <link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+  </head>
+  <body>
+    <c-layout id="app">
+      <c-layout.header><c-layout.toggle /></c-layout.header>
+      <c-layout.sidebar label="Navigation"><nav>Navigation</nav></c-layout.sidebar>
+      <c-layout.page tag="main">Content</c-layout.page>
+      <c-layout.footer>Footer</c-layout.footer>
+    </c-layout>
+  </body>
+</html>

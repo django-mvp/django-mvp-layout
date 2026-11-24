@@ -59,3 +59,18 @@ pass `side` through, so they follow it with no requirement of their own.
 
 **SC-001 is restated (approved by the orchestrator, 2026-11-24).** It measured the demonstration pages, which issue 5 owns, so no task here could demonstrate it. It now measures the suite's own layout pages, written as components and covering every layout on the prototype's overview, playground and nested pages, including the settings dialog and filters drawer. `spec.md` carries the new wording.
 **ADR:** none — a wording change to one criterion
+
+## An empty persist name is none given
+
+FS-001's test listed an empty `persist` among the names refused. The Cotton sidebar always passes `persist=""` when none is written, so the tag now reads an empty string as none given, as it does for every other option. The refused-name test loses its empty-string row and a new test pins the new meaning. The tags' other behaviour is unchanged. To be named in the report: this is a change to FS-001's tag.
+**ADR:** none — a one-line correction local to this feature
+
+## The component pages keep two hooks of the script
+
+The prototype's pages put `data-mvpl-when` on a title that shows while a sidebar is closed, and `data-mvpl-close` on a button inside a filters drawer. No component writes either: they mark page content, not a layout part. SC-001's "no data attribute" is read as no attribute that the components write, so the test pages keep these two and a test names them as the only ones allowed.
+**ADR:** none — local to this feature
+
+## Implemented directly
+
+The build was done in the orchestrating build session, not dispatched to an implementer, because the session was already on the Sonnet tier and the work is six templates, one tag and tests over them.
+**ADR:** none — a process note
