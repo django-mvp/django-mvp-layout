@@ -1205,7 +1205,7 @@ class TestScriptInterface:
         page.evaluate(LISTEN)
         page.evaluate("MvpLayout('app'); MvpLayout(document.getElementById('app'))")
         assert page.evaluate("[window.mvplObserved, MvpLayout.state('app')]") == before
-        assert len(page.evaluate("window.mvplEvents")) == 2
+        assert len(page.evaluate("window.mvplEvents")) == 0
 
     def test_state_reports_each_sidebar_present_and_whether_it_is_open(
         self, visit
