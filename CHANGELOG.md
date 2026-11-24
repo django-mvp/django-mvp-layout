@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.2] - 2026-11-24
+
 ### Fixed
 
 - A sidebar on a fixed side of a layout with `container`, such as the right sidebar of `hHh LpR fFf`,
