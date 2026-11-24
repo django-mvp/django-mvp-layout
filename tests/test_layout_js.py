@@ -1354,7 +1354,10 @@ class TestScriptInterface:
 
 TAKE_LAYOUT = """() => {
   const layout = document.getElementById("contained");
-  const html = layout.outerHTML.replace('id="contained"', 'id="late"');
+  // Without the ids the script gave it, so any id on the copy is the script's.
+  const html = layout.outerHTML
+    .replace('id="contained"', 'id="late"')
+    .replace(/ id="mvpl-sidebar-\\d+"/g, "");
   layout.remove();
   return html;
 }"""
