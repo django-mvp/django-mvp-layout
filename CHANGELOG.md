@@ -22,6 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A layout with `container` no longer collapses to nothing when it is given no height. It is as tall
+  as its content, like any card, and its fixed sidebars fill their rows instead of reaching the
+  window's height. A height works as before.
+- A layout with `container` and a max-height grows with its content up to the limit, then scrolls
+  inside it. A box that caps its own height, such as a dialog, caps a layout inside it once the box
+  is a flex column.
+
 ## [v0.1.0] - 2026-11-24
 
 ### Added

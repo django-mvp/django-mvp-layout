@@ -124,7 +124,7 @@ project's own names don't collide with them.
 | `--mvpl-areas`, `--mvpl-left-top`, `--mvpl-left-bottom`, `--mvpl-right-top`, `--mvpl-right-bottom` | `{% layout_attrs %}` | The grid and the offsets fixed sidebars stick at. |
 | `--mvpl-header-h`, `--mvpl-footer-h` | The script | The measured heights. |
 | `--mvpl-dir` | The stylesheet | `1`, or `-1` under `dir="rtl"`. |
-| `--mvpl-vh` | The stylesheet | The height a layout fills. |
+| `--mvpl-vh` | The stylesheet, and the script in a contained layout | The height a fixed sidebar is sized from: the window's, or the box a contained layout scrolls in. |
 
 ### Cookie
 

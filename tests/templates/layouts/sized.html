@@ -1,0 +1,25 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}A contained layout sized by its box{% endblock title %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav>Navigation</nav>{% endblock navigation %}
+{% block content %}
+    <div id="sized-box" style="width: {% if narrow %}300px{% else %}min(700px, calc(100% - 2rem)){% endif %}; margin: 1rem; {{ box_style }}">
+      <div id="sized" {% layout_attrs "hHh LpR fFf" container=True style=layout_style %}>
+        <div class="mvpl-grid">
+          <header class="mvpl-header"><button type="button" data-mvpl-toggle="left">Navigation</button> Header</header>
+          <aside {% sidebar_attrs "left" breakpoint="sm" %} aria-label="Navigation">
+            <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+            <div class="mvpl-panel"><nav>Navigation</nav></div>
+          </aside>
+          <main class="mvpl-page"><div style="height: {% if tall %}1600px{% else %}200px{% endif %}">Content</div></main>
+          <aside {% sidebar_attrs "right" breakpoint="sm" %} aria-label="Aside">
+            <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+            <div class="mvpl-panel">Aside</div>
+          </aside>
+          <footer class="mvpl-footer">Footer</footer>
+        </div>
+      </div>
+    </div>
+  <div style="height: 2400px">Tall enough for the window to scroll.</div>
+{% endblock content %}

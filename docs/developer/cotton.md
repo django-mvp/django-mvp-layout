@@ -37,15 +37,24 @@ code places them, but screen readers and the Tab key follow the order in the mar
 | Attribute | Default | |
 |---|---|---|
 | `view` | `hHh lpr fFf` | The [layout code](layout-code.md). A wrong code raises. |
-| `container` | off | A bare attribute. Fill the box the layout is placed in and scroll inside it, instead of the window. Give the layout a height. |
+| `container` | off | A bare attribute. Lay the layout out as a box instead of the page. With no height it is as tall as its content. Given a height or a max-height, it scrolls inside it. |
 | `id` | generated | The layout's id. Give one when something outside the layout toggles it. |
 | `class` | | Classes added to the layout's own. |
 | `style` | | Declarations added after the layout's own. |
 
 Any other attribute is added to the layout's element. Without `container` the layout is the page: it
 scrolls with the window, and a drawer covers the window. With it, the layout is a box: a card, a
-dialog, or the page area of another layout. It scrolls inside itself, and its drawers stay inside
-it.
+dialog, or the page area of another layout. Its drawers stay inside it, and its sidebars become
+drawers by its own width. How tall it is depends on what it is given:
+
+- **No height:** it is as tall as its content, like any card, and nothing scrolls inside it.
+- **A height**, such as `style="height: 36rem"`: it fills that height and scrolls inside it.
+- **A max-height**: it grows with its content up to the limit, then scrolls inside it. A fixed
+  header and footer stay in view.
+
+A box that caps its own height, such as daisyUI's `modal-box`, caps a layout inside it once the box
+is a flex column: `<div class="modal-box flex flex-col">`. The layout then fills the box up to its
+limit and scrolls inside it.
 
 ## `<c-layout.header>`, `<c-layout.page>`, `<c-layout.footer>`
 

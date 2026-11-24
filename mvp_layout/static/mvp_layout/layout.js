@@ -147,6 +147,11 @@
     var footer = g.querySelector(":scope > .mvpl-footer");
     root.style.setProperty("--mvpl-header-h", (header ? header.offsetHeight : 0) + "px");
     root.style.setProperty("--mvpl-footer-h", (footer ? footer.offsetHeight : 0) + "px");
+    // A contained layout can take its height from its content, so no CSS unit
+    // gives the box its grid scrolls in. Its fixed sidebars are sized from this.
+    if (root.hasAttribute("data-mvpl-container")) {
+      root.style.setProperty("--mvpl-vh", g.clientHeight + "px");
+    }
   }
 
   // Whether this script, and not the host, set the page's overflow.
