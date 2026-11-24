@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.1] - 2026-11-24
+
 ### Fixed
 
 - A layout with `container` no longer collapses to nothing when it is given no height. It is as tall
