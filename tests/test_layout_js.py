@@ -1118,3 +1118,240 @@ class TestRememberedState:
         pinned = '#sidebars > .mvpl-grid > [data-mvpl-side="right"]'
         assert state_of(page, pinned) == "open"
         assert width_of(page, pinned) > 0
+
+
+COUNT_OBSERVERS = """
+window.mvplObserved = 0;
+const Native = window.ResizeObserver;
+window.ResizeObserver = class extends Native {
+  observe(target, options) {
+    window.mvplObserved++;
+    super.observe(target, options);
+  }
+};
+"""
+
+LISTEN = """
+window.mvplEvents = [];
+document.getElementById("app").addEventListener("mvpl:change", (event) => {
+  window.mvplEvents.push(event.detail);
+});
+"""
+
+
+class TestScriptInterface:
+    FUNCTIONS = ["sync", "state", "toggle", "open", "close"]
+
+    def test_an_id_and_an_element_each_mount_the_layout_and_return_it(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        assert page.evaluate(
+            """() => {
+              const app = document.getElementById("app");
+              return MvpLayout("app") === app && MvpLayout(app) === app;
+            }"""
+        )
+
+    def test_mounting_twice_adds_no_observer_and_changes_no_state(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.add_init_script(COUNT_OBSERVERS)
+        page.reload()
+        before = page.evaluate("[window.mvplObserved, MvpLayout.state('app')]")
+        page.evaluate(LISTEN)
+        page.evaluate("MvpLayout('app'); MvpLayout(document.getElementById('app'))")
+        assert page.evaluate("[window.mvplObserved, MvpLayout.state('app')]") == before
+        assert len(page.evaluate("window.mvplEvents")) == 2
+
+    def test_state_reports_each_sidebar_present_and_whether_it_is_open(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        left = page.evaluate("MvpLayout.state('app')")["left"]
+        assert left["present"] is True
+        assert left["mode"] == "docked"
+        assert left["state"] == "open"
+        assert left["visible"] is True
+        assert left["rail"] is False
+        assert set(left) == {"present", "mode", "state", "collapse", "rail", "visible"}
+        assert page.evaluate("MvpLayout.state('app')")["right"]["present"] is True
+
+    def test_state_reports_a_drawer_by_its_mode_and_whether_it_is_showing(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles", PHONE)
+        left = page.evaluate("MvpLayout.state('app')")["left"]
+        assert (left["mode"], left["visible"]) == ("overlay", False)
+        page.evaluate("MvpLayout.open('app', 'left')")
+        left = page.evaluate("MvpLayout.state('app')")["left"]
+        assert (left["mode"], left["visible"]) == ("overlay", True)
+        assert drawer_open(page, LEFT)
+
+    def test_state_says_a_side_with_no_sidebar_is_not_present(self, visit) -> None:
+        page = visit("layouts-empty-aside")
+        sides = page.evaluate("MvpLayout.state('app')")
+        assert [sides[side]["present"] for side in ("left", "right")] == [True, False]
+
+    def test_toggle_changes_the_sidebar_as_its_button_does(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate("MvpLayout.toggle('app', 'left')")
+        assert state_of(page, LEFT) == "closed"
+        assert remembered(page) == {"mvpl-nav": "closed"}
+        page.evaluate("MvpLayout.toggle(document.getElementById('app'), 'left')")
+        assert state_of(page, LEFT) == "open"
+        assert remembered(page) == {"mvpl-nav": "open"}
+
+    def test_close_and_open_set_the_state_and_remember_it(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate("MvpLayout.close('app', 'left')")
+        assert state_of(page, LEFT) == "closed"
+        assert remembered(page) == {"mvpl-nav": "closed"}
+        page.evaluate("MvpLayout.close('app', 'left')")
+        assert state_of(page, LEFT) == "closed"
+        page.evaluate("MvpLayout.open('app', 'left')")
+        assert state_of(page, LEFT) == "open"
+        assert remembered(page) == {"mvpl-nav": "open"}
+        page.evaluate("MvpLayout.open('app', 'left')")
+        assert state_of(page, LEFT) == "open"
+
+    def test_sync_brings_toggles_and_sidebars_back_in_line_with_the_markup(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        assert page.locator("#show-only-closed").is_hidden()
+        page.evaluate(
+            """() => {
+              document.querySelector("#app > .mvpl-grid > [data-mvpl-side=left]")
+                .setAttribute("data-mvpl-state", "closed");
+              const late = document.createElement("button");
+              late.id = "late-toggle";
+              late.setAttribute("data-mvpl-toggle", "left");
+              document.getElementById("app").append(late);
+              MvpLayout.sync("app");
+            }"""
+        )
+        assert page.locator("#show-only-closed").is_visible()
+        assert page.locator("#show-only-open").is_hidden()
+        assert page.locator("#toggle").get_attribute("aria-expanded") == "false"
+        sidebar_id = page.locator(LEFT).get_attribute("id")
+        assert page.locator("#late-toggle").get_attribute("aria-controls") == sidebar_id
+
+    def test_a_listener_hears_every_open_and_close_with_the_new_state(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate(LISTEN)
+        page.locator("#toggle").click()
+        page.locator("#toggle").click()
+        page.evaluate("MvpLayout.close('app', 'left')")
+        seen = page.evaluate("window.mvplEvents.map((detail) => detail.left.state)")
+        assert seen == ["closed", "open", "closed"]
+
+    def test_a_listener_hears_a_drawer_open_and_close(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.evaluate(LISTEN)
+        page.evaluate("MvpLayout.open('app', 'left')")
+        page.evaluate("MvpLayout.close('app', 'left')")
+        seen = page.evaluate("window.mvplEvents.map((detail) => detail.left.visible)")
+        assert seen[0] is True
+        assert seen[-1] is False
+
+    def test_a_listener_hears_the_switch_between_docked_and_drawer(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate(LISTEN)
+        page.set_viewport_size(PHONE)
+        page.wait_for_function(
+            "window.mvplEvents.some((detail) => detail.left.mode === 'overlay')"
+        )
+        page.set_viewport_size(DESKTOP)
+        page.wait_for_function("window.mvplEvents.at(-1).left.mode === 'docked'")
+
+    @pytest.mark.parametrize("name", FUNCTIONS)
+    @pytest.mark.parametrize("argument", ["no-such-layout", "toggle"])
+    def test_an_id_that_names_no_layout_throws_an_error_naming_it(
+        self, visit, name, argument
+    ) -> None:
+        page = visit("layouts-toggles")
+        message = page.evaluate(
+            """([name, id]) => {
+              try {
+                MvpLayout[name](id, "left");
+              } catch (error) {
+                return error instanceof Error ? error.message : "not an Error";
+              }
+              return null;
+            }""",
+            [name, argument],
+        )
+        assert message is not None
+        assert argument in message
+
+    def test_mounting_an_id_that_names_no_layout_throws_an_error_naming_it(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        message = page.evaluate(
+            """() => {
+              try {
+                MvpLayout("no-such-layout");
+              } catch (error) {
+                return error.message;
+              }
+              return null;
+            }"""
+        )
+        assert message is not None
+        assert "no-such-layout" in message
+
+    def test_there_is_no_mount_alias(self, visit) -> None:
+        page = visit("layouts-toggles")
+        assert page.evaluate("typeof MvpLayout.mount") == "undefined"
+
+
+TAKE_LAYOUT = """() => {
+  const layout = document.getElementById("contained");
+  const html = layout.outerHTML.replace('id="contained"', 'id="late"');
+  layout.remove();
+  return html;
+}"""
+
+INSERTIONS = {
+    "insertAdjacentHTML": "document.body.insertAdjacentHTML('beforeend', html)",
+    "innerHTML": (
+        "const box = document.createElement('div');"
+        "document.body.append(box);"
+        "box.innerHTML = html"
+    ),
+    "a script": (
+        "const box = document.createElement('div');"
+        "box.innerHTML = html;"
+        "const script = document.createElement('script');"
+        "script.textContent = \"MvpLayout('late')\";"
+        "document.body.append(box, script)"
+    ),
+}
+
+
+class TestLateLayouts:
+    @pytest.mark.parametrize("how", INSERTIONS)
+    def test_a_layout_added_after_load_is_mounted(self, visit, how) -> None:
+        page = visit("layouts-contained")
+        html = page.evaluate(TAKE_LAYOUT)
+        heard = page.evaluate(
+            f"""async (html) => {{
+              const heard = new Promise((resolve) => {{
+                document.addEventListener("mvpl:change", (event) => {{
+                  if (event.target.id === "late") resolve(true);
+                }});
+              }});
+              {INSERTIONS[how]};
+              return await heard;
+            }}""",
+            html,
+        )
+        assert heard is True
+        sidebars = '#late > .mvpl-grid > [data-mvpl-side="left"]'
+        assert page.locator(sidebars).get_attribute("id")
+        before = page.evaluate("MvpLayout.state('late')")["left"]["visible"]
+        page.locator("#late [data-mvpl-toggle=left]").click()
+        assert page.evaluate("MvpLayout.state('late')")["left"]["visible"] != before

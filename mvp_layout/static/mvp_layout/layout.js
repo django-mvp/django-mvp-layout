@@ -203,7 +203,11 @@
   }
 
   function resolve(rootOrId) {
-    return typeof rootOrId === "string" ? document.getElementById(rootOrId) : rootOrId;
+    var root = typeof rootOrId === "string" ? document.getElementById(rootOrId) : rootOrId;
+    if (!root || !root.matches(ROOT)) {
+      throw new Error("MvpLayout: no layout has the id " + JSON.stringify(rootOrId));
+    }
+    return root;
   }
 
   var uid = 0;
