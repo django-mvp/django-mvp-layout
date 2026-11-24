@@ -181,8 +181,10 @@ feature owns.
 
 ### Measurable Outcomes
 
-- **SC-001**: Every layout on the demonstration pages, nested ones included, can be written with the
-  six components alone, with no layout tag, data attribute or script in the page template.
+- **SC-001**: Every layout on the prototype's overview, playground and nested pages, the nested
+  page's settings dialog and filters drawer included, can be written with the six components alone,
+  with no layout tag, data attribute or script in the page template. The test suite's own layout pages
+  hold those layouts written as components.
 - **SC-002**: For every combination of layout and sidebar options the tests use, a component layout
   and a plain-template layout render identical layout, sidebar and toggle attributes.
 - **SC-003**: Every attribute each component accepts appears on the developer documentation's

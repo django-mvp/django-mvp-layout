@@ -57,5 +57,5 @@ pass `side` through, so they follow it with no requirement of their own.
 **Carried as watch items.** Classes are compared as sets (trailing spaces). `closed` and `container` are bare attributes, which the components page says. No CSP nonce on the mount script, as in the base template.
 **ADR:** none — local to this feature
 
-**SC-001 is put to the orchestrator.** It measures the demonstration pages, which issue 5 owns, so no task here can demonstrate it. Proposed: restate it against the suite's own layout pages written as components. Waiting for the answer before building.
+**SC-001 is restated (approved by the orchestrator, 2026-11-24).** It measured the demonstration pages, which issue 5 owns, so no task here could demonstrate it. It now measures the suite's own layout pages, written as components and covering every layout on the prototype's overview, playground and nested pages, including the settings dialog and filters drawer. `spec.md` carries the new wording.
 **ADR:** none — a wording change to one criterion

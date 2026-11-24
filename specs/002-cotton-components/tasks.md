@@ -30,7 +30,8 @@ Paths are repository-relative. `verify` means `uv run pytest -n auto --dist load
 
 ### Group 2: parity, behaviour and documentation
 
-- [ ] T006 [US1] `tests/test_components/test_parity.py`: one component page and the same page in tags and
+- [ ] T006 [US1] Component test pages under `tests/templates/components/` that copy every layout of the prototype's overview, playground and nested pages (settings dialog and filters drawer included) as components only (SC-001), and
+   `tests/test_components/test_parity.py`: one component page and the same page in tags and
   data attributes render equal layout, sidebar and toggle attributes for every combination the tests
   use, ids ignored and classes compared as sets, the toggle compared with FS-001's plain toggles in `tests/templates/layouts/toggles.html` (FR-012, SC-002); and a browser test that opens, closes and turns a sidebar into a drawer
   on both pages, and that a page without the script raises no error (scenarios 7 and 8, FR-004).
