@@ -120,11 +120,13 @@
 
 /* In a contained layout the script measures --mvpl-vh, the box the grid
    scrolls in, and a panel is no taller than its own row, so a layout with no
-   height has its fixed sidebars fill their rows, not the window's height. */
-.mvpl[data-mvpl-container][data-mvpl-left-fixed] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel {
+   height has its fixed sidebars fill their rows, not the window's height.
+   :where() keeps these no more specific than the drawer rules after them,
+   so a fixed sidebar shown as a drawer still runs the layout's full height. */
+.mvpl[data-mvpl-left-fixed]:where([data-mvpl-container]) > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel {
   height: min(100%, var(--mvpl-vh) - var(--mvpl-left-top) - var(--mvpl-left-bottom));
 }
-.mvpl[data-mvpl-container][data-mvpl-right-fixed] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] > .mvpl-panel {
+.mvpl[data-mvpl-right-fixed]:where([data-mvpl-container]) > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] > .mvpl-panel {
   height: min(100%, var(--mvpl-vh) - var(--mvpl-right-top) - var(--mvpl-right-bottom));
 }
 
