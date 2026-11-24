@@ -1291,6 +1291,16 @@ class TestScriptInterface:
         seen = page.evaluate("window.mvplEvents.map((detail) => detail.left.state)")
         assert seen == ["closed", "open", "closed"]
 
+    def test_a_listener_hears_nothing_when_nothing_changed(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate(LISTEN)
+        page.set_viewport_size({"width": DESKTOP["width"] - 40, "height": 800})
+        page.evaluate(
+            "new Promise((done) => requestAnimationFrame(() => "
+            "requestAnimationFrame(done)))"
+        )
+        assert page.evaluate("window.mvplEvents.length") == 0
+
     def test_a_listener_hears_a_drawer_open_and_close(self, visit) -> None:
         page = visit("layouts-toggles", PHONE)
         page.evaluate(LISTEN)

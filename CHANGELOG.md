@@ -38,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `mvpl:change` now fires only when a layout's state changes. A resize that changed nothing, or the
+  script's own first measurement after a listener was added, no longer sends an event.
 - The stylesheet now opens with `@layer base, mvpl;`, so a host's `base` layer, where Tailwind's
   preflight goes, sorts below the package's layer. Before, that reset removed the sidebar borders in
   a Tailwind project. Layers a host declares after the package's stylesheet still sort above it.
