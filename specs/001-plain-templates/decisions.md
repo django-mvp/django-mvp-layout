@@ -134,3 +134,11 @@ later feature that needs one adds it.
   system colour keyword, never a specific colour value.
 - Changing the sidebar's animation for SC-005 changes the ported look, so it needs the side-by-side
   comparison with the prototype as well as a decision entry.
+
+## `tests/settings.py` changes in this feature
+
+**Open**: the tamper check flags `tests/settings.py` as an existing test file that was modified.
+**Chosen**: the change stands. It appends `docs/` to the template directories so a test page can
+extend the documented base template, keeping the entries already there.
+**Why**: the base template lives under `docs/examples/` and must be exercised where it is. No
+assertion or test was removed or weakened.
