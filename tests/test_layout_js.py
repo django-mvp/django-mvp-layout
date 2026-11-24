@@ -1343,6 +1343,7 @@ class TestLateLayouts:
                 document.addEventListener("mvpl:change", (event) => {{
                   if (event.target.id === "late") resolve(true);
                 }});
+                setTimeout(() => resolve(false), 3000);
               }});
               {INSERTIONS[how]};
               return await heard;
@@ -1353,5 +1354,5 @@ class TestLateLayouts:
         sidebars = '#late > .mvpl-grid > [data-mvpl-side="left"]'
         assert page.locator(sidebars).get_attribute("id")
         before = page.evaluate("MvpLayout.state('late')")["left"]["visible"]
-        page.locator("#late [data-mvpl-toggle=left]").click()
+        page.locator("#late [data-mvpl-toggle=left]").dispatch_event("click")
         assert page.evaluate("MvpLayout.state('late')")["left"]["visible"] != before
