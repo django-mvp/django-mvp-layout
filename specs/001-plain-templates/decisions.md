@@ -88,3 +88,49 @@ the spec's header is updated when they exist.
 **Chosen**: this feature's browser tests run on test pages of their own.
 **Why**: the feature must be testable before the demo exists, and the request asks for browser
 tests beyond the demo pages.
+
+## Data attributes carry the package's prefix
+
+**Open**: the prototype's tags, stylesheet and script use `data-side`, `data-collapse`,
+`data-breakpoint`, `data-behavior`, `data-state`, `data-persist`, `data-overlay` and `data-mode`.
+FR-022 says every data attribute starts with `mvpl`.
+**Chosen**: rename them to `data-mvpl-side` and so on, in the tags, the generated stylesheet and
+the script.
+**Why**: the requirement is explicit and a host project's own `data-state` would otherwise meet the
+package's rules. The look is unchanged. The Cotton components write their attributes through the
+tags, so they follow without a change of their own.
+
+## The stylesheet is one cascade layer
+
+**Open**: how a host's rules on the package's classes take effect (US1 scenario 11) when the
+prototype's rules are unlayered and some have high specificity.
+**Chosen**: the generator wraps its output in `@layer mvpl`, and the base template links it before
+the host's `styles` block.
+**Why**: any unlayered host rule beats a layered one at any specificity, and a host's own layers
+that follow ours beat it too. The alternative, lowering the package's specificity with `:where()`,
+rewrites every selector the look depends on.
+
+## The package's runtime dependencies
+
+**Open**: `main` lists django-mvp as a runtime dependency, which pulls in a CSS component library.
+FR-023 and Article XII forbid that.
+**Chosen**: runtime dependencies are `django` and `django-cotton`. django-mvp moves to the
+development group for the demo.
+**Why**: the prototype settled it and `PROTOTYPE.md` records it. The demo is replaced by issue 5.
+
+## Drop what no requirement asks for
+
+`LayoutView.explain` and its four `*_reaches_*` fields, the `layout_view` and `layout_uid` tags and
+the `MvpLayout.mount` alias are not ported. No requirement in this specification reads them, and a
+later feature that needs one adds it.
+
+## Watch items from the design review
+
+- The `closed` argument is truthiness-tested. The documentation says it takes `True` or `False`.
+- `width`, `rail_width` and `style` go into a style attribute escaped but unchecked. They are
+  template-author input, and the documentation never shows them fed from request or model data.
+- The script's toggle names are typed as `'left' | 'right'`.
+- A test of host variables asserts that the variable is honoured and that the fallback is a
+  system colour keyword, never a specific colour value.
+- Changing the sidebar's animation for SC-005 changes the ported look, so it needs the side-by-side
+  comparison with the prototype as well as a decision entry.

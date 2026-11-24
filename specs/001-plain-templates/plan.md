@@ -111,8 +111,8 @@ calls with an unknown id and does nothing or returns `null`.
 
 ## Constitution check
 
-The repository's rules that bear on this plan: tests mirror the source tree (the three browser and
-stylesheet modules are declared under `non-mirror-paths`), no leading-underscore names, 88-character
+The repository's rules that bear on this plan: tests mirror the source tree (the two browser and
+stylesheet modules are declared under `non-mirror-paths`, with a comment that their subject is the committed static assets), no leading-underscore names, 88-character
 lines, no compatibility aliases, no test of wording or design preferences, every public name
 documented.
 
