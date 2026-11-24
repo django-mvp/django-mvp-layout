@@ -166,6 +166,23 @@ content marked `mvpl-rail-only` is rendered only there:
 <a href="/inbox/"><span class="mvpl-rail-only">I</span><span class="mvpl-rail-hide">Inbox</span></a>
 ```
 
+## Use a drawer
+
+A drawer is a sidebar drawn over the page, below its breakpoint or with `behavior="overlay"`.
+While one is open, a user gets this:
+
+- **Focus stays inside it.** Focus moves into the drawer when it opens. Tab and Shift+Tab wrap
+  between its first and last focusable elements, in a contained layout as well as a whole-page
+  one. Closing the drawer returns focus to the toggle that opened it.
+- **The rest of the layout is inert.** The header, page, footer and the other sidebar take no
+  clicks and no focus.
+- **Escape closes the topmost drawer.** With drawers open in a layout and in one nested inside it,
+  the first Escape closes the one opened last and the second closes the other.
+- **The backdrop and any link inside the drawer close it.**
+- **The wheel stays in the drawer.** A whole-page drawer locks the page behind it. A fixed sidebar
+  or a contained layout that has reached the end of its own scrolling passes the wheel on to the
+  page, and an open drawer does not.
+
 ## Remember a sidebar's state
 
 Give `{% sidebar_attrs %}` a `persist` name and the sidebar is drawn the way its reader left it.

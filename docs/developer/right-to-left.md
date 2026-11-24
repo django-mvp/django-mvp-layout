@@ -28,3 +28,18 @@ The stylesheet needs nothing extra: it places everything with logical properties
 
 A drawer slides in from the side its name gives. Under `dir="rtl"` the left sidebar's drawer comes
 from the right edge, at a narrow width as well as a wide one.
+
+## What mirrors
+
+Under `dir="rtl"`, at phone width and at desktop width:
+
+- **A docked sidebar sits at the side its name gives.** The `left` sidebar is at the right edge of
+  its layout, the `right` sidebar at the left edge. Closing it and opening it again leaves it
+  there.
+- **An icon rail stays at that edge**, and the page area ends where the rail begins.
+- **A drawer's panel meets the edge of its layout on the side its name gives.** `left` meets the
+  right edge and `right` meets the left edge, whether the layout fills the window or sits in a
+  box.
+- **A drawer waits outside that edge and slides in from it.** Escape closes it and focus returns
+  to the toggle that opened it.
+

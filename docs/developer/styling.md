@@ -1,7 +1,7 @@
 # Styling
 
 The package ships one stylesheet, `mvp_layout/layout.css`. It is plain CSS and needs no build in
-the host project. It places the areas, sizes and animates the sidebars, and draws the drawers. The
+the host project. It places the areas, sizes the sidebars, slides them in and out, and draws the drawers. The
 colours, type and everything inside the areas are the host project's. This page covers how to
 restyle a layout with variables and hooks, and lists every public name the package uses.
 
@@ -123,6 +123,16 @@ project's own names don't collide with them.
 `mvpl-<name>` holds the open or closed state of the sidebar whose `persist` is `<name>`, with the
 value `open` or `closed`. The script writes it and `{% sidebar_attrs %}` reads it from the request.
 See [Remember a sidebar's state](plain-templates.md#remember-a-sidebars-state).
+
+## Change how a sidebar closes
+
+A sidebar that closes beside the page gives up its width at once, and its panel slides away with
+`translate` over 0.2 s. The page is laid out one time instead of on every frame, which keeps a
+long page smooth. An icon rail changes width at once and does not slide.
+
+To change the slide, set `transition` and `translate` on `.mvpl-sidebar[data-mvpl-state="closed"]
+> .mvpl-panel`. Your rule wins without extra specificity, because the stylesheet is in a cascade
+layer. `prefers-reduced-motion: reduce` turns the slide off.
 
 ## Hooks for your own rules
 
