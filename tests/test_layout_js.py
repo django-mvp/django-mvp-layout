@@ -701,3 +701,159 @@ class TestDrawers:
         assert state_of(page, right) == "closed"
         assert not drawer_open(page, right)
         assert width_of(page, right) < opened
+
+
+class SidebarStates(HTMLParser):
+    """Collect each sidebar's side and drawn state, in document order."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.found: list[tuple[str | None, str | None]] = []
+
+    def handle_starttag(self, tag, attrs) -> None:
+        attributes = dict(attrs)
+        if "mvpl-sidebar" in (attributes.get("class") or "").split():
+            self.found.append(
+                (attributes.get("data-mvpl-side"), attributes.get("data-mvpl-state"))
+            )
+
+
+def drawn_states(response):
+    """Return the (side, state) pair of every sidebar in a response."""
+    parser = SidebarStates()
+    parser.feed(response.content.decode())
+    return parser.found
+
+
+# Records what the sidebar looks like at DOMContentLoaded and on each of the
+# first frames, before anything the layout script does after loading can show.
+RECORD_FRAMES = """
+window.mvplFrames = [];
+const sample = () => {
+  const sb = document.querySelector('#app > .mvpl-grid > [data-mvpl-side="left"]');
+  if (!sb) return;
+  window.mvplFrames.push({
+    state: sb.getAttribute("data-mvpl-state"),
+    width: sb.getBoundingClientRect().width,
+  });
+};
+document.addEventListener("DOMContentLoaded", sample);
+let frames = 0;
+const tick = () => {
+  sample();
+  if (++frames < 20) requestAnimationFrame(tick);
+};
+requestAnimationFrame(tick);
+"""
+
+
+def remembered(page):
+    """Return the layout cookies the browser holds, by name."""
+    return {
+        cookie["name"]: cookie["value"]
+        for cookie in page.context.cookies()
+        if cookie["name"].startswith("mvpl-")
+    }
+
+
+def remember_in_browser(page, name, value):
+    """Give the browser a layout cookie before the page is visited."""
+    page.context.add_cookies(
+        [{"name": name, "value": value, "url": "http://localhost"}]
+    )
+
+
+class TestRememberedState:
+    def test_the_server_draws_a_remembered_closed_sidebar_closed(self, client) -> None:
+        client.cookies["mvpl-nav"] = "closed"
+        assert drawn_states(client.get(reverse("layouts-toggles"))) == [
+            ("left", "closed"),
+            ("right", "open"),
+        ]
+
+    def test_without_a_cookie_the_sidebar_is_in_its_options_state(self, client) -> None:
+        assert drawn_states(client.get(reverse("layouts-toggles"))) == [
+            ("left", "open"),
+            ("right", "open"),
+        ]
+
+    def test_a_value_that_is_neither_open_nor_closed_is_ignored(self, client) -> None:
+        client.cookies["mvpl-nav"] = "ajar"
+        assert drawn_states(client.get(reverse("layouts-toggles")))[0] == (
+            "left",
+            "open",
+        )
+
+    def test_the_server_ignores_a_cookie_on_a_sidebar_that_never_closes(
+        self, client
+    ) -> None:
+        client.cookies["mvpl-pinned"] = "closed"
+        # The page's own boxed layout comes first, then the base layout's
+        # right sidebar after the page content.
+        states = drawn_states(client.get(reverse("layouts-sidebars")))
+        assert states == [
+            ("left", "open"),
+            ("left", "open"),
+            ("right", "open"),
+            ("right", "open"),
+        ]
+
+    @pytest.mark.parametrize("name", ["layouts-toggles", "layouts-default"])
+    def test_sidebars_sharing_a_name_share_the_one_cookie(self, client, name) -> None:
+        client.cookies["mvpl-nav"] = "closed"
+        assert drawn_states(client.get(reverse(name)))[0] == ("left", "closed")
+
+    def test_closing_writes_the_cookie_and_opening_again_updates_it(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        assert remembered(page) == {}
+        page.locator("#toggle").click()
+        assert remembered(page) == {"mvpl-nav": "closed"}
+        page.locator("#toggle").click()
+        assert remembered(page) == {"mvpl-nav": "open"}
+
+    def test_a_reload_draws_it_closed_from_the_first_frame(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.locator("#toggle").click()
+        page.add_init_script(RECORD_FRAMES)
+        page.reload()
+        page.wait_for_function("window.mvplFrames.length >= 5")
+        frames = page.evaluate("window.mvplFrames")
+        assert {frame["state"] for frame in frames} == {"closed"}
+        assert {frame["width"] for frame in frames} == {0}
+
+    def test_a_sidebar_with_no_name_writes_no_cookie_and_reopens_on_reload(
+        self, visit
+    ) -> None:
+        page = visit("layouts-sidebars")
+        rail = '#sidebars > .mvpl-grid > [data-mvpl-side="left"]'
+        page.locator("#rail-toggle").click()
+        assert state_of(page, rail) == "closed"
+        assert remembered(page) == {}
+        page.reload()
+        assert state_of(page, rail) == "open"
+
+    def test_two_sidebars_with_one_name_share_the_state_across_pages(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles")
+        page.locator("#toggle").click()
+        other = visit("layouts-default")
+        assert state_of(other, LEFT) == "closed"
+        assert remembered(other) == {"mvpl-nav": "closed"}
+
+    def test_a_cookie_that_is_neither_open_nor_closed_is_ignored(
+        self, visit, page
+    ) -> None:
+        remember_in_browser(page, "mvpl-nav", "ajar")
+        assert state_of(visit("layouts-toggles"), LEFT) == "open"
+
+    def test_a_cookie_on_a_sidebar_that_never_closes_is_ignored(
+        self, visit, page
+    ) -> None:
+        remember_in_browser(page, "mvpl-pinned", "closed")
+        page = visit("layouts-sidebars")
+        pinned = '#sidebars > .mvpl-grid > [data-mvpl-side="right"]'
+        assert state_of(page, pinned) == "open"
+        assert width_of(page, pinned) > 0

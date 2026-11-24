@@ -19,7 +19,9 @@ runs across the sidebar.
 
 `left` and `right` name the sidebar at the reading start and the reading end. In a left-to-right
 page the left sidebar is drawn at the left. In a right-to-left page it is drawn at the right. See
-[Right to left](right-to-left.md).
+[Right to left](right-to-left.md). A toggle names the sidebar it controls the same way, with
+`data-mvpl-toggle="left"` or `data-mvpl-toggle="right"`. See
+[Add a toggle](plain-templates.md#add-a-toggle).
 
 An upper-case header, sidebar or footer letter keeps that area in place while the layout scrolls.
 `hHh` keeps the header at the top. `LpR` keeps both sidebars in place beside the page. For a
@@ -67,6 +69,15 @@ reads those variables and attributes and never changes with the code.
 
 Each area is placed by its class (`.mvpl-header`, `.mvpl-sidebar[data-mvpl-side="left"]`,
 `.mvpl-page` and so on), never by where it sits in the markup.
+
+## What a sidebar's letter does not decide
+
+The code places a sidebar and says whether it stays in place. It does not say how the sidebar
+closes. That is the sidebar's `collapse` argument. A sidebar with `collapse="icons"` closes to a
+rail beside the page, and the rail is the width of `--mvpl-rail-w`. Mark the content that belongs
+only to the open sidebar with `mvpl-rail-hide`, and the content that belongs only to the rail with
+`mvpl-rail-only`. See
+[Show different content in an icon rail](plain-templates.md#show-different-content-in-an-icon-rail).
 
 ## Order in the markup
 

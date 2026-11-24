@@ -61,7 +61,8 @@ rail:
 ```
 
 Without Tailwind, `.mvpl-rail-hide` hides an element in the rail and `.mvpl-rail-only` shows an
-element only there.
+element only there. See
+[Show different content in an icon rail](plain-templates.md#show-different-content-in-an-icon-rail).
 
 ## Every public name
 
@@ -79,7 +80,7 @@ project's own names don't collide with them.
 | `.mvpl-panel` | What a sidebar holds, and what slides as a drawer. |
 | `.mvpl-backdrop` | The shade behind an open drawer. |
 | `.mvpl-rail-hide`, `.mvpl-rail-only` | Content hidden in, or shown only in, an icon rail. |
-| `.mvpl-toggle` | A toggle the script hides when there is nothing to toggle. |
+| `.mvpl-toggle` | A toggle the script hides when there is nothing to toggle. See [Add a toggle](plain-templates.md#add-a-toggle). |
 | `.mvpl-locked` | The `html` element while a drawer holds the page. |
 
 ### Data attributes
@@ -121,6 +122,7 @@ project's own names don't collide with them.
 
 `mvpl-<name>` holds the open or closed state of the sidebar whose `persist` is `<name>`, with the
 value `open` or `closed`. The script writes it and `{% sidebar_attrs %}` reads it from the request.
+See [Remember a sidebar's state](plain-templates.md#remember-a-sidebars-state).
 
 ## Hooks for your own rules
 

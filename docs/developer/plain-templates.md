@@ -126,6 +126,67 @@ The tag reads the remembered state from `request`, so the template needs the
 `django.template.context_processors.request` context processor. A sidebar with `collapse="none"` is
 always open.
 
+## Add a toggle
+
+A toggle is any element that carries `data-mvpl-toggle` with the side it controls, `left` or
+`right`. Both mean the side of the reading, so under `dir="rtl"` the `left` sidebar is drawn at the
+right.
+
+1. Put a button inside the layout, such as in its header:
+
+   ```html
+   <button type="button" class="mvpl-toggle" data-mvpl-toggle="left">Menu</button>
+   ```
+
+2. Open the page. Activating the button closes the sidebar beside the page, or opens it as a drawer
+   when the layout is narrow, and activating it again reverses that.
+
+The script adds the attributes a screen reader needs. `aria-controls` names the sidebar's id (the
+script gives the sidebar one when it has none), and `aria-expanded` says whether the sidebar is
+open. It hides the toggle with the `hidden` attribute where there is nothing to toggle: for a
+sidebar with `collapse="none"` beside the page, and for a sidebar whose panel is empty. The
+`mvpl-toggle` class makes sure that `hidden` wins over a button style that sets its own `display`.
+
+To change what a toggle does or where it sits:
+
+- **Show a toggle in one state only.** Add `data-mvpl-when="open"` or `data-mvpl-when="closed"`.
+  Use one of each for a button that opens the sidebar and a button that closes it.
+- **Close a drawer from inside it.** Put `data-mvpl-close` on any element in the sidebar. The
+  backdrop already carries it.
+- **Put a toggle outside its layout.** Add `data-mvpl-layout` with the layout's id. Without it a
+  toggle controls the layout it sits in, and never one nested inside that.
+
+### Show different content in an icon rail
+
+A sidebar with `collapse="icons"` stays beside the page at its rail width when it is closed, and the
+script sets `data-mvpl-rail` on it. Content marked `mvpl-rail-hide` is not rendered in the rail, and
+content marked `mvpl-rail-only` is rendered only there:
+
+```html
+<a href="/inbox/"><span class="mvpl-rail-only">I</span><span class="mvpl-rail-hide">Inbox</span></a>
+```
+
+## Remember a sidebar's state
+
+Give `{% sidebar_attrs %}` a `persist` name and the sidebar is drawn the way its reader left it.
+
+1. Add the name: `{% sidebar_attrs "left" persist="nav" %}`.
+2. Check that `django.template.context_processors.request` is in your template settings. The tag
+   reads the cookie from the request, and a template rendered without a request draws every sidebar
+   in the state its options give.
+3. Close the sidebar and reload. The page is drawn closed from its first paint, with no frame that
+   shows it open.
+
+The script writes the state to the cookie `mvpl-<persist>`, with the value `open` or `closed`, each
+time the reader toggles the sidebar beside the page. A drawer is never remembered.
+
+- **A sidebar with no `persist` name** writes no cookie and starts in the state its options give on
+  every load.
+- **Sidebars that share a name share one cookie**, so one navigation sidebar stays as the reader
+  left it across pages written with different layouts.
+- **A value that is neither `open` nor `closed` is ignored.**
+- **A sidebar with `collapse="none"` ignores the cookie**, because it is always open.
+
 ## Leave a sidebar empty
 
 A sidebar whose `.mvpl-panel` is empty takes no space, and its toggles hide. A block left empty is
