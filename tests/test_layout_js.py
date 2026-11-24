@@ -99,6 +99,24 @@ def visit(chromium, page, live_server, errors):
     return go
 
 
+@pytest.fixture
+def visit_rtl(visit, page):
+    """Visit a page whose root element is drawn right to left from the first byte."""
+
+    def go(name, size=DESKTOP):
+        def mirror(route):
+            response = route.fetch()
+            body = response.text().replace("<html", '<html dir="rtl"', 1)
+            route.fulfill(response=response, body=body)
+
+        page.route("**/layouts/**", mirror)
+        visit(name, size)
+        assert page.evaluate("document.documentElement.dir") == "rtl"
+        return page
+
+    return go
+
+
 class TestTheBaseTemplate:
     @pytest.mark.parametrize("name", BASE_PAGES)
     def test_each_page_extends_the_base_template(self, client, name) -> None:
@@ -398,6 +416,96 @@ class TestRightToLeft:
             opened = viewport_rect(page, panel)
             assert opened["left"] < width - 100
             assert near(opened["right"], width, 20)
+
+    def test_toggling_a_docked_sidebar_closes_and_opens_it_at_the_start_side(
+        self, visit_rtl
+    ) -> None:
+        page = visit_rtl("layouts-toggles", DESKTOP)
+        layout = viewport_rect(page, "#app")
+        left, right = LEFT, RIGHT
+        assert near(viewport_rect(page, left)["right"], layout["right"])
+        assert near(viewport_rect(page, right)["left"], layout["left"])
+
+        page.locator("#toggle").click()
+        assert state_of(page, left) == "closed"
+        assert width_of(page, left) < 1
+        page.locator("#toggle").click()
+        assert state_of(page, left) == "open"
+        assert width_of(page, left) > 0
+        assert near(viewport_rect(page, left)["right"], layout["right"])
+
+        page.locator("#aside-toggle").click()
+        assert state_of(page, right) == "closed"
+        assert width_of(page, right) < 1
+        page.locator("#aside-toggle").click()
+        assert width_of(page, right) > 0
+        assert near(viewport_rect(page, right)["left"], layout["left"])
+
+    def test_the_icon_rail_stays_at_the_start_side(self, visit_rtl) -> None:
+        page = visit_rtl("layouts-sidebars", DESKTOP)
+        rail = '#sidebars > .mvpl-grid > [data-mvpl-side="left"]'
+        edge = viewport_rect(page, "#sidebars")["right"]
+        assert near(viewport_rect(page, rail)["right"], edge)
+
+        page.locator("#rail-toggle").click()
+        settle(page)
+        assert page.locator(rail).get_attribute("data-mvpl-rail") is not None
+        closed = viewport_rect(page, rail)
+        assert near(closed["right"], edge)
+        assert near(closed["width"], length_of(page, rail, "--mvpl-rail-w"))
+        assert page.locator("#rail-only").is_visible()
+        assert not page.locator("#rail-hide").is_visible()
+        page_area = viewport_rect(page, "#sidebars > .mvpl-grid > .mvpl-page")
+        assert near(page_area["right"], closed["left"])
+
+    @pytest.mark.parametrize(
+        ("toggle", "side"),
+        [("#toggle", "left"), ("#aside-toggle", "right")],
+    )
+    def test_a_drawer_slides_in_from_the_side_its_name_gives(
+        self, visit_rtl, toggle, side
+    ) -> None:
+        page = visit_rtl("layouts-toggles", PHONE)
+        width = page.evaluate("innerWidth")
+        sidebar = f'#app > .mvpl-grid > [data-mvpl-side="{side}"]'
+        panel = f"{sidebar} > .mvpl-panel"
+        assert mode_of(page, sidebar) == "overlay"
+        waiting = viewport_rect(page, panel)
+        if side == "left":
+            assert waiting["left"] >= width - 1
+        else:
+            assert waiting["right"] <= 1
+
+        page.locator(toggle).click()
+        settle(page)
+        assert drawer_open(page, sidebar)
+        opened = viewport_rect(page, panel)
+        assert near(
+            opened["right"] if side == "left" else opened["left"],
+            (width if side == "left" else 0),
+        )
+        assert 0 < opened["width"] < width
+        assert focus_is_in(page, panel)
+
+        page.keyboard.press("Escape")
+        assert not drawer_open(page, sidebar)
+        assert page.evaluate("document.activeElement.id") == page.locator(
+            toggle
+        ).get_attribute("id")
+
+    def test_a_drawer_in_a_contained_layout_slides_in_from_the_container_edge(
+        self, visit_rtl
+    ) -> None:
+        page = visit_rtl("layouts-behaviors", DESKTOP)
+        modes = '#modes > .mvpl-grid > [data-mvpl-side="left"]'
+        panel = f"{modes} > .mvpl-panel"
+        edge = viewport_rect(page, "#modes")["right"]
+        assert viewport_rect(page, panel)["left"] >= edge - 1
+
+        page.locator("#overlay-toggle").click()
+        settle(page)
+        assert drawer_open(page, modes)
+        assert near(viewport_rect(page, panel)["right"], edge)
 
 
 LEFT = '#app > .mvpl-grid > [data-mvpl-side="left"]'
