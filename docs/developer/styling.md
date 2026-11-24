@@ -41,7 +41,7 @@ on a single sidebar:
 
 | Variable | Default | |
 |---|---|---|
-| `--mvpl-w` | `16rem` left, `18rem` right | A sidebar's open width. The `width` argument of `{% sidebar_attrs %}` sets it. |
+| `--mvpl-w` | `16rem` left, `18rem` right | A sidebar's open width. The `width` argument of `{% sidebar_attrs %}` sets it, and setting it on a layout or any element around it sizes every sidebar inside. |
 | `--mvpl-rail-w` | `4rem` | An icon rail's width. The `rail_width` argument sets it. |
 
 The header's and footer's heights are measured by the script, so a fixed sidebar sticks just below

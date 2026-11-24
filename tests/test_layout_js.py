@@ -383,6 +383,17 @@ class TestTheHostsRules:
         left = '#app > .mvpl-grid > [data-mvpl-side="left"]'
         assert computed(page, left, "backgroundColor") == "rgb(10, 20, 30)"
 
+    def test_a_host_width_variable_on_the_layout_sizes_its_sidebars(
+        self, visit
+    ) -> None:
+        page = visit("layouts-default")
+        page.evaluate(
+            "document.querySelector('#app').style.setProperty('--mvpl-w', '24rem')"
+        )
+        settle(page)
+        assert width_of(page, LEFT) == 384
+        assert width_of(page, RIGHT) == 384
+
     def test_without_a_theme_the_sidebar_follows_the_system_colours(
         self, visit
     ) -> None:

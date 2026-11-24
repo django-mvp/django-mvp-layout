@@ -78,14 +78,14 @@
 /* A sidebar beside the page. Its column is as wide as it is, so a closed
    sidebar, or one the page left empty, takes no space. */
 .mvpl-grid > .mvpl-sidebar {
-  --mvpl-w: 16rem;
+  --mvpl-sidebar-w: var(--mvpl-w, 16rem);
   --mvpl-rail-w: 4rem;
   --mvpl-mode: docked;
-  width: var(--mvpl-w);
+  width: var(--mvpl-sidebar-w);
   min-width: 0;
   background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
 }
-.mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] { --mvpl-w: 18rem; }
+.mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] { --mvpl-sidebar-w: var(--mvpl-w, 18rem); }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel {
   border-inline-end: 1px solid var(--mvpl-line, var(--color-base-300, color-mix(in oklab, CanvasText 15%, Canvas)));
 }
@@ -96,7 +96,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  width: var(--mvpl-w);
+  width: var(--mvpl-sidebar-w);
   min-height: 100%;
   transition: translate 0.2s ease;
 }
@@ -142,7 +142,7 @@
   translate: calc(-100% * var(--mvpl-dir)) 0;
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"][data-mvpl-side="right"] > .mvpl-panel {
-  margin-inline-start: calc(var(--mvpl-w) * -1);
+  margin-inline-start: calc(var(--mvpl-sidebar-w) * -1);
   translate: calc(100% * var(--mvpl-dir)) 0;
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] { width: var(--mvpl-rail-w); }
@@ -184,7 +184,7 @@
   top: 0;
   bottom: 0;
   z-index: 40;
-  width: min(var(--mvpl-w), 100% - 3.5rem);
+  width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
   height: auto;
   min-height: 0;
   overflow-y: auto;
@@ -240,7 +240,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-w), 100% - 3.5rem);
+    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -297,7 +297,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-w), 100% - 3.5rem);
+    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -354,7 +354,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-w), 100% - 3.5rem);
+    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -411,7 +411,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-w), 100% - 3.5rem);
+    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -468,7 +468,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-w), 100% - 3.5rem);
+    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
