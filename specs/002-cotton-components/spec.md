@@ -212,8 +212,8 @@ feature owns.
 ## Assumptions
 
 - The plain-template layout feature (issue #3) is delivered first, with the layout tag, the sidebar
-  tag, the tag that generates unique ids, the stylesheet and the script. This feature restates none
-  of their behaviour: drawers, focus, Escape, the cookie, scrolling, breakpoints and right-to-left
+  tag, the stylesheet and the script. It left out the tag that generates unique ids, so this feature
+  adds that tag to the same tags file. This feature restates none of the delivered behaviour: drawers, focus, Escape, the cookie, scrolling, breakpoints and right-to-left
   are specified there.
 - If that feature renames `left` and `right` to `start` and `end`, the components' `side` attribute
   and the toggle's default name follow it.
