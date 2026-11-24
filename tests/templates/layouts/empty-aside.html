@@ -1,0 +1,10 @@
+{% extends "examples/base.html" %}
+{% block title %}Empty aside{% endblock title %}
+{% block header %}
+  <button type="button" data-mvpl-toggle="left">Navigation</button>
+  <span>Header</span>
+  <button type="button" data-mvpl-toggle="right">Aside</button>
+{% endblock header %}
+{% block navigation %}<nav><a href="#one">One</a></nav>{% endblock navigation %}
+{% block content %}<h1>Page</h1><p>Nothing in the aside block.</p>{% endblock content %}
+{% block footer %}Footer{% endblock footer %}

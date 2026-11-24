@@ -25,3 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - The package, generated and not yet doing anything.
+- Layouts for any Django project, written in a plain template: the `{% layout_attrs %}` and
+  `{% sidebar_attrs %}` tags, one stylesheet (`mvp_layout/layout.css`) and one script
+  (`mvp_layout/layout.js`) with no build step. The script exposes `MvpLayout` to mount a layout,
+  read and change its sidebars and listen for `mvpl:change`.
+
+### Changed
+
+- django-mvp is no longer a runtime dependency, and django-cotton (2.9 or later) is. A project
+  that relied on this package to install django-mvp must now depend on it directly.

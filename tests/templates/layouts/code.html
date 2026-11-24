@@ -1,0 +1,37 @@
+{% load static mvp_layout %}<!DOCTYPE html>
+{% comment %}
+  The base template with its layout code taken from the address (?view=) and a
+  page that is tall only when asked (?tall=1), so one route can place the areas
+  of any code. It has no block for the code, which is why it does not extend
+  the base template.
+{% endcomment %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A layout code</title>
+    <link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+    <style>body { margin: 0; }</style>
+    <script src="{% static 'mvp_layout/layout.js' %}"></script>
+  </head>
+  <body>
+    <div id="app" {% layout_attrs view %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">Header</header>
+        <aside {% sidebar_attrs "left" %} aria-label="Navigation">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel"><nav>Navigation</nav></div>
+        </aside>
+        <main class="mvpl-page">
+          <div {% if tall %}style="height: 3000px"{% endif %}>Content</div>
+        </main>
+        <aside {% sidebar_attrs "right" %} aria-label="Aside">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">Aside</div>
+        </aside>
+        <footer class="mvpl-footer">Footer</footer>
+      </div>
+    </div>
+    <script>MvpLayout("app");</script>
+  </body>
+</html>

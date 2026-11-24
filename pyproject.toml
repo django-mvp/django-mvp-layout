@@ -11,12 +11,12 @@ authors = [
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
-# django-mvp is a hard dependency rather than an integration: this package's
-# markup sits inside django-mvp's layout primitives and reads its colours from
-# the theme django-mvp supplies. Without it, whatever this renders arrives on
-# an unstyled page.
-dependencies = ["django>=5.2", "django-mvp>=0.28.1"]
-keywords = ["django", "django-mvp", "cotton"]
+# Layout components for any Django project, so django-mvp is deliberately not a
+# dependency: django-mvp is one of the projects meant to use this. daisyUI is
+# the host's, not a dependency: the stylesheet reads its theme colours and falls
+# back to the system's.
+dependencies = ["django>=5.2", "django-cotton>=2.9"]
+keywords = ["django", "django-mvp", "django-cotton", "daisyui", "layout", "sidebar"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
@@ -52,16 +52,14 @@ packages = ["mvp_layout"]
 [tool.hatch.build.targets.sdist]
 include = ["/mvp_layout", "/README.md", "/LICENSE"]
 
-# django-cotton is deliberately absent from the dependency list. django-mvp
-# pins it exactly, and a second constraint here could only ever fight that one.
-# This package has no say in which version a project runs.
-
 [dependency-groups]
 # Shared toolchain bundle, pinned to a release tag so every package built this
 # way runs one version of each tool. Ships ruff, mypy, deptry, pre-commit,
 # pytest, pytest-django, pytest-xdist, factory-boy, coverage and django-stubs.
 dev = [
     "mvp-shared[dev,test]",
+    # The demo project runs on django-mvp's application shell.
+    "django-mvp>=0.28.1",
     # Some guarantees can only be measured in a real browser: a resolved height,
     # a computed colour, an element that moves when the window does. Rendered
     # markup cannot answer any of them.
@@ -158,17 +156,17 @@ ignore_missing_model_attributes = "True"
 extend_exclude = ["tests/", "demo/", "docs/"]
 
 [tool.deptry.per_rule_ignores]
-# django-mvp is a real runtime dependency that no Python module here imports.
-# The dependency is at the template and theme level: this package's markup
-# renders inside django-mvp's layout and reads its colours from the theme
-# django-mvp supplies. Dropping it would leave every page unstyled while every
-# import still resolved.
-DEP002 = ["django-mvp"]
+# django-cotton is a runtime dependency that no Python module here imports:
+# the <c-layout> components are Cotton templates.
+DEP002 = ["django-cotton"]
 
 [tool.forge.conformance]
-# Neither has a module under mvp_layout/ to mirror: the undistributed demo and
-# the installed layout of the package.
+# None of these has a Python module under mvp_layout/ to mirror: the undistributed
+# demo and the installed layout. The last two test the committed static assets
+# (the script and the stylesheet), not a Python module.
 non-mirror-paths = [
   "tests/test_demo.py",
   "tests/test_smoke.py",
+  "tests/test_layout_js.py",
+  "tests/test_build_css.py",
 ]
