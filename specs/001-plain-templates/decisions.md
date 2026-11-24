@@ -159,3 +159,9 @@ exactly this. Sixteen corner choices need sixteen codes on one route.
 **Chosen**: the change stands. It appends the routes of the test pages and keeps the demo's routes.
 **Why**: the browser tests need pages of their own (spec, Clarifications). No test was removed or
 weakened.
+
+## The nested test page gains a toggle in each header
+
+**Open**: the tamper check flags `tests/templates/layouts/nested.html` as a pre-existing test file that was modified.
+**Chosen**: the change stands. Each header gains a toggle button so the toggle tests can act on a nested layout's own sidebar.
+**Why**: the page was written in this feature's first story and no assertion on it was changed or removed.
