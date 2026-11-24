@@ -18,6 +18,7 @@ PAGES = (
     "toggles",
     "sidebars",
     "behaviors",
+    "focus",
     "heavy",
     "host-rules",
     "host-colours",

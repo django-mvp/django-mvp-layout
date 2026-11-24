@@ -1,0 +1,26 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}Drawers with links to tab through{% endblock title %}
+{% block header %}
+  <button type="button" id="toggle" data-mvpl-toggle="left">Navigation</button>
+{% endblock header %}
+{% block navigation %}
+  <nav><a href="#one">One</a> <a href="#two">Two</a> <button type="button">Three</button></nav>
+{% endblock navigation %}
+{% block content %}
+  <a id="before" href="#before">Before</a>
+  <div id="box" style="width: 700px; height: 400px">
+    <div id="inner" {% layout_attrs "hHh LpR fFf" container=True style="height: 100%" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header"><button type="button" id="inner-toggle" data-mvpl-toggle="left">Navigation</button></header>
+        <aside {% sidebar_attrs "left" %} aria-label="Navigation">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel"><nav><a href="#four">Four</a> <a href="#five">Five</a> <button type="button">Six</button></nav></div>
+        </aside>
+        <main class="mvpl-page"><a href="#seven">Seven</a></main>
+        <footer class="mvpl-footer">Footer</footer>
+      </div>
+    </div>
+  </div>
+  <a id="after" href="#after">After</a>
+{% endblock content %}

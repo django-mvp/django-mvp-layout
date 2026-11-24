@@ -26,6 +26,7 @@ BASE_PAGES = [
     "layouts-toggles",
     "layouts-sidebars",
     "layouts-behaviors",
+    "layouts-focus",
     "layouts-heavy",
     "layouts-host-rules",
     "layouts-host-colours",
@@ -701,6 +702,74 @@ class TestDrawers:
         assert state_of(page, right) == "closed"
         assert not drawer_open(page, right)
         assert width_of(page, right) < opened
+
+
+class TestDrawerFocus:
+    OUTER = '#app > .mvpl-grid > [data-mvpl-side="left"] > .mvpl-panel'
+    INNER = '#inner > .mvpl-grid > [data-mvpl-side="left"] > .mvpl-panel'
+
+    @pytest.mark.parametrize(
+        ("toggle", "panel", "size"),
+        [
+            ("#toggle", OUTER, PHONE),
+            ("#inner-toggle", INNER, DESKTOP),
+        ],
+        ids=["whole-page", "contained"],
+    )
+    @pytest.mark.parametrize("key", ["Tab", "Shift+Tab"])
+    def test_tab_never_leaves_an_open_drawer(
+        self, visit, toggle, panel, size, key
+    ) -> None:
+        page = visit("layouts-focus", size)
+        page.locator(toggle).click()
+        count = page.locator(f"{panel} :is(a, button)").count()
+        assert count == 3
+        for _ in range(count + 2):
+            page.keyboard.press(key)
+            assert focus_is_in(page, panel)
+
+    def test_tab_wraps_from_the_last_element_to_the_first(self, visit) -> None:
+        page = visit("layouts-focus", DESKTOP)
+        page.locator("#inner-toggle").click()
+        links = f"{TestDrawerFocus.INNER} :is(a, button)"
+        page.locator(links).last.focus()
+        page.keyboard.press("Tab")
+        assert page.evaluate(
+            "(s) => document.activeElement === document.querySelector(s)", links
+        )
+        page.keyboard.press("Shift+Tab")
+        assert page.evaluate(
+            "(s) => document.activeElement === [...document.querySelectorAll(s)].at(-1)",
+            links,
+        )
+
+    def test_focus_outside_an_open_drawer_is_pulled_back_in(self, visit) -> None:
+        page = visit("layouts-focus", DESKTOP)
+        page.locator("#inner-toggle").click()
+        page.evaluate("document.querySelector('#after').focus()")
+        page.keyboard.press("Tab")
+        assert focus_is_in(page, self.INNER)
+
+    def test_escape_closes_only_the_topmost_of_nested_drawers(self, visit) -> None:
+        page = visit("layouts-nested", DESKTOP)
+        outer = '#outer > .mvpl-grid > [data-mvpl-side="left"]'
+        inner = '#inner > .mvpl-grid > [data-mvpl-side="left"]'
+        # Both boxes narrower than the sidebars' breakpoint, so both are drawers.
+        page.evaluate(
+            "document.querySelector('#outer-box').style.width = '560px';"
+            "document.querySelector('#inner-box').style.width = '500px'"
+        )
+        settle(page)
+        assert mode_of(page, outer) == mode_of(page, inner) == "overlay"
+        page.locator("#inner-toggle").click()
+        page.locator("#outer-toggle").click()
+        assert drawer_open(page, outer) and drawer_open(page, inner)
+
+        # The drawer opened last is the topmost.
+        page.keyboard.press("Escape")
+        assert drawer_open(page, inner) and not drawer_open(page, outer)
+        page.keyboard.press("Escape")
+        assert not drawer_open(page, inner)
 
 
 class SidebarStates(HTMLParser):

@@ -153,10 +153,7 @@
     if (sb.getAttribute("aria-label")) p.setAttribute("aria-label", sb.getAttribute("aria-label"));
     if (!p.hasAttribute("tabindex")) p.setAttribute("tabindex", "-1");
     stack.push(sb);
-    var first = Array.prototype.find.call(p.querySelectorAll(FOCUSABLE), function (el) {
-      return el.checkVisibility ? el.checkVisibility() : true;
-    });
-    (first || p).focus({ preventScroll: true });
+    (reachable(p)[0] || p).focus({ preventScroll: true });
   }
 
   function closeOverlay(sb, returnFocus) {
@@ -259,9 +256,33 @@
     }
   });
 
+  function reachable(p) {
+    return Array.prototype.filter.call(p.querySelectorAll(FOCUSABLE), function (el) {
+      return el.checkVisibility ? el.checkVisibility() : true;
+    });
+  }
+
   document.addEventListener("keydown", function (event) {
-    if (event.key !== "Escape" || !stack.length) return;
+    if (!stack.length) return;
     var sb = stack[stack.length - 1];
+    if (event.key === "Tab") {
+      // Only a whole-page drawer is modal to the browser's own tab order; a
+      // contained one is trapped here, so focus stays in whichever is topmost.
+      var p = panel(sb);
+      var items = reachable(p);
+      var first = items[0] || p;
+      var last = items[items.length - 1] || p;
+      var active = document.activeElement;
+      if (!p.contains(active) || (event.shiftKey && (active === first || active === p))) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus({ preventScroll: true });
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+      }
+      return;
+    }
+    if (event.key !== "Escape") return;
     closeOverlay(sb, true);
     sync(ownRoot(sb));
     // Escape closes the drawer and nothing else, such as a dialog around it.
