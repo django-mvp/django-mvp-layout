@@ -309,6 +309,31 @@ class TestSidebarAttrs:
             assert attrs["data-mvpl-rail"] is None
 
 
+class TestSidebarPersistName:
+    @pytest.mark.parametrize(
+        ("name", "allowed"),
+        [
+            ("nav", True),
+            ("left-nav", True),
+            ("nav_2", True),
+            ("NAV9", True),
+            ("my nav", False),
+            ("a;b", False),
+            ("a=b", False),
+            ("a/b", False),
+            ("", False),
+        ],
+    )
+    def test_a_name_is_kept_only_when_it_is_safe_in_a_cookie_name(self, name, allowed):
+        tag = "{% sidebar_attrs persist=name %}"
+        if allowed:
+            assert render_tag(tag, {"name": name})["data-mvpl-persist"] == name
+            return
+        with pytest.raises(LayoutOptionError) as refusal:
+            render_tag(tag, {"name": name})
+        assert "A-Za-z0-9_-" in str(refusal.value)
+
+
 class TestSidebarCookie:
     """The state a sidebar is drawn in, from the cookie its persist name reads."""
 

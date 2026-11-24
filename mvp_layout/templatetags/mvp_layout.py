@@ -13,6 +13,7 @@ A template calls them on the elements of a layout::
     </div>
 """
 
+import re
 from dataclasses import dataclass
 from typing import ClassVar, Self
 
@@ -45,6 +46,7 @@ class Sidebar:
     DEFAULT_BREAKPOINTS: ClassVar[dict[str, str]] = {"left": "lg", "right": "xl"}
     STATES: ClassVar[tuple[str, ...]] = ("open", "closed")
     COOKIE_PREFIX: ClassVar[str] = "mvpl-"
+    PERSIST_NAME: ClassVar[re.Pattern[str]] = re.compile(r"[A-Za-z0-9_-]+")
 
     side: str
     collapse: str
@@ -121,7 +123,8 @@ class Sidebar:
             The settled options and state.
 
         Raises:
-            LayoutOptionError: An option is outside its choices.
+            LayoutOptionError: An option is outside its choices, or the persist
+                name has characters other than ``A-Za-z0-9_-``.
         """
         side = cls.choose("side", side, cls.SIDES, "left")
         collapse = cls.choose("collapse", collapse, cls.COLLAPSES, "offcanvas")
@@ -129,6 +132,11 @@ class Sidebar:
         breakpoint = cls.choose(  # noqa: A001
             "breakpoint", breakpoint, cls.BREAKPOINTS, cls.DEFAULT_BREAKPOINTS[side]
         )
+        if persist is not None and not cls.PERSIST_NAME.fullmatch(str(persist)):
+            raise LayoutOptionError(
+                f"{persist!r} is not a sidebar persist name. Use only the characters"
+                " A-Za-z0-9_-, as it becomes part of a cookie name."
+            )
         state = "closed" if closed is True else "open"
         if persist and request is not None:
             remembered = request.COOKIES.get(cls.COOKIE_PREFIX + str(persist))

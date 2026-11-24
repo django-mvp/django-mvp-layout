@@ -114,7 +114,7 @@ Every argument is optional and can be given by name. The tag writes the sidebar'
 | `collapse` | `offcanvas` slides the sidebar away, `icons` leaves a rail, `none` never closes it beside the page. | `offcanvas` |
 | `breakpoint` | `sm`, `md`, `lg`, `xl` or `2xl`, the layout width below which the sidebar is a drawer. | `lg` for the left, `xl` for the right |
 | `behavior` | `auto` is a drawer below the breakpoint, `docked` is always beside the page, `overlay` is always a drawer. | `auto` |
-| `persist` | The name the open or closed state is remembered under. Without one nothing is remembered. | none |
+| `persist` | The name the open or closed state is remembered under, written with the letters, digits, hyphens and underscores of `A-Za-z0-9_-` only, because it becomes part of a cookie name. Any other name is refused. Without one nothing is remembered. | none |
 | `closed` | `True` or `False`, whether the sidebar starts closed. Any other value leaves it open. | `False` |
 | `width` | The sidebar's open width, as a CSS length. | `16rem` left, `18rem` right |
 | `rail_width` | The width of its icon rail, as a CSS length. | `4rem` |
