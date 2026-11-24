@@ -24,8 +24,9 @@ page the left sidebar is drawn at the left. In a right-to-left page it is drawn 
 [Add a toggle](plain-templates.md#add-a-toggle).
 
 An upper-case header, sidebar or footer letter keeps that area in place while the layout scrolls.
-`hHh` keeps the header at the top. `LpR` keeps both sidebars in place beside the page. For a
-sidebar, any of its three letters in upper case fixes it.
+`hHh` keeps the header at the top. `LpR` keeps both sidebars in place beside the page. Any of an
+area's letters in upper case fixes it: `Hhh`, `hHh` and `hhH` all fix the header, and any of a
+sidebar's three letters fixes that sidebar.
 
 The rules are those of the `view` property on Quasar's `QLayout`, so a code written for one works in
 the other.

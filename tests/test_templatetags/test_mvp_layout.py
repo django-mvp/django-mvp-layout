@@ -92,6 +92,10 @@ class TestLayoutAttrs:
             ("hhh lpr fFf", {"footer"}),
             ("hhh Lpr fff", {"left"}),
             ("hhh lpR fff", {"right"}),
+            ("Hhh lpr fff", {"header"}),
+            ("hhH lpr fff", {"header"}),
+            ("hhh lpr ffF", {"footer"}),
+            ("hhh lpr Fff", {"footer"}),
             ("lHh LpR lFf", {"header", "left", "right", "footer"}),
         ],
     )

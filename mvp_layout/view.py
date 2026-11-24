@@ -84,8 +84,8 @@ class LayoutView:
             raise LayoutViewError(cls.refusal(value))
         rows = code.split(" ")
         lower = [row.lower() for row in rows]
-        header_fixed = rows[0][1] == "H"
-        footer_fixed = rows[2][1] == "F"
+        header_fixed = "H" in rows[0]
+        footer_fixed = "F" in rows[2]
         left_fixed = "L" in (rows[0][0], rows[1][0], rows[2][0])
         right_fixed = "R" in (rows[0][2], rows[1][2], rows[2][2])
         return cls(

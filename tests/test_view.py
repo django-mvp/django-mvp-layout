@@ -107,6 +107,22 @@ class TestLayoutView:
         assert (fixed.header_fixed, fixed.footer_fixed) == (True, True)
         assert (loose.header_fixed, loose.footer_fixed) == (False, False)
 
+    @pytest.mark.parametrize(
+        ("code", "header", "footer"),
+        [
+            ("Hhh lpr fff", True, False),
+            ("hhH lpr fff", True, False),
+            ("hhh lpr ffF", False, True),
+            ("hhh lpr Fff", False, True),
+        ],
+    )
+    def test_an_upper_case_letter_in_a_corner_fixes_the_header_or_footer(
+        self, code, header, footer
+    ):
+        view = LayoutView.parse(code)
+
+        assert (view.header_fixed, view.footer_fixed) == (header, footer)
+
     def test_the_header_and_footer_are_fixed_independently(self):
         view = LayoutView.parse("hHh lpr fff")
 
