@@ -752,11 +752,12 @@ version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
-    { name = "django-mvp" },
+    { name = "django-cotton" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "django-mvp" },
     { name = "mvp-shared", extra = ["dev", "test"] },
     { name = "pytest-playwright" },
 ]
@@ -767,11 +768,12 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.2" },
-    { name = "django-mvp", specifier = ">=0.28.1" },
+    { name = "django-cotton", specifier = ">=2.9" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "django-mvp", specifier = ">=0.28.1" },
     { name = "mvp-shared", extras = ["dev", "test"], git = "https://github.com/django-mvp/shared.git?tag=v0.6.0" },
     { name = "pytest-playwright", specifier = ">=0.5" },
 ]

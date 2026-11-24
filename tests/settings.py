@@ -23,4 +23,9 @@ ROOT_URLCONF = "tests.urls"
 
 # Templates that exist only to put something in one exact situation a test
 # needs. They are not part of the demo project and are never distributed.
-TEMPLATES[0]["DIRS"] = [BASE_DIR / "tests" / "templates"]  # noqa: F405
+TEMPLATES[0]["DIRS"] = [  # noqa: F405
+    *TEMPLATES[0]["DIRS"],  # noqa: F405
+    BASE_DIR / "tests" / "templates",  # noqa: F405
+    # A test page extends examples/base.html.
+    BASE_DIR / "docs",  # noqa: F405
+]
