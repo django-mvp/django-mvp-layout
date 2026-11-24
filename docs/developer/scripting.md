@@ -106,10 +106,13 @@ try {
 
 The layout dispatches `mvpl:change` on its own element each time its state changes. The event
 bubbles and its `detail` is the object `MvpLayout.state` returns, so a listener on the layout or on
-`document` is enough:
+`document` is enough. It also bubbles out of a layout nested inside another, so a listener on the
+outer layout receives the inner layout's events too. Check that the event came from the layout the
+listener is on before reading `detail`:
 
 ```js
 document.getElementById("app").addEventListener("mvpl:change", (event) => {
+  if (event.target !== event.currentTarget) return;
   console.log(event.detail.left.visible);
 });
 ```
