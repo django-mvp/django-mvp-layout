@@ -847,7 +847,8 @@ class TestDrawerFocus:
         )
         page.keyboard.press("Shift+Tab")
         assert page.evaluate(
-            "(s) => document.activeElement === [...document.querySelectorAll(s)].at(-1)",
+            "(s) => document.activeElement"
+            " === [...document.querySelectorAll(s)].at(-1)",
             links,
         )
 

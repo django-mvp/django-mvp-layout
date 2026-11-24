@@ -181,3 +181,9 @@ weakened.
 **Open**: the tamper check flags `tests/templates/layouts/nested.html` as a pre-existing test file that was modified.
 **Chosen**: the change stands. Each header gains a toggle button so the toggle tests can act on a nested layout's own sidebar.
 **Why**: the page was written in this feature's first story and no assertion on it was changed or removed.
+
+## `tests/views.py` serves fewer rows on the heavy page
+
+**Open**: the tamper check flags `tests/views.py` as a pre-existing test file that was modified.
+**Chosen**: the heavy page serves 1900 rows instead of 3000.
+**Why**: the transition measurement could only tell the two animations apart at that size (see the transform decision above). No assertion was changed.
