@@ -29,6 +29,7 @@ class LayoutPage(TemplateView):
         context["rows"] = range(1900)
         context["tall"] = "tall" in self.request.GET
         context["narrow"] = "narrow" in self.request.GET
+        context["right_behavior"] = self.request.GET.get("right")
         context["box_style"], context["layout_style"] = SIZES[
             self.request.GET.get("size", "none")
         ]

@@ -343,10 +343,11 @@ SIZED_GRID = "#sized > .mvpl-grid"
 BOUNDED = [("height", 320), ("max-height", 320), ("dialog", 312)]
 
 
-def sized(visit, size, viewport=DESKTOP, *, tall=False, narrow=False):
+def sized(visit, size, viewport=DESKTOP, *, tall=False, narrow=False, right=None):
     query = (
         f"?size={size}" + ("&tall=1" if tall else "") + ("&narrow=1" if narrow else "")
     )
+    query += f"&right={right}" if right else ""
     return visit("layouts-sized", viewport, query)
 
 
@@ -458,6 +459,23 @@ class TestContainedSize:
         assert near(panel["bottom"], layout["bottom"])
         assert near(panel["left"], layout["left"])
         assert panel["right"] <= layout["right"]
+
+    @pytest.mark.parametrize("size", ["none", "height", "max-height", "dialog"])
+    @pytest.mark.parametrize("tall", [False, True], ids=["short", "tall"])
+    def test_an_overlay_drawer_on_a_fixed_side_fits_the_layouts_visible_box(
+        self, visit, size, tall
+    ) -> None:
+        page = sized(visit, size, tall=tall, right="overlay")
+        right = f'{SIZED_GRID} > [data-mvpl-side="right"]'
+        assert mode_of(page, right) == "overlay"
+        page.evaluate("MvpLayout.open('sized', 'right')")
+        settle(page)
+        assert drawer_open(page, right)
+        layout = rect(page, SIZED)
+        panel = rect(page, f"{right} > .mvpl-panel")
+        assert near(panel["top"], layout["top"])
+        assert near(panel["bottom"], layout["bottom"])
+        assert near(panel["right"], layout["right"])
 
 
 class TestTheHostsRules:

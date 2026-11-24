@@ -13,7 +13,7 @@
             <div class="mvpl-panel"><nav>Navigation</nav></div>
           </aside>
           <main class="mvpl-page"><div style="height: {% if tall %}1600px{% else %}200px{% endif %}">Content</div></main>
-          <aside {% sidebar_attrs "right" breakpoint="sm" %} aria-label="Aside">
+          <aside {% sidebar_attrs "right" breakpoint="sm" behavior=right_behavior %} aria-label="Aside">
             <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
             <div class="mvpl-panel">Aside</div>
           </aside>
