@@ -1,0 +1,495 @@
+@layer mvpl {
+/* Layouts arranged by a layout code, such as lHh LpR lff.
+   Written by scripts/build_css.py: edit that file, not this one.
+
+   The colours are daisyUI's theme variables, so the layout follows the
+   host's theme, and the system colours where daisyUI isn't installed. Every
+   rule reaches its areas through child combinators, so a layout nested inside
+   another is styled by its own code and nothing else. */
+
+.mvpl {
+  --mvpl-header-h: 0px;
+  --mvpl-footer-h: 0px;
+  --mvpl-dir: 1;
+  --mvpl-vh: 100dvh;
+  container: mvpl / inline-size;
+  min-width: 0;
+}
+[dir="rtl"] .mvpl,
+.mvpl[dir="rtl"] {
+  --mvpl-dir: -1;
+}
+
+/* A contained layout fills the box it is given and scrolls inside it. Its
+   root holds still, so a drawer drawn against it stays in view while the
+   grid inside it scrolls. */
+.mvpl[data-mvpl-container] {
+  --mvpl-vh: 100cqh;
+  container: mvpl / size;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.mvpl-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: var(--mvpl-areas);
+  min-height: 100dvh;
+}
+.mvpl[data-mvpl-container] > .mvpl-grid {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+.mvpl-grid > .mvpl-header { grid-area: header; min-width: 0; }
+.mvpl-grid > .mvpl-page { grid-area: page; min-width: 0; }
+.mvpl-grid > .mvpl-footer { grid-area: footer; min-width: 0; }
+.mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] { grid-area: left; }
+.mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] { grid-area: right; }
+
+/* Upper case in the code: the area stays in place while the layout scrolls. */
+.mvpl[data-mvpl-header-fixed] > .mvpl-grid > .mvpl-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.mvpl[data-mvpl-footer-fixed] > .mvpl-grid > .mvpl-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+}
+
+/* A header that stays gets a line under it once the layout has scrolled. */
+.mvpl[data-mvpl-header-fixed] > .mvpl-grid > .mvpl-header {
+  transition: box-shadow 0.15s ease;
+}
+.mvpl[data-mvpl-header-fixed][data-mvpl-scrolled] > .mvpl-grid > .mvpl-header {
+  box-shadow: 0 1px 0 var(--mvpl-line, var(--color-base-300, color-mix(in oklab, CanvasText 15%, Canvas))), 0 1px 3px rgb(0 0 0 / 0.06);
+}
+.mvpl[data-mvpl-footer-fixed] > .mvpl-grid > .mvpl-footer {
+  box-shadow: 0 -1px 0 var(--mvpl-line, var(--color-base-300, color-mix(in oklab, CanvasText 15%, Canvas)));
+}
+
+/* A sidebar beside the page. Its column is as wide as it is, so a closed
+   sidebar, or one the page left empty, takes no space. */
+.mvpl-grid > .mvpl-sidebar {
+  --mvpl-w: 16rem;
+  --mvpl-rail-w: 4rem;
+  --mvpl-mode: docked;
+  width: var(--mvpl-w);
+  min-width: 0;
+  background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+  transition: width 0.2s ease;
+}
+.mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] { --mvpl-w: 18rem; }
+.mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel {
+  border-inline-end: 1px solid var(--mvpl-line, var(--color-base-300, color-mix(in oklab, CanvasText 15%, Canvas)));
+}
+.mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] > .mvpl-panel {
+  border-inline-start: 1px solid var(--mvpl-line, var(--color-base-300, color-mix(in oklab, CanvasText 15%, Canvas)));
+}
+.mvpl-grid > .mvpl-sidebar > .mvpl-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: var(--mvpl-w);
+  min-height: 100%;
+}
+.mvpl-grid > .mvpl-sidebar > .mvpl-backdrop { display: none; }
+
+.mvpl[data-mvpl-left-fixed] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel,
+.mvpl[data-mvpl-right-fixed] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] > .mvpl-panel {
+  position: sticky;
+  z-index: 20;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.mvpl[data-mvpl-left-fixed] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel {
+  top: var(--mvpl-left-top);
+  height: calc(var(--mvpl-vh) - var(--mvpl-left-top) - var(--mvpl-left-bottom));
+}
+.mvpl[data-mvpl-right-fixed] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] > .mvpl-panel {
+  top: var(--mvpl-right-top);
+  height: calc(var(--mvpl-vh) - var(--mvpl-right-top) - var(--mvpl-right-bottom));
+}
+
+/* A sidebar with nothing in its panel isn't drawn. The Cotton component leaves
+   an empty sidebar out altogether; a template written by hand leaves its
+   panel empty instead. */
+.mvpl-grid > .mvpl-sidebar:has(> .mvpl-panel:empty) { display: none; }
+
+/* Closed beside the page: slid away, or an icon rail. */
+.mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"] {
+  width: 0;
+  overflow: clip;
+}
+.mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"] > .mvpl-panel {
+  visibility: hidden;
+  transition: visibility 0s linear 0.2s;
+}
+.mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] { width: var(--mvpl-rail-w); }
+.mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] > .mvpl-panel {
+  width: var(--mvpl-rail-w);
+  overflow-x: hidden;
+}
+
+/* Content that is only for the open sidebar, or only for the rail. */
+.mvpl-rail-only { display: none; }
+.mvpl-sidebar[data-mvpl-rail] .mvpl-rail-hide { display: none !important; }
+.mvpl-sidebar[data-mvpl-rail] .mvpl-rail-only { display: revert; }
+
+/* The script hides a toggle with nothing to toggle. daisyUI's buttons set
+   their own display, which would otherwise beat the hidden attribute. */
+.mvpl-toggle[hidden],
+[data-mvpl-when][hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mvpl-grid > .mvpl-sidebar,
+  .mvpl-grid > .mvpl-sidebar > .mvpl-panel,
+  .mvpl-grid > .mvpl-sidebar > .mvpl-backdrop { transition: none !important; }
+}
+
+@media print {
+  .mvpl-grid > .mvpl-sidebar { display: none; }
+  .mvpl[data-mvpl-header-fixed] > .mvpl-grid > .mvpl-header,
+  .mvpl[data-mvpl-footer-fixed] > .mvpl-grid > .mvpl-footer { position: static; }
+}
+
+/* A sidebar whose behaviour is overlay is a drawer at every width. */
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"] {
+  --mvpl-mode: overlay;
+  width: 0;
+  overflow: visible;
+}
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"] > .mvpl-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 40;
+  width: min(var(--mvpl-w), 100% - 3.5rem);
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  visibility: hidden;
+  border-inline-width: 0;
+  background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+  box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
+  transition: translate 0.25s ease, visibility 0s linear 0.25s;
+}
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-side="left"] > .mvpl-panel {
+  inset-inline-start: 0;
+  translate: calc(-100% * var(--mvpl-dir)) 0;
+}
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-side="right"] > .mvpl-panel {
+  inset-inline-end: 0;
+  translate: calc(100% * var(--mvpl-dir)) 0;
+}
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-overlay="open"] > .mvpl-panel {
+  translate: 0 0;
+  visibility: visible;
+  transition: translate 0.25s ease, visibility 0s;
+}
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"] > .mvpl-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: rgb(0 0 0 / 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-overlay="open"] > .mvpl-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+.mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"] > .mvpl-panel,
+.mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"] > .mvpl-backdrop {
+  position: absolute;
+}
+
+/* Below 40rem of layout width, a sidebar with breakpoint sm is a drawer. */
+@container mvpl (width < 40rem) {
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"] {
+    --mvpl-mode: overlay;
+    width: 0;
+    overflow: visible;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"] > .mvpl-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(var(--mvpl-w), 100% - 3.5rem);
+    height: auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    border-inline-width: 0;
+    background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
+    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-side="left"] > .mvpl-panel {
+    inset-inline-start: 0;
+    translate: calc(-100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-side="right"] > .mvpl-panel {
+    inset-inline-end: 0;
+    translate: calc(100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-overlay="open"] > .mvpl-panel {
+    translate: 0 0;
+    visibility: visible;
+    transition: translate 0.25s ease, visibility 0s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"] > .mvpl-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgb(0 0 0 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-overlay="open"] > .mvpl-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"] > .mvpl-panel,
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"] > .mvpl-backdrop {
+    position: absolute;
+  }
+}
+
+/* Below 48rem of layout width, a sidebar with breakpoint md is a drawer. */
+@container mvpl (width < 48rem) {
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"] {
+    --mvpl-mode: overlay;
+    width: 0;
+    overflow: visible;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"] > .mvpl-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(var(--mvpl-w), 100% - 3.5rem);
+    height: auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    border-inline-width: 0;
+    background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
+    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-side="left"] > .mvpl-panel {
+    inset-inline-start: 0;
+    translate: calc(-100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-side="right"] > .mvpl-panel {
+    inset-inline-end: 0;
+    translate: calc(100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-overlay="open"] > .mvpl-panel {
+    translate: 0 0;
+    visibility: visible;
+    transition: translate 0.25s ease, visibility 0s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"] > .mvpl-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgb(0 0 0 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-overlay="open"] > .mvpl-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"] > .mvpl-panel,
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"] > .mvpl-backdrop {
+    position: absolute;
+  }
+}
+
+/* Below 64rem of layout width, a sidebar with breakpoint lg is a drawer. */
+@container mvpl (width < 64rem) {
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"] {
+    --mvpl-mode: overlay;
+    width: 0;
+    overflow: visible;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"] > .mvpl-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(var(--mvpl-w), 100% - 3.5rem);
+    height: auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    border-inline-width: 0;
+    background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
+    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-side="left"] > .mvpl-panel {
+    inset-inline-start: 0;
+    translate: calc(-100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-side="right"] > .mvpl-panel {
+    inset-inline-end: 0;
+    translate: calc(100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-overlay="open"] > .mvpl-panel {
+    translate: 0 0;
+    visibility: visible;
+    transition: translate 0.25s ease, visibility 0s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"] > .mvpl-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgb(0 0 0 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-overlay="open"] > .mvpl-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"] > .mvpl-panel,
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"] > .mvpl-backdrop {
+    position: absolute;
+  }
+}
+
+/* Below 80rem of layout width, a sidebar with breakpoint xl is a drawer. */
+@container mvpl (width < 80rem) {
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"] {
+    --mvpl-mode: overlay;
+    width: 0;
+    overflow: visible;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"] > .mvpl-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(var(--mvpl-w), 100% - 3.5rem);
+    height: auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    border-inline-width: 0;
+    background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
+    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-side="left"] > .mvpl-panel {
+    inset-inline-start: 0;
+    translate: calc(-100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-side="right"] > .mvpl-panel {
+    inset-inline-end: 0;
+    translate: calc(100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-overlay="open"] > .mvpl-panel {
+    translate: 0 0;
+    visibility: visible;
+    transition: translate 0.25s ease, visibility 0s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"] > .mvpl-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgb(0 0 0 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-overlay="open"] > .mvpl-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"] > .mvpl-panel,
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"] > .mvpl-backdrop {
+    position: absolute;
+  }
+}
+
+/* Below 96rem of layout width, a sidebar with breakpoint 2xl is a drawer. */
+@container mvpl (width < 96rem) {
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"] {
+    --mvpl-mode: overlay;
+    width: 0;
+    overflow: visible;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"] > .mvpl-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(var(--mvpl-w), 100% - 3.5rem);
+    height: auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    border-inline-width: 0;
+    background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
+    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-side="left"] > .mvpl-panel {
+    inset-inline-start: 0;
+    translate: calc(-100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-side="right"] > .mvpl-panel {
+    inset-inline-end: 0;
+    translate: calc(100% * var(--mvpl-dir)) 0;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-overlay="open"] > .mvpl-panel {
+    translate: 0 0;
+    visibility: visible;
+    transition: translate 0.25s ease, visibility 0s;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"] > .mvpl-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgb(0 0 0 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-overlay="open"] > .mvpl-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"] > .mvpl-panel,
+  .mvpl[data-mvpl-container] > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"] > .mvpl-backdrop {
+    position: absolute;
+  }
+}
+}
