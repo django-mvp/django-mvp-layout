@@ -1,0 +1,5 @@
+{# @description The small label naming an area of the playground's preview, with a note when the code keeps that area in place. #}
+{# @prop name:text | description:"The area's name." #}
+{# @prop fixed:boolean | description:"Whether the layout code keeps the area in place while the page scrolls." #}
+<c-vars name="" fixed="" />
+<span class="inline-flex items-center gap-1 text-[0.6875rem] font-semibold uppercase tracking-wide text-base-content/50 mvpl-rail-hide">{{ name }}{% if fixed %}<span class="badge badge-xs badge-primary badge-soft normal-case tracking-normal">stays</span>{% endif %}</span>

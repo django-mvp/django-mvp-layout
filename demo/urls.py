@@ -2,13 +2,13 @@
 
 from django.urls import include, path
 
-from demo.views import OverviewView
+from demo import views
 
 urlpatterns = [
-    path("", OverviewView.as_view(), name="overview"),
-    # django-mvp's Account Center, with a development sign-in and sign-out
-    # until an account app such as allauth is installed.
-    path("", include("mvp.urls")),
+    path("", views.HomeView.as_view(), name="home"),
+    path("playground/", views.PlaygroundView.as_view(), name="playground"),
+    path("nested/", views.NestedView.as_view(), name="nested"),
+    path("without-cotton/", views.PlainView.as_view(), name="plain"),
     # The endpoint an open page holds to hear that something on disk changed.
     path("__reload__/", include("django_browser_reload.urls")),
 ]

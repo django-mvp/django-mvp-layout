@@ -58,15 +58,13 @@ include = ["/mvp_layout", "/README.md", "/LICENSE"]
 # pytest, pytest-django, pytest-xdist, factory-boy, coverage and django-stubs.
 dev = [
     "mvp-shared[dev,test]",
-    # The demo project runs on django-mvp's application shell.
-    "django-mvp>=0.28.1",
     # Some guarantees can only be measured in a real browser: a resolved height,
     # a computed colour, an element that moves when the window does. Rendered
     # markup cannot answer any of them.
     "pytest-playwright>=0.5",
 ]
 # Installed only where the documentation is built: `uv sync --group docs`.
-docs = ["fairdm-docs[sphinx_book_theme]"]
+docs = ["fairdm-docs"]
 
 [tool.uv.sources]
 fairdm-docs = { git = "https://github.com/FAIR-DM/fairdm-docs" }

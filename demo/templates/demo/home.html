@@ -1,0 +1,47 @@
+{% extends "demo/base.html" %}
+{% load demo_icons %}
+{% block aside %}
+  <div class="flex flex-col gap-2 p-4 text-sm">
+    <div class="flex items-center justify-between">
+      <p class="font-semibold">On this page</p>
+      <c-layout.toggle side="right" label="Close" class="btn btn-ghost btn-xs btn-square">{% icon "close" %}</c-layout.toggle>
+    </div>
+    <ul class="menu menu-sm w-full p-0">
+      <li><a href="#code">The layout code</a></li>
+      <li><a href="#sidebars">Sidebars</a></li>
+      <li><a href="#pages">The demo pages</a></li>
+    </ul>
+  </div>
+{% endblock aside %}
+{% block content %}
+  <h1 class="text-3xl font-bold">django-mvp-layout</h1>
+  <p class="max-w-prose text-lg text-base-content/80">A header, two sidebars, the page and a footer, arranged by a nine-letter layout code. The sidebars open, close, collapse to an icon rail and become drawers on narrow screens, and a layout nests inside a card, a dialog or another layout.</p>
+  <section id="code" class="flex flex-col gap-3">
+    <h2 class="text-xl font-semibold">The layout code</h2>
+    <p class="max-w-prose text-base-content/80">This page is laid out by <code class="font-mono">lHh LpR lff</code>. The three groups are the top, middle and bottom rows, each read left, centre and right: <code>h</code> header, <code>l</code> left sidebar, <code>p</code> page, <code>r</code> right sidebar, <code>f</code> footer. A corner names the area that reaches it, and an upper-case letter keeps that area in place while the page scrolls. The code reads as it does in Quasar's <code>QLayout</code>.</p>
+    <pre class="w-fit max-w-full overflow-x-auto rounded-box bg-base-200 p-4 text-sm"><code>&lt;c-layout view="lHh LpR lff"&gt;
+  &lt;c-layout.header&gt;…&lt;/c-layout.header&gt;
+  &lt;c-layout.sidebar side="left" collapse="icons" persist="nav"&gt;…&lt;/c-layout.sidebar&gt;
+  &lt;c-layout.page&gt;…&lt;/c-layout.page&gt;
+  &lt;c-layout.sidebar side="right"&gt;…&lt;/c-layout.sidebar&gt;
+  &lt;c-layout.footer&gt;…&lt;/c-layout.footer&gt;
+&lt;/c-layout&gt;</code></pre>
+  </section>
+  <section id="sidebars" class="flex flex-col gap-3">
+    <h2 class="text-xl font-semibold">Sidebars</h2>
+    <ul class="max-w-prose list-disc ps-5 text-base-content/80">
+      <li>Each sidebar slides away, shrinks to an icon rail, or stays open. The navigation here shrinks to a rail.</li>
+      <li>Below its breakpoint it becomes a drawer over the page, measured against the layout's own width, never the window's.</li>
+      <li>Its open or closed state is kept in a cookie and drawn by the server, so a page never loads open and snaps shut.</li>
+      <li>A sidebar with nothing in it takes no space, and its toggles hide.</li>
+    </ul>
+  </section>
+  <section id="pages" class="flex flex-col gap-3">
+    <h2 class="text-xl font-semibold">The demo pages</h2>
+    <div class="grid gap-3 md:grid-cols-3">
+      <a href="{% url 'playground' %}" class="card border border-base-300 bg-base-100 hover:border-primary"><div class="card-body">{% icon "layout" "text-primary" %}<h3 class="card-title text-base">Playground</h3><p class="text-sm text-base-content/70">Type a code, set each sidebar, and resize the preview.</p></div></a>
+      <a href="{% url 'nested' %}" class="card border border-base-300 bg-base-100 hover:border-primary"><div class="card-body">{% icon "layers" "text-primary" %}<h3 class="card-title text-base">Nested layouts</h3><p class="text-sm text-base-content/70">An inbox in a card, settings in a dialog, a layout in a layout.</p></div></a>
+      <a href="{% url 'plain' %}" class="card border border-base-300 bg-base-100 hover:border-primary"><div class="card-body">{% icon "code" "text-primary" %}<h3 class="card-title text-base">Without Cotton</h3><p class="text-sm text-base-content/70">The same layout in a plain Django base template.</p></div></a>
+    </div>
+  </section>
+{% endblock content %}

@@ -1,0 +1,6 @@
+{# @description The line under the layout code field: the rule, or the refusal for a code that is not one. #}
+{# @prop error:text | description:"The refusal. The rule is shown when empty." #}
+<c-vars error="" />
+<p id="lp-msg"
+   class="text-sm min-h-5 {% if error %}text-error{% else %}text-base-content/70{% endif %}"
+   aria-live="polite">{% if error %}{{ error }}{% else %}Three groups of three letters: top, middle and bottom rows, each read left, centre and right.{% endif %}</p>

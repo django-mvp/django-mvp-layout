@@ -16,16 +16,23 @@ on every commit.
 
 ## Run the demo project
 
-The repository carries a demo project in `demo/`. It is not part of the package. It has a page
-for each feature, so you can see the package working in a browser while you change it.
+The repository carries a demo project in `demo/`. It is not part of the package. It shows the
+layouts in a browser while you change them, on four pages: an overview, a playground where you type
+a layout code and set the sidebars, a page of nested layouts, and a page whose layout is written
+without django-cotton.
 
 ```bash
-uv run python manage.py migrate
-uv run python manage.py seed_demo
 uv run python manage.py runserver
 ```
 
-Open <http://localhost:8000/>. `seed_demo` creates three accounts, `regular.user@example.com`,
-`staff.user@example.com` and `super.user@example.com`, all with the password `password`. The
-staff and superuser accounts can sign in to the admin at `/admin/`. The page reloads by itself
+Open <http://localhost:8000/>. The demo has no database and no accounts. The page reloads by itself
 when you change a template or Python file.
+
+The demo's own stylesheet is Tailwind and daisyUI, built into `demo/static/demo/demo.css`, which is
+committed. After you change the classes a demo template uses, build it again. You need
+[Node](https://nodejs.org/):
+
+```bash
+npm install
+npm run build:css
+```

@@ -41,3 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A sidebar tag given an empty `persist` now means none was given, where it used to raise.
 - django-mvp is no longer a runtime dependency, and django-cotton (2.9 or later) is. A project
   that relied on this package to install django-mvp must now depend on it directly.
+
+### Removed
+
+- The starter component `<c-mvp_layout.example>` that the package template shipped. The components
+  of this package are `<c-layout>` and the areas inside it.

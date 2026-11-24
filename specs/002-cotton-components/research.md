@@ -60,8 +60,8 @@ sentence and a link.
 
 ### The dependency (adopted, nothing to do)
 
-See above. The package template's sample component `cotton/mvp_layout/example.html` stays: issue #5
-removes it.
+See above. The package template's sample component `cotton/mvp_layout/example.html` is removed
+with the demo pages that replace it.
 
 ### Left and right (adopted)
 
