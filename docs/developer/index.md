@@ -8,3 +8,13 @@ For a developer laying out the pages of their own Django project.
 
 installation
 ```
+
+```{toctree}
+:caption: Laying out pages
+:maxdepth: 1
+
+layout-code
+cotton
+without-cotton
+styling
+```

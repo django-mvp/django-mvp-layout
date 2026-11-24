@@ -9,7 +9,7 @@ inside them, which is the host project's job.
 ## Stack and commands
 
 - **Stack:** Python 3.12+ / Django 5.2, 6.0 and 6.1, uv-managed (hatchling build backend), built on
-  django-mvp and django-cotton
+  django-cotton. django-mvp is deliberately not a dependency
 - **Install:** `uv sync`
 - **Test (whole suite):** `uv run pytest -n auto --dist loadscope`
 - **Test (one class or file, while iterating):** `uv run pytest <path> -x` —
@@ -18,6 +18,8 @@ inside them, which is the host project's job.
 - **Type-check:** `uv run mypy`
 - **Build:** `uv build`
 - **Demo project:** `uv run python manage.py runserver 0.0.0.0:8000`
+- **Stylesheet:** `uv run python scripts/build_css.py` rewrites `mvp_layout/static/mvp_layout/layout.css`; never edit that file by hand
+- **Demo stylesheet:** `npm install && npm run build:css` (Tailwind and daisyUI, demo only)
 - **Bump the version:** `uv version` — never edit `pyproject.toml` alone, because `uv.lock`
   records this package's own version too
 
@@ -32,43 +34,43 @@ that introduced it.
 
 ## The demo project
 
-`demo/` is a Django project running on django-mvp's application shell. It is
-how this package is looked at while it is being written, and it is never
-deployed. Nothing in it is distributed — `pyproject.toml` packages
-`mvp_layout` alone.
+`demo/` is a Django project laid out by this package. It is how the package is
+looked at while it is being written, and it is never deployed. Nothing in it is
+distributed — `pyproject.toml` packages `mvp_layout` alone. It has no
+database and no accounts.
 
-`tests/settings.py` inherits `demo/settings.py` rather than restating it, so
-there is one description of the shell.
+`tests/settings.py` inherits `demo/settings.py` rather than restating it.
 
-Everything in the demo fails quietly. A Cotton component that cannot be
-resolved renders as empty output, a Tailwind class the packaged stylesheet does
-not emit does nothing, and a menu entry whose URL will not resolve is dropped
-from the tree. None of them raise, which is why `tests/test_demo.py` asserts
-against the rendered page rather than against the objects behind it.
+The pages are the overview, the playground (type a code, set the sidebars),
+nested layouts (a card, a dialog, a layout in a layout) and Without Cotton. The
+Without Cotton page extends `docs/examples/base.html` itself, because
+`TEMPLATES["DIRS"]` includes `docs/examples/`, so the documented base template
+is the one the browser tests run against.
 
-**Adding a page** takes four things: a view in `demo/views.py` on
-`mvp.views.MVPTemplateView`, a route in `demo/urls.py`, a template extending
-`page_view.html` and filling `{% block page.content %}`,
-and a `MenuItem` in `demo/menus.py`.
-
-**Signing in.** `uv run python manage.py seed_demo` creates three accounts —
-`regular.user@example.com`, `staff.user@example.com` and
-`super.user@example.com`, all with the password `password`. The shell renders
-differently for each, so all three exist rather than one. The command refuses
-to run unless `DEBUG` is on.
+**Adding a page** takes a view in `demo/views.py`, a route in `demo/urls.py`, a
+template extending `demo/base.html`, and a link in that template's sidebar.
 
 ## Components
 
-Components live at
-`mvp_layout/templates/cotton/mvp_layout/<name>.html`.
-Cotton maps a tag's first segment onto that directory, so
-`<c-mvp_layout.example>` resolves to
-`cotton/mvp_layout/example.html`.
+Components live at `mvp_layout/templates/cotton/layout/<name>.html`. Cotton
+maps a tag's segments onto that path, so `<c-layout.sidebar>` resolves to
+`cotton/layout/sidebar.html` and `<c-layout>` to `cotton/layout/index.html`.
 
 The directory name is load-bearing and fails quietly: a component Cotton cannot
-resolve renders as empty output rather than raising, so renaming the directory
-breaks every tag in it without an error anywhere. `tests/test_smoke.py`
+resolve renders as empty output rather than raising. `tests/test_smoke.py`
 asserts the directory exists for that reason.
+
+The components are built on the `layout_attrs` and `sidebar_attrs` template
+tags, which are also the public surface for templates that don't use Cotton.
+A change to the markup goes in both the component and
+`docs/examples/base.html`.
+
+## Browser tests
+
+`tests/test_layout_js.py` runs the demo in chromium through pytest-playwright:
+drawers, focus, inert regions, the cookie, container queries and nesting.
+Anything that can be asserted on rendered HTML goes in the other modules
+instead, which never skip.
 
 ## Releasing
 

@@ -1,1 +1,1 @@
-"""The Layout app for django-mvp."""
+"""The Layouts app for django-mvp."""

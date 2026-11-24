@@ -1,59 +1,34 @@
-"""The demo project's pages, asserted as rendered."""
-
-# Everything in the demo fails quietly: an unresolvable component renders empty
-# and a menu entry whose URL will not resolve is dropped from the tree.
+"""The demo project's pages respond and are built on the layout."""
 
 import pytest
-from django.conf import settings
-from django.shortcuts import resolve_url
 from django.urls import reverse
 
-# The address a page guarded by LoginRequiredMixin sends an anonymous visitor to.
-SIGN_IN_URL = resolve_url(settings.LOGIN_URL)
+PAGES = ["home", "playground", "nested", "plain"]
 
 
-class TestSignIn:
-    def test_the_sign_in_page_renders(self, client, db) -> None:
-        assert client.get(SIGN_IN_URL).status_code == 200
+class TestTheDemoPages:
+    @pytest.mark.parametrize("name", PAGES)
+    def test_each_page_is_a_layout(self, client, name) -> None:
+        response = client.get(reverse(name))
+        assert response.status_code == 200
+        assert "data-mvpl-view" in response.content.decode()
 
-    def test_a_seeded_account_can_sign_in(self, client, django_user_model) -> None:
-        django_user_model.objects.create_user(
-            username="regular.user@example.com", password="password"
-        )
-        response = client.post(
-            SIGN_IN_URL,
-            {"username": "regular.user@example.com", "password": "password"},
-        )
-        assert response.status_code == 302
-        assert "_auth_user_id" in client.session
+    def test_the_playground_draws_the_code_it_is_given(self, client) -> None:
+        html = client.get(
+            reverse("playground"), {"view": "hHh LpR fFf"}
+        ).content.decode()
+        assert 'data-mvpl-view="hHh LpR fFf"' in html
 
+    def test_the_playground_refuses_a_wrong_code_without_failing(self, client) -> None:
+        assert client.get(reverse("playground"), {"view": "nope"}).status_code == 200
 
-class TestOverviewPage:
-    def test_it_responds(self, client, db) -> None:
-        assert client.get(reverse("overview")).status_code == 200
+    def test_the_playground_preview_is_a_fragment(self, client) -> None:
+        response = client.get(reverse("playground"), headers={"X-Preview": "1"})
+        assert response.status_code == 200
+        assert "<html" not in response.content.decode()
 
-    def test_the_shell_wraps_it(self, overview_page: str) -> None:
-        # A template that fails to extend the shell still returns 200.
-        assert 'aria-label="Main navigation"' in overview_page
-
-    def test_the_sidebar_links_the_pages_that_exist(self, overview_page: str) -> None:
-        sidebar = overview_page.split('aria-label="Main navigation"', 1)[1]
-        sidebar = sidebar.split("</ul>", 1)[0]
-        assert f'href="{reverse("overview")}"' in sidebar
-
-
-@pytest.mark.django_db
-class TestOverviewPageInABrowser:
-    # Only what a real browser can measure belongs here. A check that works on
-    # rendered HTML goes in the class above, which cannot skip.
-
-    def test_the_page_loads_without_a_console_error(
-        self, chromium, live_server, page
-    ) -> None:
-        # A script that throws leaves the markup intact and the page broken.
-        errors: list[str] = []
-        page.on("pageerror", lambda exception: errors.append(str(exception)))
-
-        page.goto(live_server.url + reverse("overview"))
-
-        assert errors == []
+    def test_the_without_cotton_page_is_the_documented_base(self, client) -> None:
+        # The page extends docs/examples/base.html, so the example cannot drift.
+        html = client.get(reverse("plain")).content.decode()
+        assert 'id="app"' in html
+        assert 'data-persist="nav"' in html

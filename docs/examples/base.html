@@ -1,0 +1,49 @@
+{% load static mvp_layout %}<!DOCTYPE html>
+{% comment %}
+  A base template laid out by a layout code, written without django-cotton.
+  Copy it into your project's templates, change the code and the sidebars'
+  options, and extend it like any base template.
+
+  The layout code places the areas, not their order here. Screen readers and
+  the Tab key follow the order here, so keep it header, navigation, page, aside,
+  footer: the order a reader expects the landmarks in.
+
+  A sidebar whose panel is empty takes no space and its toggles hide, so a
+  page that leaves the aside block empty has no right sidebar. Keep the block
+  tags touching the panel's tags: whitespace counts as content.
+{% endcomment %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{% endblock title %}</title>
+    {% block styles %}{% endblock styles %}
+    <link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+    {# Not deferred, so each layout is mounted before the first paint. #}
+    <script src="{% static 'mvp_layout/layout.js' %}"></script>
+  </head>
+  <body>
+    <div id="app" {% layout_attrs "hHh LpR fFf" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">
+          {% block header %}{% endblock header %}
+        </header>
+        <aside {% sidebar_attrs "left" collapse="offcanvas" breakpoint="lg" persist="nav" %} aria-label="Navigation">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">{% block navigation %}{% endblock navigation %}</div>
+        </aside>
+        <main class="mvpl-page">
+          {% block content %}{% endblock content %}
+        </main>
+        <aside {% sidebar_attrs "right" breakpoint="xl" persist="aside" %} aria-label="On this page">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">{% block aside %}{% endblock aside %}</div>
+        </aside>
+        <footer class="mvpl-footer">
+          {% block footer %}{% endblock footer %}
+        </footer>
+      </div>
+    </div>
+    <script>MvpLayout("app");</script>
+  </body>
+</html>

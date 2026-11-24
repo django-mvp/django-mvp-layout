@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i demo/assets/demo.css -o demo/static/demo/demo.css",
+    "watch:css": "tailwindcss -i demo/assets/demo.css -o demo/static/demo/demo.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.2",
+    "daisyui": "5.7.0",
+    "tailwindcss": "4.3.2"
+  }
+}

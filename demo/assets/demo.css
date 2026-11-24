@@ -1,0 +1,16 @@
+/* The demo project's stylesheet: Tailwind and daisyUI, for the demo pages only.
+   The package's own stylesheet, mvp_layout/static/mvp_layout/layout.css, is
+   plain CSS and needs no build. */
+@import "tailwindcss" source(none);
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, corporate, dracula;
+}
+
+@source "../templates";
+@source "../templatetags";
+@source "../views.py";
+@source "../../docs/examples";
+
+/* Styles for content inside a sidebar closed to its icon rail, for example
+   mvpl-rail:justify-center. */
+@custom-variant mvpl-rail (&:where(.mvpl-sidebar[data-mvpl-rail] *));

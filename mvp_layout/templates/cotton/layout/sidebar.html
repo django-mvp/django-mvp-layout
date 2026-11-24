@@ -1,0 +1,22 @@
+{# @description A sidebar on the left or right of the page. Drawn only when it has content. #}
+{# @prop side:text | default:"left" | description:"left or right: the l or r area of the layout code." #}
+{# @prop collapse:text | default:"offcanvas" | description:"How it closes beside the page: offcanvas slides it away, icons leaves an icon rail, none keeps it open." #}
+{# @prop breakpoint:text | default:"lg (left), xl (right)" | description:"The layout width below which it becomes a drawer over the page: sm, md, lg, xl or 2xl." #}
+{# @prop behavior:text | default:"auto" | description:"auto follows the breakpoint, docked keeps it beside the page at every width, overlay makes it a drawer at every width." #}
+{# @prop width:text | default:"16rem (left), 18rem (right)" | description:"Its width while open." #}
+{# @prop rail-width:text | default:"4rem" | description:"Its width as an icon rail." #}
+{# @prop closed:boolean | description:"Start closed. A remembered state wins." #}
+{# @prop persist:text | description:"A name to remember its open or closed state under, across pages and visits." #}
+{# @prop label:text | description:"Its accessible name, such as Main navigation." #}
+{% load mvp_layout %}
+<c-vars side="left" collapse="offcanvas" breakpoint="" behavior="auto" width="" rail-width="" closed="" persist="" label="" id="" class="" />
+{% if slot.strip %}
+  {% if not id %}{% layout_uid "sidebar" as id %}{% endif %}
+  <aside id="{{ id }}"
+         {% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width class %}
+         {% if label %}aria-label="{{ label }}"{% endif %}
+         {{ attrs }}>
+    <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+    <div class="mvpl-panel">{{ slot }}</div>
+  </aside>
+{% endif %}

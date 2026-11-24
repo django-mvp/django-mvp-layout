@@ -3,13 +3,11 @@
 from pathlib import Path
 
 from django.apps import apps
+from django.contrib.staticfiles import finders
 
 import mvp_layout
 
 PACKAGE_ROOT = Path(mvp_layout.__file__).parent
-COTTON_ROOT = PACKAGE_ROOT / "templates" / "cotton" / "mvp_layout"
-
-EXAMPLE_TAG = "c-mvp_layout.example"
 
 
 class TestPackagedApp:
@@ -19,22 +17,10 @@ class TestPackagedApp:
     def test_components_are_where_cotton_looks_for_them(self) -> None:
         # The directory name is the first segment of every tag, and a component
         # Cotton cannot find renders as empty output rather than raising.
-        assert COTTON_ROOT.is_dir()
+        assert (
+            PACKAGE_ROOT / "templates" / "cotton" / "layout" / "index.html"
+        ).is_file()
 
-
-class TestStarterComponent:
-    # Delete this class along with the starter component it covers.
-
-    def test_it_renders_its_slot(self, render) -> None:
-        markup = render(f"<{EXAMPLE_TAG}>Inside</{EXAMPLE_TAG}>")
-        assert "Inside" in markup
-
-    def test_it_renders_a_title_when_given_one(self, render) -> None:
-        markup = render(f'<{EXAMPLE_TAG} title="Named" />')
-        assert "Named" in markup
-
-    def test_it_renders_no_heading_without_a_title(self, render) -> None:
-        # Asserted as an absence: a component that always drew the heading would
-        # pass the test above while putting an empty one on every page.
-        markup = render(f"<{EXAMPLE_TAG}>Inside</{EXAMPLE_TAG}>")
-        assert "<h2" not in markup
+    def test_the_stylesheet_and_script_are_static_files(self) -> None:
+        assert finders.find("mvp_layout/layout.css")
+        assert finders.find("mvp_layout/layout.js")

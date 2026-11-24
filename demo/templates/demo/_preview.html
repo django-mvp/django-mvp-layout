@@ -1,0 +1,4 @@
+{# The parts of the playground that change with the form, swapped in by its script. #}
+{% include "demo/_message.html" %}
+<div id="lp-preview-slot">{% if view %}{% include "demo/_preview_layout.html" %}{% endif %}</div>
+<div id="lp-details-slot">{% if view %}{% include "demo/_preview_details.html" %}{% endif %}</div>
