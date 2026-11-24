@@ -220,3 +220,10 @@ replaced produced six to eight long frames of 65 to 120 ms, and still fails this
 still fails on the regression it exists to catch. The remaining frame is reported as a concern, as
 SC-005 is measured and met apart from that single frame.
 **ADR:** none — a test threshold sealed inside this feature
+
+## D23 — The late-layouts test strips ids from its copy
+
+**Open**: the tamper check flags `tests/test_layout_js.py` as a pre-existing test file that was modified.
+**Chosen**: the change stands. The helper that copies a layout's markup now removes the sidebar ids before inserting the copy, and a few tests were added.
+**Why**: the review found the id assertion could not fail, because the copied markup already carried the ids. With them stripped, removing the script's mount call turns the test red. No assertion was removed or weakened.
+**ADR:** none — a test support edit
