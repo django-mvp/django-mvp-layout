@@ -1,28 +1,10 @@
 # AGENTS.md — Agent configuration for django-mvp-layout
 
-<!--
-  A thin index, not a manual. Anything long enough to skim past is long enough
-  to be ignored, and an ignored instruction is worse than an absent one: it
-  reads as covered.
+Page layouts arranged by a nine-letter layout code, with sidebars that open, close, collapse and nest.
 
-  Keep to what someone cannot work out from the code in a minute — the commands
-  that actually run here, the conventions that fail quietly, and pointers to
-  the files that hold the detail. Everything with its own home stays in that
-  home: standards in CONSTITUTION.md, vocabulary in CONTEXT.md, decisions in
-  docs/adr/.
-
-  Rewrite the paragraph below to say what this package is and, just as
-  usefully, what it is not. Use the words CONTEXT.md defines.
--->
-
-Page layouts arranged by a nine-letter layout code, with sidebars that open, close, collapse and nest
-
-<!--
-  Then a short paragraph on the shape of the package. The most useful sentence
-  is usually the one ruling something out — "presentation only: no models, no
-  views, no URLs, no migrations" tells a reader more than a list of what is
-  there, which they can see.
--->
+Presentation only: a set of Cotton components, two template tags, one stylesheet and one script. No
+models, views, URLs, settings or migrations. It arranges the areas of a layout and draws nothing
+inside them, which is the host project's job.
 
 ## Stack and commands
 
