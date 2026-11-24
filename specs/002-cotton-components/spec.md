@@ -89,10 +89,10 @@ plain-template layout's do.
 ### User Story 2 - A developer lays out a box inside a page (Priority: P2)
 
 A developer puts a layout inside a card, a dialog, a tab, or the page area of another layout, by
-writing `<c-layout container>` there and giving it a height. The inner layout fills its box, scrolls
-inside it, keeps its drawers inside it, and answers to its own width, so a layout in a narrow card
-turns its sidebars into drawers on a wide screen, as the plain-template feature specifies. Its
-toggles reach only its own sidebars.
+writing `<c-layout container>` there. With no height the inner layout is as tall as its content.
+Given a height, or a max-height it reaches, it fills it and scrolls inside it. It keeps its drawers
+inside it and answers to its own width, so a layout in a narrow card turns its sidebars into drawers
+on a wide screen, as the plain-template feature specifies. Its toggles reach only its own sidebars.
 
 **Why this priority**: nesting is what the package offers beyond a page frame, and it is built on
 everything Story 1 delivers.

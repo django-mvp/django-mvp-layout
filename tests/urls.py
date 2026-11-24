@@ -12,6 +12,7 @@ PAGES = (
     "contained",
     "nested",
     "narrow-box",
+    "sized",
     "empty-aside",
     "outside-toggle",
     "rtl",

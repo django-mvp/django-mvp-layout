@@ -74,8 +74,10 @@ explains.
 
 ## Put a layout in a box
 
-Pass `container=True` to `{% layout_attrs %}` and give the root element a height, such as
-`style="height: 100%"`. The layout then fills the box it is placed in and scrolls inside it, and its
+Pass `container=True` to `{% layout_attrs %}`. With no height the layout is as tall as its content.
+Give the root element a height, such as `style="height: 100%"`, and it fills that height and scrolls
+inside it. Give it a max-height and it grows with its content up to the limit, then scrolls inside
+it. A box that caps its own height caps a layout inside it once the box is a flex column. Its
 sidebars become drawers by the width of the box, not the window.
 
 ## `{% layout_attrs %}`

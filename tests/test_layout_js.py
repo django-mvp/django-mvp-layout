@@ -20,6 +20,7 @@ BASE_PAGES = [
     "layouts-contained",
     "layouts-nested",
     "layouts-narrow-box",
+    "layouts-sized",
     "layouts-empty-aside",
     "layouts-outside-toggle",
     "layouts-rtl",
@@ -331,6 +332,132 @@ class TestPlacement:
         page = visit("layouts-empty-aside")
         assert rect(page, right)["width"] == 0
         assert near(areas(page)["page"]["right"], areas(page)["grid"]["right"])
+
+
+SIZED = "#sized"
+SIZED_GRID = "#sized > .mvpl-grid"
+
+# How the sized page bounds its layout, and the height the layout stops at: a
+# height, a max-height on the layout, and a dialog's max-height of 360px less
+# its padding.
+BOUNDED = [("height", 320), ("max-height", 320), ("dialog", 312)]
+
+
+def sized(visit, size, viewport=DESKTOP, *, tall=False, narrow=False):
+    query = (
+        f"?size={size}" + ("&tall=1" if tall else "") + ("&narrow=1" if narrow else "")
+    )
+    return visit("layouts-sized", viewport, query)
+
+
+def scrolls_inside(page):
+    return page.evaluate(
+        "(s) => { const g = document.querySelector(s);"
+        " return g.scrollHeight > g.clientHeight + 1; }",
+        SIZED_GRID,
+    )
+
+
+def panel_rect(page, side):
+    return viewport_rect(
+        page, f'{SIZED_GRID} > [data-mvpl-side="{side}"] > .mvpl-panel'
+    )
+
+
+class TestContainedSize:
+    @pytest.mark.parametrize("tall", [False, True], ids=["short", "tall"])
+    def test_with_no_height_it_is_as_tall_as_its_content(self, visit, tall) -> None:
+        page = sized(visit, "none", tall=tall)
+        a = areas(page, SIZED)
+        content = a["header"]["height"] + a["page"]["height"] + a["footer"]["height"]
+        assert a["page"]["height"] >= (1600 if tall else 200)
+        assert near(rect(page, SIZED)["height"], content)
+        assert not scrolls_inside(page)
+
+    @pytest.mark.parametrize("tall", [False, True], ids=["short", "tall"])
+    def test_with_no_height_a_fixed_sidebar_fills_its_row(self, visit, tall) -> None:
+        page = sized(visit, "none", tall=tall)
+        a = areas(page, SIZED)
+        for side in ("left", "right"):
+            assert (
+                mode_of(page, f'{SIZED_GRID} > [data-mvpl-side="{side}"]') == "docked"
+            )
+            panel = rect(
+                page, f'{SIZED_GRID} > [data-mvpl-side="{side}"] > .mvpl-panel'
+            )
+            assert near(panel["top"], a["header"]["bottom"]), side
+            assert near(panel["bottom"], a["footer"]["top"]), side
+
+    @pytest.mark.parametrize(("size", "height"), BOUNDED)
+    def test_bounded_it_stops_at_its_limit_and_scrolls_inside(
+        self, visit, size, height
+    ) -> None:
+        page = sized(visit, size, tall=True)
+        assert near(rect(page, SIZED)["height"], height)
+        assert scrolls_inside(page)
+
+        page.evaluate(
+            "(s) => { document.querySelector(s).scrollTop = 600; }", SIZED_GRID
+        )
+        settle(page, 150)
+        assert (
+            page.evaluate("(s) => document.querySelector(s).scrollTop", SIZED_GRID) > 0
+        )
+        layout = viewport_rect(page, SIZED)
+        header = viewport_rect(page, f"{SIZED_GRID} > .mvpl-header")
+        footer = viewport_rect(page, f"{SIZED_GRID} > .mvpl-footer")
+        assert near(header["top"], layout["top"])
+        assert near(footer["bottom"], layout["bottom"])
+        for side in ("left", "right"):
+            panel = panel_rect(page, side)
+            assert near(panel["top"], header["bottom"]), side
+            assert near(panel["bottom"], footer["top"]), side
+
+    @pytest.mark.parametrize("size", ["max-height", "dialog"])
+    def test_under_a_max_height_it_is_as_tall_as_its_content(self, visit, size) -> None:
+        page = sized(visit, size)
+        a = areas(page, SIZED)
+        content = a["header"]["height"] + a["page"]["height"] + a["footer"]["height"]
+        assert near(rect(page, SIZED)["height"], content)
+        assert not scrolls_inside(page)
+
+    def test_given_a_height_with_less_content_it_fills_it(self, visit) -> None:
+        page = sized(visit, "height")
+        a = areas(page, SIZED)
+        layout = rect(page, SIZED)
+        assert near(layout["height"], 320)
+        assert near(a["footer"]["bottom"], layout["bottom"])
+        for side in ("left", "right"):
+            panel = rect(
+                page, f'{SIZED_GRID} > [data-mvpl-side="{side}"] > .mvpl-panel'
+            )
+            assert near(panel["bottom"], a["footer"]["top"]), side
+
+    @pytest.mark.parametrize("size", ["none", "height", "max-height", "dialog"])
+    def test_its_breakpoints_measure_its_own_width(self, visit, size) -> None:
+        left = f'{SIZED_GRID} > [data-mvpl-side="left"]'
+        assert mode_of(sized(visit, size), left) == "docked"
+        assert mode_of(sized(visit, size, narrow=True), left) == "overlay"
+
+    @pytest.mark.parametrize("size", ["none", "height", "max-height", "dialog"])
+    @pytest.mark.parametrize("tall", [False, True], ids=["short", "tall"])
+    def test_a_drawer_fits_the_layouts_visible_box(self, visit, size, tall) -> None:
+        page = sized(visit, size, PHONE, tall=tall)
+        left = f'{SIZED_GRID} > [data-mvpl-side="left"]'
+        assert mode_of(page, left) == "overlay"
+        if scrolls_inside(page):
+            page.evaluate(
+                "(s) => { document.querySelector(s).scrollTop = 400; }", SIZED_GRID
+            )
+        page.locator(f"{SIZED} [data-mvpl-toggle='left']").click()
+        settle(page)
+        assert drawer_open(page, left)
+        layout = rect(page, SIZED)
+        panel = rect(page, f"{left} > .mvpl-panel")
+        assert near(panel["top"], layout["top"])
+        assert near(panel["bottom"], layout["bottom"])
+        assert near(panel["left"], layout["left"])
+        assert panel["right"] <= layout["right"]
 
 
 class TestTheHostsRules:

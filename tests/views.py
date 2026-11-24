@@ -4,6 +4,20 @@ from django.views.generic import TemplateView
 
 from tests.page_context import NESTED, preview_context
 
+# How the sized page bounds its layout, by the URL's size: the styles of the
+# box the layout is in, and of the layout itself. A dialog is capped the way
+# daisyUI caps its modal box, and lays its content out as a flex column.
+SIZES = {
+    "none": ("", ""),
+    "height": ("", "height: 320px"),
+    "max-height": ("", "max-height: 320px"),
+    "dialog": (
+        "max-height: 360px; padding: 24px; box-sizing: border-box;"
+        " overflow-y: auto; display: flex; flex-direction: column",
+        "",
+    ),
+}
+
 
 class LayoutPage(TemplateView):
     """Render a test page, with what the pages that need it read from the URL."""
@@ -14,6 +28,10 @@ class LayoutPage(TemplateView):
         context["view"] = self.request.GET.get("view")
         context["rows"] = range(1900)
         context["tall"] = "tall" in self.request.GET
+        context["narrow"] = "narrow" in self.request.GET
+        context["box_style"], context["layout_style"] = SIZES[
+            self.request.GET.get("size", "none")
+        ]
         return context
 
 

@@ -258,7 +258,11 @@ by element, and assert the returned state, the sidebar's resulting state and the
   page, right sidebar, footer.
 - **FR-007** (US1): A sidebar whose panel is empty MUST take no space, and every toggle for it MUST be
   hidden.
-- **FR-008** (US1): A layout with `container` MUST fill the box it is placed in and scroll inside it.
+- **FR-008** (US1): A layout with `container` MUST be as tall as its content when it is given no
+  height, and nothing inside it scrolls. Given a height, it MUST fill it and scroll inside it. Given a
+  max-height, it MUST grow with its content up to the limit and then scroll inside it, with a fixed
+  header and footer in view. A fixed sidebar in it MUST run no further than its own row, and a
+  drawer MUST fit the layout's visible box.
   Layouts MUST nest, each with its own sidebars, breakpoints and toggles.
 
 **Sidebars**
