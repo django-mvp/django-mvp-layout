@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 PLAIN_LAYOUT = """{% load mvp_layout %}
 <div {% layout_attrs "lHh LpR lff" container=True css_class="frame" %}>
   <div class="mvpl-grid">
-    <aside {% sidebar_attrs "left" collapse="icons" breakpoint="md" persist="nav" width="14rem" %}>
+    <aside {% sidebar_attrs "left" collapse="icons" persist="nav" width="14rem" %}>
       <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
       <div class="mvpl-panel">x</div>
     </aside>
@@ -25,7 +25,8 @@ PLAIN_LAYOUT = """{% load mvp_layout %}
 
 COMPONENT_LAYOUT = """
 <c-layout view="lHh LpR lff" container class="frame">
-  <c-layout.sidebar side="left" collapse="icons" breakpoint="md" persist="nav" width="14rem">x</c-layout.sidebar>
+  <c-layout.sidebar side="left" collapse="icons" persist="nav"
+                    width="14rem">x</c-layout.sidebar>
   <c-layout.sidebar side="right" behavior="docked" closed>y</c-layout.sidebar>
 </c-layout>
 """

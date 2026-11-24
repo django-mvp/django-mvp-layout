@@ -108,7 +108,7 @@ NESTED = {
         (
             "Kofi Mensah",
             "Re: core samples",
-            "I've logged the last six cores. Two need re-labelling before they go to the lab.",
+            "I've logged the last six cores. Two need re-labelling before the lab.",
             "08:52",
             True,
         ),
