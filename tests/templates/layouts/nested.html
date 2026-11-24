@@ -7,7 +7,7 @@
   <div id="outer-box" style="width: 880px; height: 500px">
     <div id="outer" {% layout_attrs "hHh LpR fFf" container=True style="height: 100%" %}>
       <div class="mvpl-grid">
-        <header class="mvpl-header">Outer header</header>
+        <header class="mvpl-header"><button type="button" id="outer-toggle" data-mvpl-toggle="left">Outer navigation</button></header>
         <aside {% sidebar_attrs "left" breakpoint="sm" width="6rem" %} aria-label="Outer navigation">
           <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
           <div class="mvpl-panel"><nav>Outer navigation</nav></div>
@@ -16,7 +16,7 @@
           <div id="inner-box" style="width: 640px; height: 250px">
             <div id="inner" {% layout_attrs "lHh lpr lFf" container=True style="height: 100%" %}>
               <div class="mvpl-grid">
-                <header class="mvpl-header">Inner header</header>
+                <header class="mvpl-header"><button type="button" id="inner-toggle" data-mvpl-toggle="left">Inner navigation</button></header>
                 <aside {% sidebar_attrs "left" breakpoint="sm" width="6rem" %} aria-label="Inner navigation">
                   <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
                   <div class="mvpl-panel"><nav>Inner navigation</nav></div>

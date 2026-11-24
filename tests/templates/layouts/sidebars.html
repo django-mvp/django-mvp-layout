@@ -1,0 +1,29 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}Sidebars that collapse to an icon rail, and ones that do not{% endblock title %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav>Navigation</nav>{% endblock navigation %}
+{% block content %}
+  <div id="sidebars-box" style="width: 900px; height: 400px">
+    <div id="sidebars" {% layout_attrs "hHh lpr fFf" container=True style="height: 100%" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">
+          <button type="button" id="rail-toggle" data-mvpl-toggle="left">Rail</button>
+          <button type="button" id="pinned-toggle" data-mvpl-toggle="right">Pinned</button>
+        </header>
+        <aside {% sidebar_attrs "left" collapse="icons" breakpoint="sm" rail_width="5rem" %} aria-label="Rail">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">
+            <a href="#one"><span class="mvpl-rail-only" id="rail-only">I</span><span class="mvpl-rail-hide" id="rail-hide">Inbox</span></a>
+          </div>
+        </aside>
+        <main class="mvpl-page">Content</main>
+        <aside {% sidebar_attrs "right" collapse="none" breakpoint="sm" persist="pinned" %} aria-label="Pinned">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">Pinned</div>
+        </aside>
+        <footer class="mvpl-footer">Footer</footer>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

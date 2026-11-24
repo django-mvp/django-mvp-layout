@@ -1,0 +1,27 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}Sidebars that ignore their breakpoint{% endblock title %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav>Navigation</nav>{% endblock navigation %}
+{% block content %}
+  <div id="modes-box" style="width: 100%; height: 400px">
+    <div id="modes" {% layout_attrs "hHh lpr fFf" container=True style="height: 100%" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">
+          <button type="button" id="overlay-toggle" data-mvpl-toggle="left">Overlay</button>
+          <button type="button" id="docked-toggle" data-mvpl-toggle="right">Docked</button>
+        </header>
+        <aside {% sidebar_attrs "left" breakpoint="sm" behavior="overlay" width="8rem" %} aria-label="Overlay">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel"><a href="#one">Overlay</a></div>
+        </aside>
+        <main class="mvpl-page">Content</main>
+        <aside {% sidebar_attrs "right" breakpoint="sm" behavior="docked" width="3rem" %} aria-label="Docked">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">Docked</div>
+        </aside>
+        <footer class="mvpl-footer">Footer</footer>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

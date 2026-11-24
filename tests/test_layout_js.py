@@ -23,6 +23,9 @@ BASE_PAGES = [
     "layouts-empty-aside",
     "layouts-outside-toggle",
     "layouts-rtl",
+    "layouts-toggles",
+    "layouts-sidebars",
+    "layouts-behaviors",
     "layouts-heavy",
     "layouts-host-rules",
     "layouts-host-colours",
@@ -394,3 +397,170 @@ class TestRightToLeft:
             opened = viewport_rect(page, panel)
             assert opened["left"] < width - 100
             assert near(opened["right"], width, 20)
+
+
+LEFT = '#app > .mvpl-grid > [data-mvpl-side="left"]'
+RIGHT = '#app > .mvpl-grid > [data-mvpl-side="right"]'
+
+
+def state_of(page, selector):
+    """Read the attribute a sidebar's open or closed state is kept in."""
+    return page.locator(selector).get_attribute("data-mvpl-state")
+
+
+def width_of(page, selector):
+    """Read a sidebar's drawn width once its transition has finished."""
+    settle(page)
+    return rect(page, selector)["width"]
+
+
+def length_of(page, selector, variable):
+    """Resolve a length variable on an element to pixels, the way the browser does."""
+    return page.evaluate(
+        """([selector, variable]) => {
+          const el = document.querySelector(selector);
+          const probe = document.createElement("div");
+          probe.style.cssText = `position: absolute; width: var(${variable})`;
+          el.appendChild(probe);
+          const width = probe.getBoundingClientRect().width;
+          probe.remove();
+          return width;
+        }""",
+        [selector, variable],
+    )
+
+
+class TestToggles:
+    def test_a_toggle_closes_and_opens_a_docked_sidebar(self, visit) -> None:
+        page = visit("layouts-toggles")
+        assert mode_of(page, LEFT) == "docked"
+        assert state_of(page, LEFT) == "open"
+        opened = width_of(page, LEFT)
+        assert opened > 0
+
+        page.locator("#toggle").click()
+        assert state_of(page, LEFT) == "closed"
+        assert width_of(page, LEFT) == 0
+        assert page.locator("#toggle").get_attribute("aria-expanded") == "false"
+
+        page.locator("#toggle").click()
+        assert state_of(page, LEFT) == "open"
+        assert near(width_of(page, LEFT), opened)
+        assert page.locator("#toggle").get_attribute("aria-expanded") == "true"
+
+    def test_a_toggle_names_the_sidebar_it_controls(self, visit) -> None:
+        page = visit("layouts-toggles")
+        sidebar_id = page.locator(LEFT).get_attribute("id")
+        assert sidebar_id
+        assert page.locator("#toggle").get_attribute("aria-controls") == sidebar_id
+        assert page.locator("#aside-toggle").get_attribute(
+            "aria-controls"
+        ) == page.locator(RIGHT).get_attribute("id")
+
+    def test_a_toggle_for_one_state_shows_only_in_that_state(self, visit) -> None:
+        page = visit("layouts-toggles")
+        assert page.locator("#show-only-open").is_visible()
+        assert not page.locator("#show-only-closed").is_visible()
+
+        page.locator("#show-only-open").click()
+        assert state_of(page, LEFT) == "closed"
+        assert page.locator("#show-only-closed").is_visible()
+        assert not page.locator("#show-only-open").is_visible()
+
+        page.locator("#show-only-closed").click()
+        assert state_of(page, LEFT) == "open"
+        assert page.locator("#show-only-open").is_visible()
+
+    def test_a_toggle_outside_its_layout_controls_the_layout_it_names(
+        self, visit
+    ) -> None:
+        page = visit("layouts-outside-toggle")
+        boxed = '#boxed > .mvpl-grid > [data-mvpl-side="left"]'
+        # The box is narrower than the sidebar's breakpoint, so it is a drawer.
+        assert mode_of(page, boxed) == "overlay"
+        page.locator("#outside").click()
+        assert page.locator(boxed).get_attribute("data-mvpl-overlay") == "open"
+        assert page.locator(LEFT).get_attribute("data-mvpl-overlay") is None
+        assert state_of(page, LEFT) == "open"
+        assert page.locator("#outside").get_attribute("aria-controls") == (
+            page.locator(boxed).get_attribute("id")
+        )
+
+    def test_a_toggle_in_a_nested_layout_acts_only_on_its_own_layout(
+        self, visit
+    ) -> None:
+        page = visit("layouts-nested")
+        outer = '#outer > .mvpl-grid > [data-mvpl-side="left"]'
+        inner = '#inner > .mvpl-grid > [data-mvpl-side="left"]'
+        assert mode_of(page, outer) == mode_of(page, inner) == "docked"
+        for toggle, sidebar in (("#outer-toggle", outer), ("#inner-toggle", inner)):
+            assert page.locator(toggle).get_attribute("aria-controls") == (
+                page.locator(sidebar).get_attribute("id")
+            )
+
+        page.locator("#inner-toggle").click()
+        assert state_of(page, inner) == "closed"
+        assert state_of(page, outer) == "open"
+
+        page.locator("#outer-toggle").click()
+        assert state_of(page, outer) == "closed"
+        assert state_of(page, inner) == "closed"
+        page.locator("#inner-toggle").click()
+        assert state_of(page, inner) == "open"
+        assert state_of(page, outer) == "closed"
+
+    def test_a_sidebar_that_never_closes_offers_no_toggle_beside_the_page(
+        self, visit
+    ) -> None:
+        page = visit("layouts-sidebars")
+        pinned = '#sidebars > .mvpl-grid > [data-mvpl-side="right"]'
+        assert mode_of(page, pinned) == "docked"
+        assert page.locator("#pinned-toggle").is_hidden()
+        assert state_of(page, pinned) == "open"
+        assert width_of(page, pinned) > 0
+
+    def test_a_sidebar_with_an_empty_panel_hides_every_toggle_for_it(
+        self, visit
+    ) -> None:
+        page = visit("layouts-empty-aside")
+        assert page.locator("[data-mvpl-toggle='right']").is_hidden()
+        assert page.locator("[data-mvpl-toggle='left']").is_visible()
+
+
+class TestIconRail:
+    RAIL = '#sidebars > .mvpl-grid > [data-mvpl-side="left"]'
+
+    def test_an_open_sidebar_is_not_a_rail(self, visit) -> None:
+        page = visit("layouts-sidebars")
+        assert page.locator(self.RAIL).get_attribute("data-mvpl-rail") is None
+        assert page.locator("#rail-hide").is_visible()
+        assert not page.locator("#rail-only").is_visible()
+
+    def test_closing_leaves_the_sidebar_beside_the_page_at_its_rail_width(
+        self, visit
+    ) -> None:
+        page = visit("layouts-sidebars")
+        assert mode_of(page, self.RAIL) == "docked"
+        page.locator("#rail-toggle").click()
+        assert state_of(page, self.RAIL) == "closed"
+        assert page.locator(self.RAIL).get_attribute("data-mvpl-rail") is not None
+        rail = length_of(page, self.RAIL, "--mvpl-rail-w")
+        assert rail > 0
+        assert near(width_of(page, self.RAIL), rail)
+        assert near(
+            rect(page, "#sidebars > .mvpl-grid > .mvpl-page")["left"],
+            rect(page, self.RAIL)["right"],
+        )
+
+    def test_a_rail_shows_what_is_for_it_and_hides_what_is_not(self, visit) -> None:
+        page = visit("layouts-sidebars")
+        page.locator("#rail-toggle").click()
+        settle(page)
+        assert page.locator("#rail-only").is_visible()
+        assert not page.locator("#rail-hide").is_visible()
+        assert computed(page, "#rail-hide", "display") == "none"
+
+        page.locator("#rail-toggle").click()
+        settle(page)
+        assert page.locator("#rail-hide").is_visible()
+        assert not page.locator("#rail-only").is_visible()
