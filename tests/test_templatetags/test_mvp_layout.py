@@ -111,7 +111,9 @@ class TestLayoutAttrs:
         variables = style_variables(render_tag('{% layout_attrs "lHh lpr lFf" %}'))
 
         assert variables == {
-            "--mvpl-areas": "'left header header' 'left page right' 'left footer footer'",
+            "--mvpl-areas": (
+                "'left header header' 'left page right' 'left footer footer'"
+            ),
             "--mvpl-left-top": "0px",
             "--mvpl-left-bottom": "0px",
             "--mvpl-right-top": "var(--mvpl-header-h, 0px)",
@@ -137,7 +139,8 @@ class TestLayoutAttrs:
 
     def test_every_argument_may_be_named(self):
         attrs = render_tag(
-            '{% layout_attrs view="lhh lpr lff" container=True css_class="x" style="y: 1" %}'
+            '{% layout_attrs view="lhh lpr lff" container=True '
+            'css_class="x" style="y: 1" %}'
         )
 
         assert attrs["data-mvpl-view"] == "lhh lpr lff"
@@ -292,7 +295,7 @@ class TestSidebarAttrs:
             ),
         ],
     )
-    def test_the_rail_attribute_is_present_for_a_closed_icon_sidebar_that_is_not_overlay(
+    def test_the_rail_attribute_marks_a_closed_icon_sidebar_that_is_not_overlay(
         self, tag, rail
     ):
         attrs = render_tag(tag)

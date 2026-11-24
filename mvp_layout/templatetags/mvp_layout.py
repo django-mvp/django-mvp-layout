@@ -1,13 +1,13 @@
 """Template tags that write a layout's attributes.
 
-The ``<c-layout>`` components are built on these, and a template that doesn't
-use django-cotton calls them itself::
+A template calls them on the elements of a layout::
 
     {% load mvp_layout %}
     <div {% layout_attrs "lHh LpR lff" %}>
       <div class="mvpl-grid">
         <header class="mvpl-header">…</header>
-        <aside {% sidebar_attrs "left" persist="nav" %} aria-label="Navigation">…</aside>
+        <aside {% sidebar_attrs "left" persist="nav" %}
+               aria-label="Navigation">…</aside>
         <main class="mvpl-page">…</main>
       </div>
     </div>

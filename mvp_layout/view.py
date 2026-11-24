@@ -128,9 +128,9 @@ class LayoutView:
             A message that shows the value and states the rules.
         """
         return (
-            f"{value!r} is not a layout code. A layout code is three groups of three "
-            "letters separated by spaces, such as 'hHh lpr fFf'. The top row is h or l, "
-            "then h, then h or r. The middle row is l, p, r. The bottom row is f or l, "
-            "then f, then f or r. An upper-case letter keeps that area in place while "
-            "the layout scrolls."
+            f"{value!r} is not a layout code. A layout code is three groups of "
+            "three letters separated by spaces, such as 'hHh lpr fFf'. The top row "
+            "is h or l, then h, then h or r. The middle row is l, p, r. The bottom "
+            "row is f or l, then f, then f or r. An upper-case letter keeps that "
+            "area in place while the layout scrolls."
         )
