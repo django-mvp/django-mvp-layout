@@ -38,9 +38,29 @@ INSTALLED_APPS = [
 ]
 ```
 
-This package requires [django-mvp](https://github.com/django-mvp/django-mvp).
-It renders inside django-mvp's layout and reads its colours from the theme
-django-mvp supplies, so it does nothing useful on its own.
+## Usage
+
+A layout is written in a plain base template that the pages of your project extend.
+
+1. Copy
+   [`docs/examples/base.html`](https://github.com/django-mvp/django-mvp-layout/blob/main/docs/examples/base.html)
+   to your project's `templates/base.html`, and add
+   `django.template.context_processors.request` to your template settings.
+2. Keep the three things the layout needs: `{% layout_attrs %}` on the root element,
+   `{% sidebar_attrs %}` on each sidebar, and the stylesheet and script in the head:
+
+   ```html
+   {% load static mvp_layout %}
+   <link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+   <script src="{% static 'mvp_layout/layout.js' %}"></script>
+   ```
+
+3. Extend it in a page, filling the `header`, `navigation`, `content`, `aside` and `footer` blocks.
+
+The nine-letter code in `{% layout_attrs "hHh LpR fFf" %}` places the areas. The
+[developer guide](https://github.com/django-mvp/django-mvp-layout/tree/main/docs/developer)
+covers the code, both tags, styling, right-to-left pages and `MvpLayout`, the script a page of your
+own uses to open and close sidebars.
 
 ## Contributing
 

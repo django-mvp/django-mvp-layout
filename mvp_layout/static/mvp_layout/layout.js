@@ -282,7 +282,11 @@
   function resolve(rootOrId) {
     var root = typeof rootOrId === "string" ? document.getElementById(rootOrId) : rootOrId;
     if (!root || !root.matches(ROOT)) {
-      throw new Error("MvpLayout: no layout has the id " + JSON.stringify(rootOrId));
+      throw new Error(
+        typeof rootOrId === "string"
+          ? "MvpLayout: no layout has the id " + JSON.stringify(rootOrId)
+          : "MvpLayout: the element is not a layout"
+      );
     }
     return root;
   }

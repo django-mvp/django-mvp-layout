@@ -15,6 +15,7 @@ installation
 
 layout-code
 plain-templates
+scripting
 styling
 right-to-left
 ```
