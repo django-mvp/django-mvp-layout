@@ -1,0 +1,14 @@
+{% extends "examples/base.html" %}
+{% block title %}Default layout{% endblock title %}
+{% block header %}
+  <button type="button" data-mvpl-toggle="left">Navigation</button>
+  <span>Header</span>
+  <button type="button" data-mvpl-toggle="right">Aside</button>
+{% endblock header %}
+{% block navigation %}<nav><a href="#one">One</a> <a href="#two">Two</a></nav>{% endblock navigation %}
+{% block content %}
+  <h1>Page</h1>
+  <div style="height: 2400px">Tall enough for the window to scroll.</div>
+{% endblock content %}
+{% block aside %}<p>Aside</p>{% endblock aside %}
+{% block footer %}Footer{% endblock footer %}

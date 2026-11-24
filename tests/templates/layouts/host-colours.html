@@ -1,0 +1,12 @@
+{% extends "examples/base.html" %}
+{% block title %}A host's colours{% endblock title %}
+{% block styles %}
+  <style>
+    #app { --mvpl-sidebar-bg: rgb(10, 20, 30); }
+  </style>
+{% endblock styles %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav><a href="#one">One</a></nav>{% endblock navigation %}
+{% block content %}<h1>Page</h1>{% endblock content %}
+{% block aside %}<p>Aside</p>{% endblock aside %}
+{% block footer %}Footer{% endblock footer %}

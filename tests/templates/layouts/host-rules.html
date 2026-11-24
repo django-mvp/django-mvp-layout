@@ -1,0 +1,22 @@
+{% extends "examples/base.html" %}
+{% block title %}A host's own rules{% endblock title %}
+{% block styles %}
+  <style>
+    .mvpl-sidebar { background-color: rgb(1, 2, 3); }
+    .mvpl-sidebar[data-mvpl-state="closed"] { background-color: rgb(4, 5, 6); }
+    aside { margin-block-start: 11px; }
+    header { margin-block-start: 12px; }
+  </style>
+{% endblock styles %}
+{% block header %}
+  <button type="button" data-mvpl-toggle="left">Navigation</button>
+  <span>Header</span>
+{% endblock header %}
+{% block navigation %}<nav><a href="#one">One</a></nav>{% endblock navigation %}
+{% block content %}
+  <h1>Page</h1>
+  <aside id="plain-aside">An aside of the host's own, outside any layout's areas.</aside>
+  <header id="plain-header">A header of the host's own.</header>
+{% endblock content %}
+{% block aside %}<p>Aside</p>{% endblock aside %}
+{% block footer %}Footer{% endblock footer %}

@@ -61,10 +61,20 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      # The script's types are checked by the TypeScript compiler. No Python
+      # package ships tsc, so it cannot come from the shared dev bundle:
+      # pre-commit builds a node environment for it instead.
+      - id: tsc
+        name: tsc (type-check the layout script)
+        entry: tsc -p tsconfig.json
+        language: node
+        additional_dependencies: [typescript@5.9.3]
+        pass_filenames: false
+        files: ^(mvp_layout/static/.*\.js|tsconfig\.json)$
 
 # pre-commit.ci runs only the env-independent hooks; the local project-env hooks
 # run in each repo's own CI (the shared build workflow's Code Quality job).
 ci:
   autoupdate_schedule: monthly
-  skip: [ruff, ruff-format, mypy, deptry]
+  skip: [ruff, ruff-format, mypy, deptry, tsc]
   submodules: false

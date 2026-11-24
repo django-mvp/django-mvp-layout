@@ -1,0 +1,25 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}A contained layout{% endblock title %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav>Navigation</nav>{% endblock navigation %}
+{% block content %}
+    <div id="contained-box" style="width: 700px; height: 400px; margin: 1rem">
+      <div id="contained" {% layout_attrs "hHh LpR fFf" container=True style="height: 100%" %}>
+        <div class="mvpl-grid">
+          <header class="mvpl-header"><button type="button" data-mvpl-toggle="left">Navigation</button> Header</header>
+          <aside {% sidebar_attrs "left" %} aria-label="Navigation">
+            <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+            <div class="mvpl-panel"><nav>Navigation</nav></div>
+          </aside>
+          <main class="mvpl-page"><div style="height: 1600px">Content</div></main>
+          <aside {% sidebar_attrs "right" %} aria-label="Aside">
+            <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+            <div class="mvpl-panel">Aside</div>
+          </aside>
+          <footer class="mvpl-footer">Footer</footer>
+        </div>
+      </div>
+    </div>
+  <div style="height: 2400px">Tall enough for the window to scroll.</div>
+{% endblock content %}
