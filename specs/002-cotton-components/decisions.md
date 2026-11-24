@@ -74,3 +74,8 @@ The prototype's pages put `data-mvpl-when` on a title that shows while a sidebar
 
 The build was done in the orchestrating build session, not dispatched to an implementer, because the session was already on the Sonnet tier and the work is six templates, one tag and tests over them.
 **ADR:** none — a process note
+
+## Two existing test files were edited
+
+The attribute reader that `tests/test_templatetags/test_mvp_layout.py` defined moved into `tests/conftest.py` so the component tests share it, as the design review asked, and the `render` fixture there gained an optional `request`. The same module's refused-name test lost its empty-string row (see "An empty persist name is none given"). No test was weakened: each moved helper is unchanged and every other row still runs.
+**ADR:** none — a test housekeeping note
