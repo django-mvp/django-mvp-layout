@@ -564,3 +564,140 @@ class TestIconRail:
         settle(page)
         assert page.locator("#rail-hide").is_visible()
         assert not page.locator("#rail-only").is_visible()
+
+
+def drawer_open(page, selector):
+    """Report whether a sidebar is open as a drawer."""
+    return page.locator(selector).get_attribute("data-mvpl-overlay") == "open"
+
+
+def focus_is_in(page, selector):
+    """Report whether the focused element is inside the one the selector names."""
+    return page.evaluate(
+        "(s) => document.querySelector(s).contains(document.activeElement)", selector
+    )
+
+
+class TestDrawers:
+    PANEL = f"{LEFT} > .mvpl-panel"
+
+    def test_a_toggle_opens_the_sidebar_as_a_modal_dialog(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        assert mode_of(page, LEFT) == "overlay"
+        assert page.locator(self.PANEL).get_attribute("role") is None
+
+        page.locator("#toggle").click()
+        assert drawer_open(page, LEFT)
+        assert page.locator(self.PANEL).get_attribute("role") == "dialog"
+        assert page.locator(self.PANEL).get_attribute("aria-modal") == "true"
+        assert page.locator("#toggle").get_attribute("aria-expanded") == "true"
+        # A drawer is not the docked state, which stays what the reader left.
+        assert state_of(page, LEFT) == "open"
+
+    def test_focus_moves_into_the_drawer_and_the_other_areas_are_inert(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.locator("#toggle").click()
+        assert focus_is_in(page, self.PANEL)
+        areas_inert = page.evaluate(
+            """() => Object.fromEntries(
+              [...document.querySelectorAll("#app > .mvpl-grid > *")]
+                .map((el) => [el.dataset.mvplSide ?? el.className, el.inert]))"""
+        )
+        assert areas_inert == {
+            "mvpl-header": True,
+            "left": False,
+            "mvpl-page": True,
+            "right": True,
+            "mvpl-footer": True,
+        }
+
+    def test_escape_closes_it_and_focus_returns_to_the_toggle(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.locator("#toggle").click()
+        page.keyboard.press("Escape")
+        assert not drawer_open(page, LEFT)
+        assert page.evaluate("document.activeElement.id") == "toggle"
+        assert page.locator(self.PANEL).get_attribute("role") is None
+
+    def test_the_backdrop_closes_it_and_focus_returns(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.locator("#toggle").click()
+        backdrop = viewport_rect(page, f"{LEFT} > .mvpl-backdrop")
+        panel = viewport_rect(page, self.PANEL)
+        assert panel["right"] < backdrop["right"] - 4
+        page.mouse.click(
+            backdrop["right"] - 2, backdrop["top"] + backdrop["height"] / 2
+        )
+        assert not drawer_open(page, LEFT)
+        assert page.evaluate("document.activeElement.id") == "toggle"
+
+    def test_following_a_link_inside_it_closes_it(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.locator("#toggle").click()
+        page.locator("#link").click()
+        assert not drawer_open(page, LEFT)
+        assert page.evaluate("document.querySelectorAll('[inert]').length") == 0
+
+    def test_a_whole_page_drawer_locks_the_page_while_it_is_open(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        root = "document.documentElement.classList.contains('mvpl-locked')"
+        assert not page.evaluate(root)
+        page.locator("#toggle").click()
+        assert page.evaluate(root)
+        page.keyboard.press("Escape")
+        assert not page.evaluate(root)
+
+    def test_a_contained_drawer_leaves_the_page_unlocked(self, visit) -> None:
+        page = visit("layouts-contained", PHONE)
+        page.locator("#contained [data-mvpl-toggle='left']").click()
+        drawer = '#contained > .mvpl-grid > [data-mvpl-side="left"]'
+        assert drawer_open(page, drawer)
+        assert not page.evaluate(
+            "document.documentElement.classList.contains('mvpl-locked')"
+        )
+
+    def test_resizing_across_the_breakpoint_closes_it_and_frees_the_page(
+        self, visit
+    ) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.locator("#toggle").click()
+        assert drawer_open(page, LEFT)
+
+        page.set_viewport_size(DESKTOP)
+        settle(page)
+        assert mode_of(page, LEFT) == "docked"
+        assert not drawer_open(page, LEFT)
+        assert page.evaluate("document.querySelectorAll('[inert]').length") == 0
+        assert not page.evaluate(
+            "document.documentElement.classList.contains('mvpl-locked')"
+        )
+
+    def test_a_sidebar_set_to_overlay_is_a_drawer_at_desktop_width(self, visit) -> None:
+        page = visit("layouts-behaviors", DESKTOP)
+        left = '#modes > .mvpl-grid > [data-mvpl-side="left"]'
+        assert page.evaluate("innerWidth") >= 1400
+        assert mode_of(page, left) == "overlay"
+
+        page.locator("#overlay-toggle").click()
+        assert drawer_open(page, left)
+        assert page.locator(f"{left} > .mvpl-panel").get_attribute("role") == "dialog"
+        assert page.locator(f"{left} > .mvpl-panel").get_attribute("aria-modal") == (
+            "true"
+        )
+        assert state_of(page, left) == "open"
+
+    def test_a_sidebar_set_to_docked_stays_beside_the_page_at_phone_width(
+        self, visit
+    ) -> None:
+        page = visit("layouts-behaviors", PHONE)
+        right = '#modes > .mvpl-grid > [data-mvpl-side="right"]'
+        assert mode_of(page, right) == "docked"
+        opened = width_of(page, right)
+        assert opened > 0
+
+        page.locator("#docked-toggle").click()
+        assert state_of(page, right) == "closed"
+        assert not drawer_open(page, right)
+        assert width_of(page, right) < opened
