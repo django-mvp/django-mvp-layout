@@ -45,6 +45,7 @@ DRAWER = """\
   overflow-y: auto;
   overscroll-behavior: contain;
   visibility: hidden;
+  margin-inline-start: 0;
   border-inline-width: 0;
   background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
   box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);

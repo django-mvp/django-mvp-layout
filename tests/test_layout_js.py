@@ -928,6 +928,41 @@ class TestTheWheel:
         assert page.evaluate("scrollY") == 0
 
 
+class TestSidebarTransition:
+    def test_closing_and_opening_a_docked_sidebar_drops_no_long_frame(
+        self, visit
+    ) -> None:
+        page = visit("layouts-heavy", DESKTOP)
+        assert page.evaluate("document.querySelectorAll('*').length") > 3000
+        assert page.evaluate(
+            "PerformanceObserver.supportedEntryTypes.includes('long-animation-frame')"
+        )
+        toggle = page.locator("[data-mvpl-toggle='left']").first
+        # The first toggle on a fresh page pays for one-off work, such as the
+        # first layout of the stylesheet's rules, that is no part of a transition.
+        toggle.click()
+        toggle.click()
+        settle(page, 600)
+        page.evaluate(
+            """() => {
+              window.longFrames = [];
+              new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                  window.longFrames.push(entry.duration);
+                }
+              }).observe({type: "long-animation-frame", buffered: false});
+            }"""
+        )
+        toggle.click()
+        assert state_of(page, LEFT) == "closed"
+        settle(page, 600)
+        toggle.click()
+        assert state_of(page, LEFT) == "open"
+        settle(page, 600)
+        # A frame is reported only past 50 ms, so any entry is one too long.
+        assert page.evaluate("window.longFrames") == []
+
+
 class SidebarStates(HTMLParser):
     """Collect each sidebar's side and drawn state, in document order."""
 

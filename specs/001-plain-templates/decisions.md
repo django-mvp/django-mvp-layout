@@ -73,6 +73,22 @@ pages written with different layouts.
 **Why**: 50 ms is the long-task threshold browsers report, so it is measurable without a judgement
 call.
 
+## A docked sidebar slides by a transform
+
+**Open**: animating the sidebar column's width made the page area lay out again on every frame of
+the 0.2 s transition. On the heavy test page that produced six to eight frames of 65 to 120 ms
+each time a sidebar closed or opened.
+**Chosen**: the column gives up or takes back its width at once, and the panel slides over the page
+with `translate` (to the side its name gives, mirrored under right-to-left). Only one frame lays
+the page out. An icon rail changes width at once, with no slide. The heavy page has 1900 rows
+(about 5700 elements): on this machine the old stylesheet failed the measurement four times out
+of four there, and the new one passed six times out of six. At 3000 rows a single layout of the
+page takes 50 to 60 ms here, which no animation can avoid, and the measurement fails even with
+the transform.
+**Why**: the transition is the only part of the cost the stylesheet controls. This changes the
+look the stylesheet ported from the prototype, so it is compared with the prototype's screens.
+**Revisit if**: a page's one layout is itself over 50 ms on the machine that runs the build.
+
 ## Goals and roadmap
 
 **Open**: the spec cites a goal id. `GOALS.md` has three rows with no goals written, and the

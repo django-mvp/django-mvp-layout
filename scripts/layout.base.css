@@ -36,11 +36,13 @@
   grid-template-rows: auto 1fr auto;
   grid-template-areas: var(--mvpl-areas);
   min-height: 100dvh;
+  overflow-x: clip;
 }
 .mvpl[data-mvpl-container] > .mvpl-grid {
   height: 100%;
   min-height: 0;
   overflow: auto;
+  overflow-x: clip;
 }
 
 .mvpl-grid > .mvpl-header { grid-area: header; min-width: 0; }
@@ -81,7 +83,6 @@
   width: var(--mvpl-w);
   min-width: 0;
   background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
-  transition: width 0.2s ease;
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-side="right"] { --mvpl-w: 18rem; }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-side="left"] > .mvpl-panel {
@@ -96,6 +97,7 @@
   box-sizing: border-box;
   width: var(--mvpl-w);
   min-height: 100%;
+  transition: translate 0.2s ease;
 }
 .mvpl-grid > .mvpl-sidebar > .mvpl-backdrop { display: none; }
 
@@ -121,14 +123,26 @@
    panel empty instead. */
 .mvpl-grid > .mvpl-sidebar:has(> .mvpl-panel:empty) { display: none; }
 
-/* Closed beside the page: slid away, or an icon rail. */
+/* Closed beside the page: slid away, or an icon rail. The column gives up its
+   width at once, and the panel slides over the page by a transform, which costs
+   the page no layout while it moves. */
+.mvpl-grid > .mvpl-sidebar[data-mvpl-collapse="offcanvas"] > .mvpl-panel {
+  position: relative;
+  z-index: 20;
+}
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"] {
   width: 0;
-  overflow: clip;
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"] > .mvpl-panel {
   visibility: hidden;
-  transition: visibility 0s linear 0.2s;
+  transition: translate 0.2s ease, visibility 0s linear 0.2s;
+}
+.mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"][data-mvpl-side="left"] > .mvpl-panel {
+  translate: calc(-100% * var(--mvpl-dir)) 0;
+}
+.mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"][data-mvpl-side="right"] > .mvpl-panel {
+  margin-inline-start: calc(var(--mvpl-w) * -1);
+  translate: calc(100% * var(--mvpl-dir)) 0;
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] { width: var(--mvpl-rail-w); }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] > .mvpl-panel {
