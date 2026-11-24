@@ -149,19 +149,6 @@ hierarchy built for a second implementation that does not exist.
 
 ## Project articles
 
-<!--
-  Articles XI onward are this package's own. They hold the rules that are
-  specific to what it does — the ones a reviewer would otherwise have to infer
-  from the code.
-
-  Write one when a decision would otherwise be re-argued on every pull request.
-  A rule belongs here if breaking it should block a merge. Anything softer is a
-  convention for the README, and anything that was a one-time choice is a
-  decision record under docs/adr/.
-
-  Two examples of the shape, to be replaced:
--->
-
 ### Article XI — Compatibility
 
 The public API is semver-stable. A deprecation lives one minor version with a
@@ -169,11 +156,21 @@ warning before it is removed, and the CHANGELOG says what replaces it.
 
 ### Article XII — Scope
 
-<!--
-  What this package refuses to do, and why. This is the article that stops
-  scope creep arriving one reasonable-sounding pull request at a time. Name the
-  neighbouring concern that is deliberately somebody else's.
--->
+The package arranges areas and makes sidebars behave. What is drawn inside an area belongs to the
+host project: navigation, menus, brand, breadcrumbs, colours and the theme. A change that would
+have the package draw one of those, or read a setting to decide one, is out of scope however
+convenient it looks, because it ties every host project to one look.
+
+The package depends on Django and django-cotton and on nothing else at runtime. A CSS framework is
+never a dependency. Where a theme's variables exist the stylesheet reads them, and it falls back to
+system colours where they do not.
+
+### Article XIII — Markup order and accessibility
+
+The order of the areas in the markup is the reading and Tab order, so it is always header, left
+sidebar, page, right sidebar, footer, whatever the layout code places where. A drawer is a modal
+dialog: focus moves into it and back, Escape closes it, and the rest of the layout is inert while it
+is open. A change that breaks any of these blocks a merge.
 
 ## Quality bar
 
@@ -196,17 +193,6 @@ Read at planning and at review; applies to every change.
   author can never approve it.
 - Machine verification gates every step. Tests, build, and lint are the gate,
   and no amount of reasoning about why a red result is acceptable overrides it.
-
-<!--
-  The footer below is mandatory and closes this file, so a review can name the
-  revision it was made against. The format is fixed: bold labels with the colon
-  outside the bold, ISO dates, and the last line of the file.
-
-  Versioning is semantic. MAJOR for a removed or redefined article, MINOR for a
-  new article or materially expanded guidance, PATCH for clarification and
-  wording. Every amendment updates the version and the Last Amended date.
-  Ratified never changes after first adoption.
--->
 
 ---
 

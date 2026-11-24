@@ -130,7 +130,7 @@ extension = "html"
 [tool.ruff]
 extend = "ruff-base.toml"
 
-[tool.ruff.lint.per-file-ignores]
+[tool.ruff.lint.extend-per-file-ignores]
 "tests/*" = ["S101", "S105", "S106", "B017", "A001", "RUF059"]
 # The demo project is a demonstration target, never deployed: its settings
 # carry a literal SECRET_KEY on purpose.
@@ -164,3 +164,11 @@ extend_exclude = ["tests/", "demo/", "docs/"]
 # django-mvp supplies. Dropping it would leave every page unstyled while every
 # import still resolved.
 DEP002 = ["django-mvp"]
+
+[tool.forge.conformance]
+# Neither has a module under mvp_layout/ to mirror: the undistributed demo and
+# the installed layout of the package.
+non-mirror-paths = [
+  "tests/test_demo.py",
+  "tests/test_smoke.py",
+]
