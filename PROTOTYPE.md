@@ -12,17 +12,20 @@ http://devserver:8066/nested/ and http://devserver:8066/without-cotton/
 
 ## The features
 
-### 1. Layouts by a layout code (feature)
+The template tags are the base layer and the Cotton components are written on them, so the plain
+templates are built first (Sam, 2026-11-24).
 
-A developer arranges a page, or a box inside one, with `<c-layout view="…">` and its areas, and gets
-sidebars that open, close, collapse to an icon rail and turn into drawers by themselves.
+### 1. Layouts in plain templates (feature)
 
-- `<c-layout view container id class style>`, `<c-layout.header>`, `<c-layout.page tag>`,
-  `<c-layout.footer>`.
-- `<c-layout.sidebar side collapse breakpoint behavior width rail-width closed persist label>`,
-  drawn only when it has content. A wrong option or code raises.
-- `<c-layout.toggle side when label>`, and `data-mvpl-toggle` with `data-mvpl-layout` for a toggle
-  outside the layout.
+A developer arranges a page, or a box inside one, by a layout code in ordinary Django templates,
+copying `docs/examples/base.html` and extending it with blocks, and gets sidebars that open, close,
+collapse to an icon rail and turn into drawers by themselves.
+
+- `{% layout_attrs view container class style %}` and
+  `{% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width class %}`
+  write a layout's and a sidebar's attributes. A wrong option or code raises.
+- `data-mvpl-toggle` buttons, with `data-mvpl-layout` for a toggle outside the layout.
+- An empty `.mvpl-panel` hides its sidebar and its toggles.
 - Breakpoints measured against the layout's own width (container queries).
 - Drawers are modal dialogs: focus in and back, Escape closes the topmost only, the rest of the
   layout inert, the page locked behind a whole-page drawer, backdrop and links close it.
@@ -31,14 +34,17 @@ sidebars that open, close, collapse to an icon rail and turn into drawers by the
 - Script API: `MvpLayout("app")` mounts a layout by id or element. `MvpLayout.sync`, `state`,
   `toggle`, `open` and `close` take the same, and a `mvpl:change` event fires on the layout.
 
-### 2. Layouts without Cotton (feature)
+### 2. Layouts with Cotton (feature)
 
-A developer copies `docs/examples/base.html` and extends it with ordinary blocks.
+A developer writes the same layouts as Cotton components, `<c-layout view="…">` and its areas.
 
-- `{% layout_attrs %}` and `{% sidebar_attrs %}` write the attributes the components write.
-- An empty `.mvpl-panel` hides its sidebar and its toggles.
+- `<c-layout view container id class style>`, `<c-layout.header>`, `<c-layout.page tag>`,
+  `<c-layout.footer>`.
+- `<c-layout.sidebar side collapse breakpoint behavior width rail-width closed persist label>`,
+  drawn only when it has content.
+- `<c-layout.toggle side when label>`.
 
-Depends on 1, and shares its stylesheet and script.
+Depends on 1. The components write their attributes with its tags and add only markup.
 
 ### 3. The demo project (resolve)
 
@@ -49,11 +55,11 @@ Overview, playground, nested layouts and the Without Cotton page, which extends
 
 | Piece | Where it occurs | Becomes | Built by |
 |---|---|---|---|
-| Reading the code | `mvp_layout/view.py` | The parser, used by the tag and the components | 1 |
-| Sidebar options and the cookie | `mvp_layout/templatetags/mvp_layout.py` | The tags under both features | 1 |
+| Reading the code | `mvp_layout/view.py` | The parser, used by the tags | 1 |
+| Sidebar options and the cookie | `mvp_layout/templatetags/mvp_layout.py` | The tags, used by plain templates and the components | 1 |
 | Drawer rules per breakpoint | `scripts/build_css.py` writes `mvp_layout/static/mvp_layout/layout.css` | The stylesheet, checked by a test | 1 |
 | Behaviour | `mvp_layout/static/mvp_layout/layout.js` | The script | 1 |
-| The base template | `docs/examples/base.html` | Documentation and the demo's Without Cotton page | 2 |
+| The base template | `docs/examples/base.html` | Documentation and the demo's Without Cotton page | 1 |
 
 ## The look
 
@@ -83,6 +89,8 @@ None. The only state is the sidebar cookie.
 - 2026-11-24: The script stays plain JavaScript. (Sam)
 - 2026-11-24: A layout is mounted with `MvpLayout("app")`, by id. (Sam)
 - 2026-11-24: The layout has to work right-to-left. Designed in the build, not now. (Sam)
+- 2026-11-24: Plain templates and their tags are built first, and the Cotton components on them.
+  (Sam)
 
 ## Decided on my own
 
