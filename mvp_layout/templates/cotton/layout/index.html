@@ -1,0 +1,15 @@
+{# @description A layout arranged by a layout code: header, left and right sidebars, page and footer. Nests inside itself. #}
+{# @prop view:text | default:"hHh lpr fFf" | description:"The layout code: three groups of three letters, such as lHh LpR lff." #}
+{# @prop container:boolean | description:"Fill the box the layout is placed in and scroll inside it, instead of the window. Give the layout a height." #}
+{# @prop id:text | description:"The layout's id. Generated when not given." #}
+{# @prop class:text | description:"Classes added to the layout's own." #}
+{# @prop style:text | description:"Declarations added after the layout's own." #}
+{# @slot The areas: c-layout.header, c-layout.sidebar, c-layout.page and c-layout.footer. The code places them, so any order draws the same layout, but screen readers and the Tab key follow the order written: header, left sidebar, page, right sidebar, footer. #}
+{% load mvp_layout %}
+<c-vars view="" container="" id="" class="" style="" />
+{% if not id %}{% layout_uid "layout" as id %}{% endif %}
+<div id="{{ id }}" {% layout_attrs view container class style %} {{ attrs }}>
+  <div class="mvpl-grid">{{ slot }}</div>
+</div>
+{# Mounted as soon as it is parsed, so the sidebars and their toggles are right before the first paint. #}
+<script>window.MvpLayout && MvpLayout("{{ id|escapejs }}");</script>

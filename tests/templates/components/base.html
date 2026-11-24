@@ -1,0 +1,67 @@
+{% load static components_icons %}<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}django-mvp-layout{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+    {# Not deferred: each layout mounts from a script right after its markup, before the first paint. #}
+    <script src="{% static 'mvp_layout/layout.js' %}"></script>
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("demo-theme") || "light";
+    </script>
+  </head>
+  <body class="bg-base-100 text-base-content">
+    <c-layout view="lHh LpR lff" id="demo" style="--mvpl-sidebar-bg: var(--color-base-200);">
+      <c-layout.header class="bg-base-100/90 backdrop-blur">
+        <div class="flex h-14 items-center gap-2 px-3">
+          <c-layout.toggle side="left" when="closed" label="Navigation" class="btn btn-ghost btn-sm btn-square" />
+          <span class="font-semibold" data-mvpl-when="left-closed">django-mvp-layout</span>
+          <nav aria-label="Breadcrumb" class="text-sm text-base-content/70 max-sm:hidden">{% block breadcrumb %}{% endblock breadcrumb %}</nav>
+          <label class="ms-auto flex items-center gap-2 text-sm">
+            <span class="max-sm:sr-only">Theme</span>
+            <select class="select select-sm w-28" id="demo-theme" aria-label="Theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="corporate">Corporate</option>
+              <option value="dracula">Dracula</option>
+            </select>
+          </label>
+          <c-layout.toggle side="right" label="On this page" class="btn btn-ghost btn-sm btn-square">{% icon "sidebar-right" %}</c-layout.toggle>
+        </div>
+      </c-layout.header>
+      <c-layout.sidebar side="left" collapse="icons" breakpoint="lg" persist="demo-nav" label="Navigation">
+        <div class="flex h-14 shrink-0 items-center justify-between gap-2 px-3">
+          <a href="{% url 'components-overview' %}" class="font-semibold mvpl-rail-hide">django-mvp-layout</a>
+          <c-layout.toggle side="left" label="Navigation" class="btn btn-ghost btn-sm btn-square" />
+        </div>
+        <ul class="menu w-full gap-1">
+          {% url 'components-overview' as home_url %}{% url 'components-playground' as playground_url %}{% url 'components-nested' as nested_url %}{% url 'layouts-default' as plain_url %}
+          <li><a href="{{ home_url }}" title="Overview" {% if request.path == home_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "house" %}<span class="mvpl-rail-hide">Overview</span></a></li>
+          <li><a href="{{ playground_url }}" title="Playground" {% if request.path == playground_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layout" %}<span class="mvpl-rail-hide">Playground</span></a></li>
+          <li><a href="{{ nested_url }}" title="Nested layouts" {% if request.path == nested_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layers" %}<span class="mvpl-rail-hide">Nested layouts</span></a></li>
+          <li><a href="{{ plain_url }}" title="Without Cotton" {% if request.path == plain_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "code" %}<span class="mvpl-rail-hide">Without Cotton</span></a></li>
+        </ul>
+      </c-layout.sidebar>
+      <c-layout.page tag="main" class="min-w-0">
+        <div class="mx-auto flex {{ page_width|default:'max-w-5xl' }} flex-col gap-6 px-4 py-6 md:px-8">
+          {% block content %}{% endblock content %}
+        </div>
+      </c-layout.page>
+      <c-layout.sidebar side="right" persist="{{ aside_persist|default:'demo-aside' }}" :closed="aside_closed" label="On this page">{% block aside %}{% endblock aside %}</c-layout.sidebar>
+      <c-layout.footer class="border-t border-base-300">
+        <div class="px-4 py-3 text-sm text-base-content/60 md:px-8">django-mvp-layout demo. MIT licence.</div>
+      </c-layout.footer>
+    </c-layout>
+    <script>
+      (function () {
+        var select = document.getElementById("demo-theme");
+        select.value = document.documentElement.dataset.theme;
+        select.addEventListener("change", function () {
+          document.documentElement.dataset.theme = select.value;
+          localStorage.setItem("demo-theme", select.value);
+        });
+      })();
+    </script>
+  </body>
+</html>

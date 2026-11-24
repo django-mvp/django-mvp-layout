@@ -40,7 +40,27 @@ INSTALLED_APPS = [
 
 ## Usage
 
-A layout is written in a plain base template that the pages of your project extend.
+A layout is written with Cotton components, or in a plain base template that the pages of your
+project extend.
+
+### With django-cotton
+
+Load the stylesheet and script in the head, then write the layout:
+
+```html
+{% load static %}
+<link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+<script src="{% static 'mvp_layout/layout.js' %}"></script>
+
+<c-layout view="lHh LpR lff">
+  <c-layout.header><c-layout.toggle when="closed" /> My project</c-layout.header>
+  <c-layout.sidebar label="Navigation">…</c-layout.sidebar>
+  <c-layout.page tag="main">…</c-layout.page>
+  <c-layout.footer>…</c-layout.footer>
+</c-layout>
+```
+
+### In a plain template
 
 1. Copy
    [`docs/examples/base.html`](https://github.com/django-mvp/django-mvp-layout/blob/main/docs/examples/base.html)
@@ -59,7 +79,7 @@ A layout is written in a plain base template that the pages of your project exte
 
 The nine-letter code in `{% layout_attrs "hHh LpR fFf" %}` places the areas. The
 [developer guide](https://github.com/django-mvp/django-mvp-layout/tree/main/docs/developer)
-covers the code, both tags, styling, right-to-left pages and `MvpLayout`, the script a page of your
+covers the code, the components, both tags, styling, right-to-left pages and `MvpLayout`, the script a page of your
 own uses to open and close sidebars.
 
 ## Contributing

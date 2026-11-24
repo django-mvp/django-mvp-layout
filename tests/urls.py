@@ -3,7 +3,7 @@
 from django.urls import path
 
 from demo.urls import urlpatterns as demo_urlpatterns
-from tests.views import LayoutPage
+from tests.views import ComponentPage, LayoutPage
 
 # Each page is a template under tests/templates/layouts/ and is routed as
 # layouts-<name>. Most extend the documented base template.
@@ -26,8 +26,18 @@ PAGES = (
     "code",
 )
 
+COMPONENT_PAGES = ("overview", "playground", "nested", "no-script")
+
 urlpatterns = [
     *demo_urlpatterns,
+    *(
+        path(
+            f"components/{name}/",
+            ComponentPage.as_view(template_name=f"components/{name}.html"),
+            name=f"components-{name}",
+        )
+        for name in COMPONENT_PAGES
+    ),
     *(
         path(
             f"layouts/{name}/",

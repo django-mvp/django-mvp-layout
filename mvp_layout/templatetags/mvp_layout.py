@@ -14,6 +14,7 @@ A template calls them on the elements of a layout::
 """
 
 import re
+import uuid
 from dataclasses import dataclass
 from typing import ClassVar, Self
 
@@ -112,8 +113,8 @@ class Sidebar:
             breakpoint: ``sm``, ``md``, ``lg``, ``xl`` or ``2xl``. Defaults to
                 ``lg`` for the left sidebar and ``xl`` for the right.
             behavior: ``auto``, ``docked`` or ``overlay``. Defaults to ``auto``.
-            persist: The name the state is remembered under. Without one nothing
-                is remembered.
+            persist: The name the state is remembered under. Without one, or with an
+                empty one, nothing is remembered.
             closed: ``True`` draws the sidebar closed unless the cookie says
                 otherwise. Any value but ``True`` leaves it open.
             request: The request whose cookies are read. Without one the state
@@ -132,7 +133,7 @@ class Sidebar:
         breakpoint = cls.choose(  # noqa: A001
             "breakpoint", breakpoint, cls.BREAKPOINTS, cls.DEFAULT_BREAKPOINTS[side]
         )
-        if persist is not None and not cls.PERSIST_NAME.fullmatch(str(persist)):
+        if persist not in (None, "") and not cls.PERSIST_NAME.fullmatch(str(persist)):
             raise LayoutOptionError(
                 f"{persist!r} is not a sidebar persist name. Use only the characters"
                 " A-Za-z0-9_-, as it becomes part of a cookie name."
@@ -166,6 +167,19 @@ def write_attrs(pairs: list[tuple[str, object]]) -> SafeString:
             for name, value in present
         ),
     )
+
+
+@register.simple_tag
+def layout_uid(prefix):
+    """Return an id for an element that was not given one.
+
+    Args:
+        prefix: What the id starts with, such as ``layout`` or ``sidebar``.
+
+    Returns:
+        The prefix, a dash and twelve random hexadecimal characters.
+    """
+    return f"{prefix}-{uuid.uuid4().hex[:12]}"
 
 
 @register.simple_tag
@@ -220,6 +234,7 @@ def sidebar_attrs(
     width=None,
     rail_width=None,
     css_class="",
+    style="",
 ):
     """Write the attributes of a sidebar's ``<aside>``.
 
@@ -239,6 +254,7 @@ def sidebar_attrs(
         width: The sidebar's width, as a CSS length.
         rail_width: The width of its icon rail, as a CSS length.
         css_class: Classes added to the sidebar's own.
+        style: Declarations added after the sidebar's own.
 
     Returns:
         The attributes, ready to place inside a tag.
@@ -260,6 +276,7 @@ def sidebar_attrs(
         for part in (
             f"--mvpl-w: {width};" if width else "",
             f"--mvpl-rail-w: {rail_width};" if rail_width else "",
+            style.strip(),
         )
         if part
     )

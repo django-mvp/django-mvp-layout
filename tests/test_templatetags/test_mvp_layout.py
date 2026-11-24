@@ -1,34 +1,14 @@
 """Tests for the template tags that write a layout's attributes."""
 
-from html.parser import HTMLParser
-
 import pytest
 from django.template import Context, Template
 from django.test import RequestFactory
 
-from mvp_layout.templatetags.mvp_layout import LayoutOptionError
+from mvp_layout.templatetags.mvp_layout import LayoutOptionError, layout_uid
 from mvp_layout.view import LayoutViewError
+from tests.conftest import attrs_of
 
 DEFAULT_CODE = "hHh lpr fFf"
-
-
-class TagReader(HTMLParser):
-    """Collects the attributes of the first start tag in a piece of HTML."""
-
-    def __init__(self):
-        super().__init__()
-        self.attrs = None
-
-    def handle_starttag(self, tag, attrs):
-        if self.attrs is None:
-            self.attrs = dict(attrs)
-
-
-def attrs_of(html):
-    """Return the attributes of the first tag in the HTML, by name."""
-    reader = TagReader()
-    reader.feed(html)
-    return reader.attrs
 
 
 def render_tag(tag, context=None):
@@ -265,6 +245,11 @@ class TestSidebarAttrs:
 
         assert style_variables(attrs) == {"--mvpl-rail-w": "3rem"}
 
+    def test_an_empty_persist_name_means_none_given(self):
+        attrs = render_tag('{% sidebar_attrs persist="" %}')
+
+        assert "data-mvpl-persist" not in attrs
+
     def test_the_persist_name_is_written_only_when_given(self):
         named = render_tag('{% sidebar_attrs persist="nav" %}')
         anonymous = render_tag("{% sidebar_attrs %}")
@@ -321,7 +306,6 @@ class TestSidebarPersistName:
             ("a;b", False),
             ("a=b", False),
             ("a/b", False),
-            ("", False),
         ],
     )
     def test_a_name_is_kept_only_when_it_is_safe_in_a_cookie_name(self, name, allowed):
@@ -405,3 +389,23 @@ class TestSidebarCookie:
         right = render_tag('{% sidebar_attrs "right" persist="nav" %}', context)
 
         assert left["data-mvpl-state"] == right["data-mvpl-state"] == "closed"
+
+
+class TestLayoutUid:
+    """The id given to a layout or sidebar that was not given one."""
+
+    def test_it_starts_with_the_prefix_and_has_a_twelve_character_suffix(self):
+        prefix, _, suffix = layout_uid("sidebar").partition("-")
+
+        assert prefix == "sidebar"
+        assert len(suffix) == 12
+
+    def test_a_thousand_ids_are_all_different(self):
+        assert len({layout_uid("layout") for _ in range(1000)}) == 1000
+
+    def test_it_is_a_tag_that_can_name_a_variable(self):
+        html = Template(
+            '{% load mvp_layout %}{% layout_uid "layout" as id %}<i id="{{ id }}"></i>'
+        ).render(Context())
+
+        assert attrs_of(html)["id"].startswith("layout-")

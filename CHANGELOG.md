@@ -29,8 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `{% sidebar_attrs %}` tags, one stylesheet (`mvp_layout/layout.css`) and one script
   (`mvp_layout/layout.js`) with no build step. The script exposes `MvpLayout` to mount a layout,
   read and change its sidebars and listen for `mvpl:change`.
+- Layouts written as Cotton components: `<c-layout>`, `<c-layout.header>`, `<c-layout.page>`,
+  `<c-layout.footer>`, `<c-layout.sidebar>` and `<c-layout.toggle>`. They write the same attributes as
+  the tags, so a component layout and a plain-template layout behave the same, and a layout nests
+  inside another with `container`. Each layout and sidebar without an `id` gets a generated one
+  (`{% layout_uid %}`). The toggle's default accessible names are translatable, and the package ships
+  its English catalogue.
 
 ### Changed
 
+- A sidebar tag given an empty `persist` now means none was given, where it used to raise.
 - django-mvp is no longer a runtime dependency, and django-cotton (2.9 or later) is. A project
   that relied on this package to install django-mvp must now depend on it directly.
