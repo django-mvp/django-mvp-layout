@@ -48,3 +48,14 @@ extra would make `<c-layout>` fail with a missing-template error instead of an i
 
 **Left and right follow issue #3.** Right-to-left naming is that feature's decision. The components
 pass `side` through, so they follow it with no requirement of their own.
+
+## Design review (one round)
+
+**Applied to the plan.** An empty `persist` is none given, a change to the shared sidebar tag the sidebar component cannot do without (Cotton always passes the empty default). The toggle's default names are translated and the English catalogue ships. Documentation is checked against each component's `<c-vars>` names, not only its `@prop` lines. Tests use the existing `render` fixture. The toggle's parity side is FS-001's plain toggles. The sidebar leaves its defaults to the tag. The mount call uses `escapejs`.
+**ADR:** none — local to this feature, nothing downstream inherits it
+
+**Carried as watch items.** Classes are compared as sets (trailing spaces). `closed` and `container` are bare attributes, which the components page says. No CSP nonce on the mount script, as in the base template.
+**ADR:** none — local to this feature
+
+**SC-001 is put to the orchestrator.** It measures the demonstration pages, which issue 5 owns, so no task here can demonstrate it. Proposed: restate it against the suite's own layout pages written as components. Waiting for the answer before building.
+**ADR:** none — a wording change to one criterion

@@ -16,9 +16,12 @@
   nothing more is needed.
 - **Cotton resolves the components in this repository's settings.** Rendering a template file that
   uses the prototype's `<c-layout>` templates in the test settings reaches `sidebar.html` and stops at
-  `layout_uid`, the one tag that is missing. Holds, and it shows Cotton only compiles a component
-  from a template file: `Engine.from_string` leaves `<c-…>` as text, so tests render files under
-  `tests/templates/components/`.
+  `layout_uid`, the first of two faults. The second, found by the design review: the prototype's
+  `sidebar.html` passes `persist=""` to `sidebar_attrs`, which raises because the tag treats only
+  `None` as none given. Both are fixed here, and the second is a change to FS-001's tag (the
+  component cannot be written otherwise, since Cotton always supplies the empty default).
+  `Engine.from_string` leaves `<c-…>` as text, but the suite's `render` fixture in `tests/conftest.py`
+  compiles components, and the tests use it.
 - **Cotton's attribute handling the components lean on.** `<c-vars>` names with a dash become
   underscores (`rail-width` is `rail_width`), a bare attribute such as `container` or `closed` arrives
   as `True`, and `{{ attrs }}` carries every attribute `<c-vars>` did not name. The build's first
