@@ -147,11 +147,15 @@
     root.style.setProperty("--mvpl-footer-h", (footer ? footer.offsetHeight : 0) + "px");
   }
 
+  // Whether this script, and not the host, set the page's overflow.
+  var pageLocked = false;
   function lockPage() {
     var locked = !!document.querySelector(
       '.mvpl:not([data-mvpl-container]) > .mvpl-grid > .mvpl-sidebar[data-mvpl-overlay="open"]'
     );
     document.documentElement.classList.toggle("mvpl-locked", locked);
+    if (locked === pageLocked) return;
+    pageLocked = locked;
     document.documentElement.style.overflow = locked ? "hidden" : "";
   }
 

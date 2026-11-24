@@ -758,6 +758,21 @@ class TestDrawers:
         page.keyboard.press("Escape")
         assert not page.evaluate(root)
 
+    def test_the_page_lock_leaves_the_hosts_own_overflow_alone(self, visit) -> None:
+        page = visit("layouts-toggles", DESKTOP)
+        page.evaluate("document.documentElement.style.overflow = 'hidden'")
+        page.evaluate("document.body.append(document.createElement('span'))")
+        page.set_viewport_size({"width": 1200, "height": 800})
+        settle(page)
+        assert page.evaluate("document.documentElement.style.overflow") == "hidden"
+
+    def test_the_page_lock_clears_the_overflow_it_set(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.locator("#toggle").click()
+        assert page.evaluate("document.documentElement.style.overflow") == "hidden"
+        page.keyboard.press("Escape")
+        assert page.evaluate("document.documentElement.style.overflow") == ""
+
     def test_a_contained_drawer_leaves_the_page_unlocked(self, visit) -> None:
         page = visit("layouts-contained", PHONE)
         page.locator("#contained [data-mvpl-toggle='left']").click()
