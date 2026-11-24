@@ -1,0 +1,43 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}Nested layouts{% endblock title %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav>Navigation</nav>{% endblock navigation %}
+{% block content %}
+  <div id="outer-box" style="width: 800px; height: 500px; margin: 1rem">
+    <div id="outer" {% layout_attrs "hHh LpR fFf" container=True style="height: 100%" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">Outer header</header>
+        <aside {% sidebar_attrs "left" breakpoint="sm" %} aria-label="Outer navigation">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel"><nav>Outer navigation</nav></div>
+        </aside>
+        <main class="mvpl-page">
+          <div id="inner-box" style="width: 400px; height: 250px; margin: 1rem">
+            <div id="inner" {% layout_attrs "lHh lpr lFf" container=True style="height: 100%" %}>
+              <div class="mvpl-grid">
+                <header class="mvpl-header">Inner header</header>
+                <aside {% sidebar_attrs "left" breakpoint="sm" %} aria-label="Inner navigation">
+                  <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+                  <div class="mvpl-panel"><nav>Inner navigation</nav></div>
+                </aside>
+                <main class="mvpl-page"><div style="height: 800px">Inner content</div></main>
+                <aside {% sidebar_attrs "right" breakpoint="sm" %} aria-label="Inner aside">
+                  <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+                  <div class="mvpl-panel">Inner aside</div>
+                </aside>
+                <footer class="mvpl-footer">Inner footer</footer>
+              </div>
+            </div>
+          </div>
+          <div style="height: 800px">Outer content</div>
+        </main>
+        <aside {% sidebar_attrs "right" breakpoint="sm" %} aria-label="Outer aside">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">Outer aside</div>
+        </aside>
+        <footer class="mvpl-footer">Outer footer</footer>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

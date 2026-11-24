@@ -1,0 +1,27 @@
+{% extends "examples/base.html" %}
+{% load mvp_layout %}
+{% block title %}A toggle outside its layout{% endblock title %}
+{% block header %}Header{% endblock header %}
+{% block navigation %}<nav>Navigation</nav>{% endblock navigation %}
+{% block content %}
+  <button type="button" id="outside" data-mvpl-toggle="left" data-mvpl-layout="boxed">
+    Toggle the boxed layout's navigation
+  </button>
+  <div id="boxed-box" style="width: 600px; height: 300px; margin: 1rem">
+    <div id="boxed" {% layout_attrs "hHh lpr fFf" container=True style="height: 100%" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">Header</header>
+        <aside {% sidebar_attrs "left" %} aria-label="Navigation">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel"><nav>Navigation</nav></div>
+        </aside>
+        <main class="mvpl-page">Content</main>
+        <aside {% sidebar_attrs "right" %} aria-label="Aside">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel">Aside</div>
+        </aside>
+        <footer class="mvpl-footer">Footer</footer>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

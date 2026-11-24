@@ -1,0 +1,15 @@
+{% extends "examples/base.html" %}
+{% block title %}Right to left{% endblock title %}
+{% block styles %}
+  {# Runs before the layout is mounted, so the first measurement is already mirrored. #}
+  <script>document.documentElement.dir = "rtl";</script>
+{% endblock styles %}
+{% block header %}
+  <button type="button" data-mvpl-toggle="left">Navigation</button>
+  <span>Header</span>
+  <button type="button" data-mvpl-toggle="right">Aside</button>
+{% endblock header %}
+{% block navigation %}<nav><a href="#one">One</a></nav>{% endblock navigation %}
+{% block content %}<h1>Page</h1><p>Content.</p>{% endblock content %}
+{% block aside %}<p>Aside</p>{% endblock aside %}
+{% block footer %}Footer{% endblock footer %}

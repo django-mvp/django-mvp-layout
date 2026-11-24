@@ -1,0 +1,15 @@
+{% extends "examples/base.html" %}
+{% block title %}Heavy page{% endblock title %}
+{% block header %}
+  <button type="button" data-mvpl-toggle="left">Navigation</button>
+  <span>Header</span>
+{% endblock header %}
+{% block navigation %}<nav><a href="#one">One</a></nav>{% endblock navigation %}
+{% block content %}
+  <h1>Page</h1>
+  <ul>
+    {% for row in rows %}<li><span>Row {{ row }}</span> <em>of many</em></li>{% endfor %}
+  </ul>
+{% endblock content %}
+{% block aside %}<p>Aside</p>{% endblock aside %}
+{% block footer %}Footer{% endblock footer %}
