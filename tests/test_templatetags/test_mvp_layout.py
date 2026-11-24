@@ -4,10 +4,9 @@ import pytest
 from django.template import Context, Template
 from django.test import RequestFactory
 
-from tests.conftest import attrs_of
-
 from mvp_layout.templatetags.mvp_layout import LayoutOptionError, layout_uid
 from mvp_layout.view import LayoutViewError
+from tests.conftest import attrs_of
 
 DEFAULT_CODE = "hHh lpr fFf"
 

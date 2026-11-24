@@ -5,7 +5,7 @@ from django.template import Context, Template
 from django.test import RequestFactory
 
 from mvp_layout.templatetags.mvp_layout import LayoutOptionError
-from tests.conftest import attrs_of, elements_of, with_data
+from tests.conftest import elements_of, with_data
 
 # Each row is a sidebar written both ways: the component's attributes and the
 # tag's arguments for the same options.
@@ -75,9 +75,10 @@ class TestSidebar:
         )
 
         assert sidebar_of(markup)[1]["data-mvpl-state"] == remembered
-        assert with_data(markup)[0] == with_data(
-            plain_sidebar('persist="nav"', request=get)
-        )[0]
+        assert (
+            with_data(markup)[0]
+            == with_data(plain_sidebar('persist="nav"', request=get))[0]
+        )
 
     def test_its_label_is_its_accessible_name(self, render):
         markup = render('<c-layout.sidebar label="Navigation">x</c-layout.sidebar>')
@@ -85,9 +86,10 @@ class TestSidebar:
         assert sidebar_of(markup)[1]["aria-label"] == "Navigation"
 
     def test_it_has_no_accessible_name_when_none_is_given(self, render):
-        assert "aria-label" not in sidebar_of(
-            render("<c-layout.sidebar>x</c-layout.sidebar>")
-        )[1]
+        assert (
+            "aria-label"
+            not in sidebar_of(render("<c-layout.sidebar>x</c-layout.sidebar>"))[1]
+        )
 
     def test_a_given_id_is_used_as_written(self, render):
         markup = render('<c-layout.sidebar id="nav">x</c-layout.sidebar>')

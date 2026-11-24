@@ -24,14 +24,16 @@ class TestLayout:
     def test_it_carries_the_attributes_the_tag_writes_for_its_code(self, render):
         markup = render('<c-layout view="lHh LpR lff" id="app" />')
 
-        assert with_data(markup)[0] == with_data(
-            plain_layout('{% layout_attrs "lHh LpR lff" %}')
-        )[0]
+        assert (
+            with_data(markup)[0]
+            == with_data(plain_layout('{% layout_attrs "lHh LpR lff" %}'))[0]
+        )
 
     def test_a_layout_with_no_code_is_the_tags_default(self, render):
-        assert with_data(render("<c-layout />"))[0] == with_data(
-            plain_layout("{% layout_attrs %}")
-        )[0]
+        assert (
+            with_data(render("<c-layout />"))[0]
+            == with_data(plain_layout("{% layout_attrs %}"))[0]
+        )
 
     def test_a_wrong_code_fails_with_the_tags_error(self, render):
         with pytest.raises(LayoutViewError):
@@ -40,9 +42,10 @@ class TestLayout:
     def test_a_contained_layout_carries_the_contained_attribute(self, render):
         markup = render("<c-layout container />")
 
-        assert with_data(markup)[0] == with_data(
-            plain_layout("{% layout_attrs container=True %}")
-        )[0]
+        assert (
+            with_data(markup)[0]
+            == with_data(plain_layout("{% layout_attrs container=True %}"))[0]
+        )
 
     def test_a_layout_without_container_is_not_contained(self, render):
         assert "data-mvpl-container" not in layout_of(render("<c-layout />"))
@@ -76,7 +79,7 @@ class TestLayout:
         assert "window.MvpLayout && MvpLayout(" in render("<c-layout />")
 
     def test_the_mount_call_escapes_an_id_a_script_string_cannot_hold(self, render):
-        markup = render("<c-layout :id=\"ident\" />", ident='a"b')
+        markup = render('<c-layout :id="ident" />', ident='a"b')
 
         assert 'MvpLayout("a\\u0022b")' in markup
 
@@ -121,13 +124,16 @@ class TestAreas:
     def test_the_page_is_a_main_when_asked(self, render):
         assert elements_of(render('<c-layout.page tag="main" />'))[0][0] == "main"
 
-    @pytest.mark.parametrize("markup", ["<c-layout.page />", '<c-layout.page tag="p" />'])
+    @pytest.mark.parametrize(
+        "markup", ["<c-layout.page />", '<c-layout.page tag="p" />']
+    )
     def test_the_page_is_otherwise_a_div(self, render, markup):
         assert elements_of(render(markup))[0][0] == "div"
 
     def test_the_page_keeps_its_class_whichever_element_it_is(self, render):
         for tag in ("main", "div"):
-            attrs = elements_of(render(f'<c-layout.page tag="{tag}" class="z" />'))[0][1]
+            attrs = elements_of(render(f'<c-layout.page tag="{tag}" class="z" />'))[0][
+                1
+            ]
 
             assert "z" in attrs["class"].split()
-

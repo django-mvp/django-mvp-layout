@@ -32,7 +32,9 @@ class TestPageOfComponents:
         page = visit("components-overview")
         assert state_of(page, LEFT) == "open"
 
-        page.locator('#demo > .mvpl-grid > [data-mvpl-side="left"] [data-mvpl-toggle]').click()
+        page.locator(
+            '#demo > .mvpl-grid > [data-mvpl-side="left"] [data-mvpl-toggle]'
+        ).click()
         assert state_of(page, LEFT) == "closed"
 
         page.locator('.mvpl-header [data-mvpl-toggle="left"]').click()
@@ -65,6 +67,7 @@ class TestPageWithoutTheScript:
         page = visit("components-no-script")
 
         assert page.locator("#app[data-mvpl]").count() == 1
-        assert page.locator('[data-mvpl-side="left"]').get_attribute(
-            "data-mvpl-state"
-        ) == "open"
+        assert (
+            page.locator('[data-mvpl-side="left"]').get_attribute("data-mvpl-state")
+            == "open"
+        )

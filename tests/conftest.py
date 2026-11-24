@@ -29,13 +29,6 @@ def attrs_of(html):
     return reader.attrs
 
 
-def attrs_of(html):
-    """Return the attributes of the first tag in the HTML, by name."""
-    reader = TagReader()
-    reader.feed(html)
-    return reader.attrs
-
-
 class ElementReader(HTMLParser):
     """Collects every start tag in a piece of HTML, in order."""
 
