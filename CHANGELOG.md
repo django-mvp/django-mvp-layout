@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0] - 2026-11-25
+
 ### Added
 
 - A sidebar can stack its content as a header, a body and a footer. Give `<c-layout.sidebar>` a
