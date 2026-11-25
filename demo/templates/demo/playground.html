@@ -1,85 +1,80 @@
 {% extends "demo/base.html" %}
 {% load demo_icons %}
 {% block aside %}
-  <c-demo.reference />
-{% endblock aside %}
-{% block content %}
-  <style>
-    .lp-frame { resize: horizontal; overflow: hidden; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
-    .lp-frame::after { content: ""; }
-    .lp-handle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 0.75rem; display: grid; place-items: center; pointer-events: none; }
-    .lp-handle::before { content: ""; width: 0.25rem; height: 2.5rem; border-radius: 9999px; background: var(--color-base-300); }
-  </style>
-  <div class="flex flex-col gap-6">
-    <form class="flex flex-col gap-5" id="lp-form" action="{% url 'playground' %}" method="get">
-      <div class="flex flex-col gap-2">
-        <label for="lp-code" class="font-medium">Layout code</label>
-        <div class="flex flex-wrap items-center gap-3">
-          <input id="lp-code"
-                 name="view"
-                 value="{{ code }}"
-                 class="input input-lg w-56 font-mono tracking-widest"
-                 spellcheck="false"
-                 autocomplete="off"
-                 autocapitalize="off"
-                 maxlength="15"
-                 aria-describedby="lp-msg"
-                 {% if error %}aria-invalid="true"{% endif %} />
-          <div class="flex flex-wrap gap-2" role="group" aria-label="Examples">
-            {% for example, label in examples %}
-              <button type="button" class="btn btn-sm" data-lp-example="{{ example }}" aria-pressed="{% if example == code %}true{% else %}false{% endif %}" title="{{ example }}">{{ label }}</button>
-            {% endfor %}
+  <div class="flex flex-col gap-5 p-4">
+    <div class="flex items-center justify-between gap-2">
+      <h2 class="text-base font-semibold">Layout settings</h2>
+      <c-layout.toggle side="right" class="btn btn-ghost btn-sm btn-square" label="Close" />
+    </div>
+      <form class="flex flex-col gap-5" id="lp-form" action="{% url 'playground' %}" method="get">
+        <div class="flex flex-col gap-2">
+          <label for="lp-code" class="font-medium">Layout code</label>
+          <div class="flex flex-col gap-2">
+            <input id="lp-code"
+                   name="view"
+                   value="{{ code }}"
+                   class="input w-full font-mono tracking-widest"
+                   spellcheck="false"
+                   autocomplete="off"
+                   autocapitalize="off"
+                   maxlength="15"
+                   aria-describedby="lp-msg"
+                   {% if error %}aria-invalid="true"{% endif %} />
+            <div class="flex flex-wrap gap-2" role="group" aria-label="Examples">
+              {% for example, label in examples %}
+                <button type="button" class="btn btn-sm" data-lp-example="{{ example }}" aria-pressed="{% if example == code %}true{% else %}false{% endif %}" title="{{ example }}">{{ label }}</button>
+              {% endfor %}
+            </div>
           </div>
+          <c-demo.message :error="error" />
         </div>
-        <c-demo.message :error="error" />
-      </div>
-      <div class="grid gap-4 md:grid-cols-2">
-        {% for side, opts in sides %}
-          <fieldset class="fieldset rounded-box border border-base-300 p-4">
-            <legend class="fieldset-legend">{{ side|capfirst }} sidebar</legend>
-            <div class="grid gap-3 sm:grid-cols-3 md:grid-cols-1 2xl:grid-cols-3">
-              <label class="flex flex-col gap-1">
-                <span class="text-sm">When closed</span>
-                <select name="{{ side }}_collapse" class="select select-sm">
-                  {% for key, label in collapses %}<option value="{{ key }}" {% if key == opts.collapse %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                </select>
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-sm">Drawer below</span>
-                <select name="{{ side }}_breakpoint" class="select select-sm">
-                  {% for key, label in breakpoints %}<option value="{{ key }}" {% if key == opts.breakpoint %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                </select>
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-sm">Behaviour</span>
-                <select name="{{ side }}_behavior" class="select select-sm">
-                  {% for key, label in behaviors %}<option value="{{ key }}" {% if key == opts.behavior %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                </select>
-              </label>
-            </div>
-            <div class="mt-2 flex flex-wrap items-end gap-x-6 gap-y-3">
-              <label class="flex flex-col gap-1">
-                <span class="text-sm">View</span>
-                <select name="{{ side }}_view" class="select select-sm w-60">
-                  {% for key, label in sidebar_views %}<option value="{{ key }}" {% if key == opts.view %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                </select>
-              </label>
-              <div class="flex flex-wrap gap-x-4 gap-y-2 pb-1.5" role="group" aria-label="{{ side|capfirst }} sidebar parts">
-                {% for key, label in parts %}
-                  <label class="label gap-2 text-sm text-base-content">
-                    <input type="checkbox" name="{{ side }}_parts" value="{{ key }}" class="checkbox checkbox-sm" {% if key in opts.parts %}checked{% endif %} />
-                    {{ label }}
-                  </label>
-                {% endfor %}
+        <div class="flex flex-col gap-4">
+          {% for side, opts in sides %}
+            <fieldset class="fieldset rounded-box border border-base-300 p-4">
+              <legend class="fieldset-legend">{{ side|capfirst }} sidebar</legend>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="flex flex-col gap-1">
+                  <span class="text-sm">When closed</span>
+                  <select name="{{ side }}_collapse" class="select select-sm">
+                    {% for key, label in collapses %}<option value="{{ key }}" {% if key == opts.collapse %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                </label>
+                <label class="flex flex-col gap-1">
+                  <span class="text-sm">Drawer below</span>
+                  <select name="{{ side }}_breakpoint" class="select select-sm">
+                    {% for key, label in breakpoints %}<option value="{{ key }}" {% if key == opts.breakpoint %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                </label>
+                <label class="flex flex-col gap-1">
+                  <span class="text-sm">Behaviour</span>
+                  <select name="{{ side }}_behavior" class="select select-sm">
+                    {% for key, label in behaviors %}<option value="{{ key }}" {% if key == opts.behavior %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                </label>
               </div>
-            </div>
-          </fieldset>
-        {% endfor %}
-      </div>
-    </form>
-    <section class="flex flex-col gap-3" aria-label="Preview">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="join" role="group" aria-label="Preview width">
+              <div class="mt-2 flex flex-col gap-3">
+                <label class="col-span-2 flex flex-col gap-1">
+                  <span class="text-sm">View</span>
+                  <select name="{{ side }}_view" class="select select-sm">
+                    {% for key, label in sidebar_views %}<option value="{{ key }}" {% if key == opts.view %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                </label>
+                <div class="flex flex-wrap gap-x-4 gap-y-2" role="group" aria-label="{{ side|capfirst }} sidebar parts">
+                  {% for key, label in parts %}
+                    <label class="label gap-2 text-sm text-base-content">
+                      <input type="checkbox" name="{{ side }}_parts" value="{{ key }}" class="checkbox checkbox-sm" {% if key in opts.parts %}checked{% endif %} />
+                      {{ label }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+            </fieldset>
+          {% endfor %}
+        </div>
+      </form>
+      <div class="flex flex-col gap-2">
+        <span class="font-medium" id="lp-width-label">Preview width</span>
+        <div class="join" role="group" aria-labelledby="lp-width-label">
           <button type="button" class="btn btn-sm join-item" data-lp-width="" aria-pressed="true">Full</button>
           <button type="button" class="btn btn-sm join-item" data-lp-width="1024" aria-pressed="false">1024</button>
           <button type="button" class="btn btn-sm join-item" data-lp-width="768" aria-pressed="false">768</button>
@@ -87,13 +82,6 @@
         </div>
         <p id="lp-status" class="text-sm text-base-content/70" aria-live="polite"></p>
       </div>
-      <div id="lp-frame" class="lp-frame relative">
-        {% if view %}<c-demo.preview-layout :view="view" :left="left" :right="right" :nav="nav" :paragraphs="paragraphs" />{% else %}<div id="lp-preview"></div>{% endif %}
-        <span class="lp-handle" aria-hidden="true"></span>
-      </div>
-      <p class="text-sm text-base-content/60">Drag the frame's right edge, or pick a width, to see the sidebars change at their breakpoints.</p>
-    </section>
-    {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div>{% endif %}
   </div>
   <script>
     (function () {
@@ -163,7 +151,11 @@
               var details = doc.getElementById("lp-details");
               // Scripts parsed by DOMParser don't run. The new layout is mounted by the MutationObserver.
               document.getElementById("lp-preview").replaceWith(document.importNode(preview, true));
+              var explain = doc.getElementById("lp-explain");
+              var tab = document.querySelector('input[name="lp-tab"]:checked');
               document.getElementById("lp-details").replaceWith(document.importNode(details, true));
+              document.getElementById("lp-explain").replaceWith(document.importNode(explain, true));
+              if (tab) document.querySelector('input[name="lp-tab"][value="' + tab.value + '"]').checked = true;
               history.replaceState(null, "", url);
             }
             report();
@@ -185,4 +177,28 @@
       report();
     })();
   </script>
+{% endblock aside %}
+{% block content %}
+  <style>
+    .lp-frame { resize: horizontal; overflow: hidden; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
+    .lp-frame::after { content: ""; }
+    .lp-handle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 0.75rem; display: grid; place-items: center; pointer-events: none; }
+    .lp-handle::before { content: ""; width: 0.25rem; height: 2.5rem; border-radius: 9999px; background: var(--color-base-300); }
+  </style>
+  <div class="flex flex-col gap-8">
+    <section class="flex flex-col gap-2" aria-label="Preview">
+      <div id="lp-frame" class="lp-frame relative">
+        <div class="mockup-browser border border-base-300 bg-base-200">
+          <div class="mockup-browser-toolbar">
+            <div class="input">acme.example/getting-started</div>
+          </div>
+          {% if view %}<c-demo.preview-layout :view="view" :left="left" :right="right" :nav="nav" :paragraphs="paragraphs" />{% else %}<div id="lp-preview"></div>{% endif %}
+        </div>
+        <span class="lp-handle" aria-hidden="true"></span>
+      </div>
+      <p class="text-sm text-base-content/60">Drag the window's right edge, or pick a width in the settings, to see the sidebars change at their breakpoints.</p>
+    </section>
+    {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div><div id="lp-explain"></div>{% endif %}
+    <c-demo.reference />
+  </div>
 {% endblock content %}
