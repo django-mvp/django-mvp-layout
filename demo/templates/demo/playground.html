@@ -11,23 +11,30 @@
     <div class="flex flex-col gap-3">
       <form class="flex flex-col gap-2" id="lp-form" action="{% url 'playground' %}" method="get">
         <div class="flex flex-wrap items-center gap-2">
-          <label for="lp-code" class="sr-only">Layout code</label>
-          <input id="lp-code"
-                 name="view"
-                 value="{{ code }}"
-                 class="input w-48 font-mono tracking-widest"
-                 spellcheck="false"
-                 autocomplete="off"
-                 autocapitalize="off"
-                 maxlength="15"
-                 placeholder="Layout code"
-                 aria-describedby="lp-msg"
-                 {% if error %}aria-invalid="true"{% endif %} />
-          <select id="lp-presets" class="select w-56" aria-label="Presets">
-            <option value="">Presets</option>
-            {% for example, label in examples %}<option value="{{ example }}" {% if example == code %}selected{% endif %}>{{ label }} · {{ example }}</option>{% endfor %}
-          </select>
-          <button type="button" class="btn" onclick="document.getElementById('lp-config').showModal()">{% icon "gear" "" %} Configure</button>
+          <div class="join">
+            <label class="input join-item w-72">
+              <span class="label">Layout code</span>
+              <input id="lp-code"
+                     name="view"
+                     value="{{ code }}"
+                     class="font-mono tracking-widest"
+                     spellcheck="false"
+                     autocomplete="off"
+                     autocapitalize="off"
+                     maxlength="15"
+                     aria-describedby="lp-msg"
+                     {% if error %}aria-invalid="true"{% endif %} />
+            </label>
+            <button type="button" class="btn join-item" aria-label="How the layout code works" onclick="document.getElementById('lp-help').showModal()">{% icon "info" "" %}</button>
+          </div>
+          <label class="select w-72">
+            <span class="label">Presets</span>
+            <select id="lp-presets">
+              {% for example, label in examples %}<option value="{{ example }}" {% if example == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+              <option value="" {% if not preset_match %}selected{% endif %}>Custom</option>
+            </select>
+          </label>
+          <button type="button" class="btn" onclick="document.getElementById('lp-config').showModal()">{% icon "gear" "" %} Sidebars</button>
           <div class="join ms-auto" role="group" aria-label="Preview width">
             <button type="button" class="btn join-item" data-lp-width="" aria-pressed="true">Full</button>
             <button type="button" class="btn join-item" data-lp-width="1024" aria-pressed="false">1024</button>
@@ -39,7 +46,7 @@
         <dialog id="lp-config" class="modal" aria-labelledby="lp-config-heading">
           <div class="modal-box flex max-w-4xl flex-col gap-4">
             <div class="flex items-center justify-between gap-2">
-              <h2 id="lp-config-heading" class="text-lg font-semibold">Configure the sidebars</h2>
+              <h2 id="lp-config-heading" class="text-lg font-semibold">Sidebars</h2>
               <button type="button" class="btn btn-ghost btn-sm btn-square" aria-label="Close" onclick="this.closest('dialog').close()">{% icon "close" "" %}</button>
             </div>
             <div class="grid gap-4 lg:grid-cols-2">
@@ -91,6 +98,16 @@
           </div>
           <div class="modal-backdrop" onclick="this.closest('dialog').close()"></div>
         </dialog>
+        <dialog id="lp-help" class="modal" aria-labelledby="lp-help-heading">
+          <div class="modal-box flex max-w-3xl flex-col gap-4">
+            <div class="flex items-center justify-between gap-2">
+              <h2 id="lp-help-heading" class="text-lg font-semibold">The layout code</h2>
+              <button type="button" class="btn btn-ghost btn-sm btn-square" aria-label="Close" onclick="this.closest('dialog').close()">{% icon "close" "" %}</button>
+            </div>
+            <c-demo.reference />
+          </div>
+          <div class="modal-backdrop" onclick="this.closest('dialog').close()"></div>
+        </dialog>
       </form>
       <section class="flex flex-col gap-2" aria-label="Preview">
         <div id="lp-frame" class="lp-frame relative">
@@ -109,7 +126,6 @@
       </section>
     </div>
     {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div><div id="lp-explain"></div>{% endif %}
-    <c-demo.reference />
   </div>
   <script>
     (function () {
@@ -168,7 +184,7 @@
           .then(function (html) {
             var doc = new DOMParser().parseFromString(html, "text/html");
             document.getElementById("lp-msg").replaceWith(doc.getElementById("lp-msg"));
-            var ok = !document.querySelector("#lp-msg.text-error");
+            var ok = !document.getElementById("lp-msg").textContent.trim();
             input.setAttribute("aria-invalid", String(!ok));
             if (ok) {
               var preview = doc.getElementById("lp-preview");

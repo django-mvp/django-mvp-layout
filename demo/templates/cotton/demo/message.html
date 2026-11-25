@@ -1,6 +1,4 @@
-{# @description The line under the layout code field: the rule, or the refusal for a code that is not one. #}
-{# @prop error:text | description:"The refusal. The rule is shown when empty." #}
+{# @description The line under the playground's toolbar: the refusal for a code that is not one, and empty otherwise. #}
+{# @prop error:text | description:"The refusal." #}
 <c-vars error="" />
-<p id="lp-msg"
-   class="text-sm min-h-5 {% if error %}text-error{% else %}text-base-content/70{% endif %}"
-   aria-live="polite">{% if error %}{{ error }}{% else %}Three groups of three letters: top, middle and bottom rows, each read left, centre and right.{% endif %}</p>
+<p id="lp-msg" class="text-sm text-error empty:hidden" aria-live="polite">{{ error }}</p>

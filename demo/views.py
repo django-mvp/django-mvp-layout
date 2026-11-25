@@ -13,11 +13,11 @@ EXAMPLE_BASE = Path(settings.BASE_DIR) / "docs" / "examples" / "base.html"
 
 EXAMPLES = [
     ("lHh LpR lff", "This site's own layout"),
-    ("hHh LpR fFf", "Header and footer stay"),
-    ("hHh lpr fff", "Only the header stays"),
-    ("hhh lpr fff", "Nothing stays"),
+    ("hHh LpR fFf", "Sticky header and footer"),
+    ("hHh lpr fff", "Sticky header"),
+    ("hhh lpr fff", "Nothing sticks"),
     ("lHr LpR lfr", "Both sidebars full height"),
-    ("hHh LpR fff", "Footer across the bottom"),
+    ("hHh LpR fff", "Full-width footer"),
 ]
 COLLAPSES = [
     ("offcanvas", "Slides away"),
@@ -38,10 +38,10 @@ BEHAVIORS = [
 ]
 SIDEBAR_VIEWS = [
     ("", "Not set"),
-    ("HbF", "HbF · header and footer stay"),
-    ("Hbf", "Hbf · header stays"),
-    ("hbF", "hbF · footer stays"),
-    ("hbf", "hbf · nothing stays"),
+    ("HbF", "Sticky header and footer"),
+    ("Hbf", "Sticky header"),
+    ("hbF", "Sticky footer"),
+    ("hbf", "Nothing sticks"),
 ]
 PARTS = [("header", "Header"), ("body", "Body"), ("footer", "Footer")]
 DEFAULTS = {
@@ -172,7 +172,7 @@ BREAKPOINT_WIDTHS = dict(
 
 
 def describe(side, opts):
-    """Say how a sidebar opens and closes, and which of its parts stay."""
+    """Say how a sidebar opens and closes, and which of its parts are sticky."""
     sentence = describe_closing(side, opts)
     view = opts["view"]
     if not view:
@@ -183,10 +183,9 @@ def describe(side, opts):
         if flag and name in opts["parts"]
     ]
     if not stays:
-        return f"{sentence} Its content scrolls as one."
-    joined = " and ".join(f"its {name}" for name in stays)
-    verb = "stays" if len(stays) == 1 else "stay"
-    return f"{sentence} While it scrolls, {joined} {verb} in place."
+        return f"{sentence} Nothing in it sticks."
+    verb = "is" if len(stays) == 1 else "are"
+    return f"{sentence} Its {' and '.join(stays)} {verb} sticky."
 
 
 def describe_closing(side, opts):
@@ -235,7 +234,7 @@ def explain(view):
         view: The parsed layout code.
 
     Returns:
-        The sentences, one for each sidebar and one for what stays in place.
+        The sentences, one for each sidebar and one for what is sticky.
     """
     top, _, bottom = view.code.split(" ")
     lines = [
@@ -253,12 +252,12 @@ def explain(view):
         if flag
     ]
     if not fixed:
-        return [*lines, "Everything scrolls with the page."]
+        return [*lines, "Nothing sticks."]
     joined = (
         fixed[0] if len(fixed) == 1 else ", ".join(fixed[:-1]) + " and " + fixed[-1]
     )
-    verb = "stays" if len(fixed) == 1 else "stay"
-    return [*lines, f"While the page scrolls, {joined} {verb} in place."]
+    verb = "is" if len(fixed) == 1 else "are"
+    return [*lines, f"{joined[0].upper()}{joined[1:]} {verb} sticky."]
 
 
 def preview_context(params):
@@ -285,6 +284,7 @@ def preview_context(params):
         "left_description": describe("left", left),
         "right_description": describe("right", right),
         "examples": EXAMPLES,
+        "preset_match": code in {example for example, _ in EXAMPLES},
         "collapses": COLLAPSES,
         "breakpoints": BREAKPOINTS,
         "behaviors": BEHAVIORS,

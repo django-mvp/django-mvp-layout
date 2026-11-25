@@ -2010,6 +2010,9 @@
   .static {
     position: static;
   }
+  .sticky {
+    position: sticky;
+  }
   .join {
     display: inline-flex;
     align-items: stretch;
@@ -2464,9 +2467,6 @@
   .h-14 {
     height: calc(var(--spacing) * 14);
   }
-  .min-h-5 {
-    min-height: calc(var(--spacing) * 5);
-  }
   .w-9 {
     width: calc(var(--spacing) * 9);
   }
@@ -2479,11 +2479,8 @@
   .w-44 {
     width: calc(var(--spacing) * 44);
   }
-  .w-48 {
-    width: calc(var(--spacing) * 48);
-  }
-  .w-56 {
-    width: calc(var(--spacing) * 56);
+  .w-72 {
+    width: calc(var(--spacing) * 72);
   }
   .w-fit {
     width: fit-content;
@@ -2993,6 +2990,11 @@
   .range-sm {
     @layer daisyui.l1.l2 {
       --range-thumb-size: calc(var(--size-selector, 0.25rem) * 5);
+    }
+  }
+  .empty\:hidden {
+    &:empty {
+      display: none;
     }
   }
   .hover\:border-primary {
