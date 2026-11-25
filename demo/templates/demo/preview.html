@@ -1,4 +1,4 @@
 {# The parts of the playground that change with the form, swapped in by its script. #}
 <c-demo.message :error="error" />
 <div id="lp-preview-slot">{% if view %}<c-demo.preview-layout :view="view" :left="left" :right="right" :nav="nav" :paragraphs="paragraphs" />{% endif %}</div>
-<div id="lp-details-slot">{% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% endif %}</div>
+<div id="lp-details-slot">{% if view %}<c-demo.preview-details :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% endif %}</div>

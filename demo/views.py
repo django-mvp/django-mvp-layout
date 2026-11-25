@@ -166,99 +166,6 @@ def markup_snippet(code, left, right):
     )
 
 
-BREAKPOINT_WIDTHS = dict(
-    sm="40rem", md="48rem", lg="64rem", xl="80rem", **{"2xl": "96rem"}
-)
-
-
-def describe(side, opts):
-    """Say how a sidebar opens and closes, and which of its parts are sticky."""
-    sentence = describe_closing(side, opts)
-    view = opts["view"]
-    if not view:
-        return sentence
-    stays = [
-        name
-        for name, flag in (("header", view[0] == "H"), ("footer", view[2] == "F"))
-        if flag and name in opts["parts"]
-    ]
-    if not stays:
-        return f"{sentence} Nothing in it sticks."
-    verb = "is" if len(stays) == 1 else "are"
-    return f"{sentence} Its {' and '.join(stays)} {verb} sticky."
-
-
-def describe_closing(side, opts):
-    """One sentence on how a sidebar opens and closes."""
-    name = f"The {side} sidebar"
-    if opts["behavior"] == "overlay":
-        return f"{name} is a drawer over the page at every width."
-    closes = {
-        "offcanvas": "slides away when closed",
-        "icons": "shrinks to an icon rail when closed",
-        "none": "stays open, with no toggle",
-    }[opts["collapse"]]
-    if opts["behavior"] == "docked":
-        return f"{name} {closes}, and stays beside the page at every width."
-    width = BREAKPOINT_WIDTHS[opts["breakpoint"]]
-    return (
-        f"{name} {closes}. Below {width} of layout width it is a drawer over the page."
-    )
-
-
-def describe_reach(side, top, bottom):
-    """Say which of the header and the footer a sidebar runs beside.
-
-    Args:
-        side: ``left`` or ``right``.
-        top: Whether the code gives the sidebar the top corner.
-        bottom: Whether the code gives the sidebar the bottom corner.
-
-    Returns:
-        One sentence.
-    """
-    name = f"The {side} sidebar"
-    if top and bottom:
-        return f"{name} runs the full height, beside the header and the footer."
-    if top:
-        return f"{name} reaches the top, beside the header."
-    if bottom:
-        return f"{name} reaches the bottom, beside the footer."
-    return f"{name} sits between the header and the footer."
-
-
-def explain(view):
-    """Say in plain sentences what a layout code does.
-
-    Args:
-        view: The parsed layout code.
-
-    Returns:
-        The sentences, one for each sidebar and one for what is sticky.
-    """
-    top, _, bottom = view.code.split(" ")
-    lines = [
-        describe_reach("left", top[0] == "l", bottom[0] == "l"),
-        describe_reach("right", top[2] == "r", bottom[2] == "r"),
-    ]
-    fixed = [
-        name
-        for name, flag in (
-            ("the header", view.header_fixed),
-            ("the left sidebar", view.left_fixed),
-            ("the right sidebar", view.right_fixed),
-            ("the footer", view.footer_fixed),
-        )
-        if flag
-    ]
-    if not fixed:
-        return [*lines, "Nothing sticks."]
-    joined = (
-        fixed[0] if len(fixed) == 1 else ", ".join(fixed[:-1]) + " and " + fixed[-1]
-    )
-    verb = "is" if len(fixed) == 1 else "are"
-    return [*lines, f"{joined[0].upper()}{joined[1:]} {verb} sticky."]
-
 
 def preview_context(params):
     """Everything the preview needs, including the refusal for a wrong code."""
@@ -280,9 +187,6 @@ def preview_context(params):
         "plain_snippet": plain_snippet(view.code, left, right) if view else "",
         "markup_snippet": markup_snippet(view.code, left, right) if view else "",
         "sides": [("left", left), ("right", right)],
-        "explanation": explain(view) if view else [],
-        "left_description": describe("left", left),
-        "right_description": describe("right", right),
         "examples": EXAMPLES,
         "preset_match": code in {example for example, _ in EXAMPLES},
         "collapses": COLLAPSES,

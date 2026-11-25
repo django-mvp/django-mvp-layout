@@ -49,6 +49,7 @@
               <h2 id="lp-config-heading" class="text-lg font-semibold">Sidebars</h2>
               <button type="button" class="btn btn-ghost btn-sm btn-square" aria-label="Close" onclick="this.closest('dialog').close()">{% icon "close" "" %}</button>
             </div>
+            <p class="text-sm text-base-content/80">A sidebar's view stacks its content as a header, a body and a footer: <code>HbF</code>, <code>Hbf</code>, <code>hbF</code> or <code>hbf</code>, upper case for a sticky part. Untick a part to leave it out.</p>
             <div class="grid gap-4 lg:grid-cols-2">
               {% for side, opts in sides %}
                 <fieldset class="fieldset rounded-box border border-base-300 p-4">
@@ -125,7 +126,7 @@
         </div>
       </section>
     </div>
-    {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div><div id="lp-explain"></div>{% endif %}
+    {% if view %}<c-demo.preview-details :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div>{% endif %}
   </div>
   <script>
     (function () {
@@ -191,10 +192,8 @@
               var details = doc.getElementById("lp-details");
               // Scripts parsed by DOMParser don't run. The new layout is mounted by the MutationObserver.
               document.getElementById("lp-preview").replaceWith(document.importNode(preview, true));
-              var explain = doc.getElementById("lp-explain");
               var tab = document.querySelector('input[name="lp-tab"]:checked');
               document.getElementById("lp-details").replaceWith(document.importNode(details, true));
-              document.getElementById("lp-explain").replaceWith(document.importNode(explain, true));
               if (tab) document.querySelector('input[name="lp-tab"][value="' + tab.value + '"]').checked = true;
               history.replaceState(null, "", url);
             }
