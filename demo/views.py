@@ -36,9 +36,27 @@ BEHAVIORS = [
     ("docked", "Always beside"),
     ("overlay", "Always a drawer"),
 ]
+SIDEBAR_VIEWS = [
+    ("", "Not set"),
+    ("HbF", "HbF · header and footer stay"),
+    ("Hbf", "Hbf · header stays"),
+    ("hbF", "hbF · footer stays"),
+    ("hbf", "hbf · nothing stays"),
+]
+PARTS = [("header", "Header"), ("body", "Body"), ("footer", "Footer")]
 DEFAULTS = {
-    "left": {"collapse": "icons", "breakpoint": "md", "behavior": "auto"},
-    "right": {"collapse": "offcanvas", "breakpoint": "lg", "behavior": "auto"},
+    "left": {
+        "collapse": "icons",
+        "breakpoint": "md",
+        "behavior": "auto",
+        "view": "HbF",
+    },
+    "right": {
+        "collapse": "offcanvas",
+        "breakpoint": "lg",
+        "behavior": "auto",
+        "view": "",
+    },
 }
 
 
@@ -50,7 +68,16 @@ def pick(value, choices, default):
 def sidebar_options(params, side):
     """One sidebar's options from the query string."""
     defaults = DEFAULTS[side]
+    # The form always sends the layout code, so a query without it is a first
+    # visit, and a sent form with every part unticked means no parts.
+    if "view" in params:
+        chosen = params.getlist(f"{side}_parts")
+        parts = [key for key, _ in PARTS if key in chosen]
+    else:
+        parts = [key for key, _ in PARTS]
     return {
+        "view": pick(params.get(f"{side}_view"), SIDEBAR_VIEWS, defaults["view"]),
+        "parts": parts,
         "collapse": pick(
             params.get(f"{side}_collapse"), COLLAPSES, defaults["collapse"]
         ),
@@ -63,18 +90,33 @@ def sidebar_options(params, side):
     }
 
 
+PART_TAGS = {"header": "header", "body": "div", "footer": "footer"}
+
+
 def plain_snippet(code, left, right):
     """Write the same layout as a template that doesn't use django-cotton."""
 
     def sidebar(side, opts):
+        if opts["view"]:
+            panel = (
+                f'      <div class="mvpl-panel {opts["view"]}">\n'
+                + "".join(
+                    f'        <{PART_TAGS[part]} class="mvpl-{part}">…'
+                    f"</{PART_TAGS[part]}>\n"
+                    for part in opts["parts"]
+                )
+                + "      </div>\n"
+            )
+        else:
+            panel = '      <div class="mvpl-panel">…</div>\n'
         return (
             f'    <aside {{% sidebar_attrs "{side}" collapse="{opts["collapse"]}" '
             f'breakpoint="{opts["breakpoint"]}" '
             f'behavior="{opts["behavior"]}" %}} aria-label="…">\n'
             '      <div class="mvpl-backdrop" data-mvpl-close '
             'aria-hidden="true"></div>\n'
-            '      <div class="mvpl-panel">…</div>\n'
-            "    </aside>\n"
+            + panel
+            + "    </aside>\n"
         )
 
     return (
@@ -98,11 +140,17 @@ def markup_snippet(code, left, right):
     """Write the same layout as components."""
 
     def sidebar(side, opts):
+        view = f' view="{opts["view"]}"' if opts["view"] else ""
+        if opts["view"]:
+            inside = "".join(
+                f"    <c-layout.{part}>…</c-layout.{part}>\n" for part in opts["parts"]
+            )
+        else:
+            inside = "    …\n"
         return (
             f'  <c-layout.sidebar side="{side}" collapse="{opts["collapse"]}" '
-            f'breakpoint="{opts["breakpoint"]}" behavior="{opts["behavior"]}">\n'
-            "    …\n"
-            "  </c-layout.sidebar>\n"
+            f'breakpoint="{opts["breakpoint"]}" behavior="{opts["behavior"]}"'
+            f"{view}>\n" + inside + "  </c-layout.sidebar>\n"
         )
 
     return (
@@ -124,6 +172,24 @@ BREAKPOINT_WIDTHS = dict(
 
 
 def describe(side, opts):
+    """Say how a sidebar opens and closes, and which of its parts stay."""
+    sentence = describe_closing(side, opts)
+    view = opts["view"]
+    if not view:
+        return sentence
+    stays = [
+        name
+        for name, flag in (("header", view[0] == "H"), ("footer", view[2] == "F"))
+        if flag and name in opts["parts"]
+    ]
+    if not stays:
+        return f"{sentence} Its content scrolls as one."
+    joined = " and ".join(f"its {name}" for name in stays)
+    verb = "stays" if len(stays) == 1 else "stay"
+    return f"{sentence} While it scrolls, {joined} {verb} in place."
+
+
+def describe_closing(side, opts):
     """One sentence on how a sidebar opens and closes."""
     name = f"The {side} sidebar"
     if opts["behavior"] == "overlay":
@@ -222,6 +288,8 @@ def preview_context(params):
         "collapses": COLLAPSES,
         "breakpoints": BREAKPOINTS,
         "behaviors": BEHAVIORS,
+        "sidebar_views": SIDEBAR_VIEWS,
+        "parts": PARTS,
         "paragraphs": range(14),
         "nav": [
             ("house", "Home"),
@@ -229,6 +297,15 @@ def preview_context(params):
             ("file-text", "Documents"),
             ("chat", "Discussions"),
             ("star", "Starred"),
+            ("send", "Sent"),
+            ("folder", "Projects"),
+            ("archive", "Archive"),
+            ("trash", "Trash"),
+            ("bell", "Notifications"),
+            ("layers", "Collections"),
+            ("palette", "Appearance"),
+            ("key", "Access keys"),
+            ("shield-lock", "Security"),
             ("gear", "Settings"),
         ],
     }
@@ -407,79 +484,3 @@ class PlainView(TemplateView):
         context["base_source"] = EXAMPLE_BASE.read_text()
         return context
 
-
-SIDEBAR_CODES = [
-    ("HbF", "Header and footer stay"),
-    ("Hbf", "Only the header stays"),
-    ("hbF", "Only the footer stays"),
-    ("hbf", "Nothing stays"),
-]
-SIDEBAR_PARTS = [("header", "Header"), ("body", "Body"), ("footer", "Footer")]
-SIDEBAR_NAV = [
-    ("house", "Home"),
-    ("inbox", "Inbox"),
-    ("send", "Sent"),
-    ("file-text", "Documents"),
-    ("folder", "Projects"),
-    ("chat", "Discussions"),
-    ("star", "Starred"),
-    ("archive", "Archive"),
-    ("trash", "Trash"),
-    ("bell", "Notifications"),
-    ("search", "Search"),
-    ("funnel", "Filters"),
-    ("layers", "Collections"),
-    ("palette", "Appearance"),
-    ("key", "Access keys"),
-    ("shield-lock", "Security"),
-    ("gear", "Settings"),
-]
-
-
-def sidebar_snippet(code, parts, opts):
-    """The preview's sidebar as components, with its content left out."""
-    attrs = f'side="left" view="{code}"'
-    for key, default in (("collapse", "offcanvas"), ("breakpoint", "lg")):
-        if opts[key] != default:
-            attrs += f' {key}="{opts[key]}"'
-    if opts["behavior"] != "auto":
-        attrs += f' behavior="{opts["behavior"]}"'
-    lines = [f"<c-layout.sidebar {attrs}>"]
-    for part in parts:
-        lines.append(f"  <c-layout.{part}>…</c-layout.{part}>")
-    lines.append("</c-layout.sidebar>")
-    return "\n".join(lines)
-
-
-class SidebarBehaviorView(TemplateView):
-    """Set one sidebar's header, body and footer and how it opens, and see it."""
-
-    template_name = "demo/sidebar_behavior.html"
-
-    def get_context_data(self, **kwargs):
-        """Add the settings the preview is drawn with."""
-        context = super().get_context_data(**kwargs)
-        params = self.request.GET
-        code = pick(params.get("view"), SIDEBAR_CODES, SIDEBAR_CODES[0][0])
-        # A form sent with every box unticked still carries "set", so it isn't
-        # read as a first visit.
-        if params.get("set"):
-            chosen = params.getlist("parts")
-            parts = [key for key, _ in SIDEBAR_PARTS if key in chosen]
-        else:
-            parts = [key for key, _ in SIDEBAR_PARTS]
-        opts = sidebar_options(params, "left")
-        context.update(
-            code=code,
-            codes=SIDEBAR_CODES,
-            parts=parts,
-            part_choices=SIDEBAR_PARTS,
-            opts=opts,
-            collapses=COLLAPSES,
-            breakpoints=BREAKPOINTS,
-            behaviors=BEHAVIORS,
-            nav=SIDEBAR_NAV,
-            snippet=sidebar_snippet(code, parts, opts),
-            page_width="max-w-none",
-        )
-        return context

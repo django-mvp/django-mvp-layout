@@ -57,6 +57,22 @@
                 </select>
               </label>
             </div>
+            <div class="mt-2 flex flex-wrap items-end gap-x-6 gap-y-3">
+              <label class="flex flex-col gap-1">
+                <span class="text-sm">View</span>
+                <select name="{{ side }}_view" class="select select-sm w-60">
+                  {% for key, label in sidebar_views %}<option value="{{ key }}" {% if key == opts.view %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+              </label>
+              <div class="flex flex-wrap gap-x-4 gap-y-2 pb-1.5" role="group" aria-label="{{ side|capfirst }} sidebar parts">
+                {% for key, label in parts %}
+                  <label class="label gap-2 text-sm text-base-content">
+                    <input type="checkbox" name="{{ side }}_parts" value="{{ key }}" class="checkbox checkbox-sm" {% if key in opts.parts %}checked{% endif %} />
+                    {{ label }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
           </fieldset>
         {% endfor %}
       </div>
@@ -155,7 +171,7 @@
           .catch(function () {});
       }
       form.addEventListener("submit", function (e) { e.preventDefault(); refresh(); });
-      form.addEventListener("change", function (e) { if (e.target.tagName === "SELECT") refresh(); });
+      form.addEventListener("change", function (e) { if (e.target.tagName === "SELECT" || e.target.type === "checkbox") refresh(); });
       input.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(refresh, 200); });
       document.addEventListener("click", function (e) {
         var b = e.target.closest("[data-lp-copy]");
