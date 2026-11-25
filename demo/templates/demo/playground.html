@@ -2,7 +2,7 @@
 {% load demo_icons %}
 {% block content %}
   <style>
-    .lp-frame { resize: horizontal; overflow: hidden; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
+    .lp-frame { resize: horizontal; overflow: hidden; margin-inline: auto; width: 100%; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
     .lp-frame::after { content: ""; }
     .lp-handle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 0.75rem; display: grid; place-items: center; pointer-events: none; }
     .lp-handle::before { content: ""; width: 0.25rem; height: 2.5rem; border-radius: 9999px; background: var(--color-base-300); }
