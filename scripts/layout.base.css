@@ -162,6 +162,39 @@
   overflow-x: hidden;
 }
 
+/* A box of up to three areas, header, body and footer, stacked by one of the
+   codes hbf, Hbf, hbF and HbF. Each child names its own area, so the markup's
+   order doesn't place it, and an area left out takes no space. An upper-case
+   letter keeps that area in place while the box, or whatever holds it,
+   scrolls. With no body the footer still sits at the bottom. */
+:is(.hbf, .Hbf, .hbF, .HbF) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "header" "body" "footer";
+}
+:is(.hbf, .Hbf, .hbF, .HbF) > .mvpl-header { grid-area: header; min-width: 0; }
+:is(.hbf, .Hbf, .hbF, .HbF) > .mvpl-body { grid-area: body; min-width: 0; }
+:is(.hbf, .Hbf, .hbF, .HbF) > .mvpl-footer { grid-area: footer; min-width: 0; }
+:is(.Hbf, .HbF) > .mvpl-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+:is(.hbF, .HbF) > .mvpl-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+/* A sidebar's panel takes the code from the sidebar's view, and an area that
+   stays in place takes the sidebar's background so nothing shows through. */
+.mvpl-grid > .mvpl-sidebar > .mvpl-panel:is(.hbf, .Hbf, .hbF, .HbF) { display: grid; }
+.mvpl-sidebar > .mvpl-panel:is(.Hbf, .HbF) > .mvpl-header,
+.mvpl-sidebar > .mvpl-panel:is(.hbF, .HbF) > .mvpl-footer {
+  background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
+}
+
 /* Content that is only for the open sidebar, or only for the rail. */
 .mvpl-rail-only { display: none; }
 .mvpl-sidebar[data-mvpl-rail] .mvpl-rail-hide { display: none !important; }

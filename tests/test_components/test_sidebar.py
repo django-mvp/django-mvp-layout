@@ -142,3 +142,16 @@ class TestSidebar:
 
         assert "<aside" not in markup
         assert markup.strip() == ""
+
+    @pytest.mark.parametrize("view", ["hbf", "Hbf", "hbF", "HbF"])
+    def test_a_view_is_added_to_the_panels_classes(self, render, view):
+        markup = render(f'<c-layout.sidebar view="{view}">x</c-layout.sidebar>')
+        classes = [attrs.get("class") for _, attrs in elements_of(markup)]
+
+        assert classes[2].split() == ["mvpl-panel", view]
+
+    def test_without_a_view_the_panel_has_only_its_own_class(self, render):
+        markup = render("<c-layout.sidebar>x</c-layout.sidebar>")
+        classes = [attrs.get("class") for _, attrs in elements_of(markup)]
+
+        assert classes[2] == "mvpl-panel"

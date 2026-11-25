@@ -113,6 +113,39 @@ sidebars only.
 
 ---
 
+### User Story 3 - A developer stacks a sidebar's content as a header, body and footer (Priority: P3)
+
+A developer gives a sidebar a `view` of `hbf`, `Hbf`, `hbF` or `HbF` and writes its content in
+`<c-layout.header>`, `<c-layout.body>` and `<c-layout.footer>`, such as a brand at the top, a menu in
+the middle and the signed-in user at the bottom. The header sits at the top of the sidebar, the
+footer at the bottom and the body between them, whatever order they are written in. An upper-case
+letter makes that part sticky while the sidebar scrolls. A plain template gets the same result by
+adding the code to the panel's classes.
+
+**Why this priority**: it saves every project the same hand-written rules for a sidebar's header and
+footer, and it builds on the sidebar Story 1 delivers.
+
+**Independent Test**: render a docked sidebar with `view="HbF"` and a body taller than the sidebar,
+scroll the sidebar, and confirm its header stays at the top and its footer at the bottom.
+
+**Acceptance Scenarios**:
+
+1. **Given** `<c-layout.sidebar view="HbF">`, **When** it renders, **Then** the sidebar's panel
+   carries the class `HbF` beside `mvpl-panel`.
+2. **Given** a sidebar with no `view`, **When** it renders, **Then** its panel carries only
+   `mvpl-panel`.
+3. **Given** `<c-layout.body>`, **When** it renders, **Then** it draws a `div` with the class
+   `mvpl-body`, the classes given and any other attribute.
+4. **Given** a stacked sidebar with its parts written footer first, **When** the page loads,
+   **Then** the header is at the top of the panel, the body below it and the footer at the bottom.
+5. **Given** a stacked sidebar with no body, **When** the page loads, **Then** its footer is at the
+   bottom of the panel.
+6. **Given** a sidebar whose body is taller than it, **When** the sidebar scrolls, **Then** an
+   upper-case header stays at the top and an upper-case footer at the bottom, and a lower-case part
+   scrolls with the body.
+
+---
+
 ### Edge Cases
 
 - A sidebar whose only content is a template block left empty by the page is drawn as no sidebar
@@ -159,11 +192,17 @@ sidebars only.
 - **FR-013**: A `<c-layout container>` MUST work inside any box, including the page area of another
   `<c-layout>`, with its toggles reaching only its own sidebars.
 - **FR-014**: The component names `c-layout`, `c-layout.header`, `c-layout.page`, `c-layout.footer`,
-  `c-layout.sidebar` and `c-layout.toggle` MUST be the public names. Each component's attributes MUST
+  `c-layout.sidebar`, `c-layout.body` and `c-layout.toggle` MUST be the public names. Each component's attributes MUST
   be documented on the component itself and on the developer documentation's components page, which
   also says that the order of the areas in the markup sets reading and Tab order.
 - **FR-015**: A host project with django-cotton installed MUST be able to use the components with
   no setup beyond installing this package and loading its stylesheet and script.
+- **FR-016**: `<c-layout.sidebar>` MUST accept a `view` of `hbf`, `Hbf`, `hbF` or `HbF` and add it to
+  the panel's classes, and `<c-layout.body>` MUST draw a `div` with the class `mvpl-body`, accepting
+  `class` and any other attribute.
+- **FR-017**: A panel carrying `hbf`, `Hbf`, `hbF` or `HbF` MUST place its `.mvpl-header`,
+  `.mvpl-body` and `.mvpl-footer` children top to bottom whatever their order in the markup, take no
+  space for a part left out, and keep an upper-case part sticky while the panel scrolls.
 
 ### Traceability
 
@@ -171,6 +210,7 @@ sidebars only.
 |---|---|
 | User Story 1 | FR-001 to FR-012, FR-014, FR-015 |
 | User Story 2 | FR-003, FR-008, FR-013 |
+| User Story 3 | FR-014, FR-016, FR-017 |
 
 ### Key Entities
 

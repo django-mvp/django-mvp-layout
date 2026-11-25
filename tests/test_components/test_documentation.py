@@ -15,6 +15,7 @@ SECTIONS = {
     "header": "`<c-layout.header>`, `<c-layout.page>`, `<c-layout.footer>`",
     "page": "`<c-layout.header>`, `<c-layout.page>`, `<c-layout.footer>`",
     "footer": "`<c-layout.header>`, `<c-layout.page>`, `<c-layout.footer>`",
+    "body": "`<c-layout.body>`",
     "sidebar": "`<c-layout.sidebar>`",
     "toggle": "`<c-layout.toggle>`",
 }

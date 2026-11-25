@@ -68,6 +68,7 @@ PATHS = {
         '2H5a2 2 0 0 1-2-2z"/>'
     ),
     "close": '<path d="M18 6 6 18M6 6l12 12"/>',
+    "info": '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
     "funnel": '<path d="M22 3H2l8 9.5V19l4 2v-8.5z"/>',
     "copy": ('<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V4h12"/>'),
     "layout": (

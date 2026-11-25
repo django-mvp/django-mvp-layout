@@ -98,11 +98,12 @@ class TestLayout:
 
 
 class TestAreas:
-    """``<c-layout.header>``, ``<c-layout.page>`` and ``<c-layout.footer>``."""
+    """``<c-layout.header>``, ``<c-layout.page>``, ``<c-layout.body>`` and
+    ``<c-layout.footer>``."""
 
     @pytest.mark.parametrize(
         ("name", "element"),
-        [("header", "header"), ("footer", "footer")],
+        [("header", "header"), ("body", "div"), ("footer", "footer")],
     )
     def test_an_area_is_its_element_with_its_class(self, render, name, element):
         tag, attrs = elements_of(render(f"<c-layout.{name} />"))[0]
@@ -110,14 +111,14 @@ class TestAreas:
         assert tag == element
         assert f"mvpl-{name}" in attrs["class"].split()
 
-    @pytest.mark.parametrize("name", ["header", "page", "footer"])
+    @pytest.mark.parametrize("name", ["header", "page", "body", "footer"])
     def test_an_area_carries_class_and_any_other_attribute(self, render, name):
         _, attrs = elements_of(render(f'<c-layout.{name} class="x" data-y="2" />'))[0]
 
         assert attrs["class"].split() == [f"mvpl-{name}", "x"]
         assert attrs["data-y"] == "2"
 
-    @pytest.mark.parametrize("name", ["header", "page", "footer"])
+    @pytest.mark.parametrize("name", ["header", "page", "body", "footer"])
     def test_an_area_draws_its_content(self, render, name):
         assert "<b>in</b>" in render(f"<c-layout.{name}><b>in</b></c-layout.{name}>")
 

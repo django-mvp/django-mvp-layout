@@ -34,7 +34,12 @@ _Avoid_: content, main (that is one element it can draw).
 
 **Fixed**:
 An area whose letter is upper case, held in place while the layout scrolls.
-_Avoid_: sticky, pinned.
+_Avoid_: pinned.
+
+**Stacked sidebar**:
+A sidebar whose panel lays its content out as a header, a body and a footer,
+by one of `hbf`, `Hbf`, `hbF` and `HbF`. An upper-case letter makes that part
+sticky while the sidebar scrolls.
 
 **Drawer**:
 A sidebar drawn over the page as a modal dialog, below its breakpoint or with

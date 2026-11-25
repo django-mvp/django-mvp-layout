@@ -216,6 +216,23 @@ time the reader toggles the sidebar beside the page. A drawer is never remembere
 - **A value that is neither `open` nor `closed` is ignored.**
 - **A sidebar with `collapse="none"` ignores the cookie**, because it is always open.
 
+## Stack a sidebar's content
+
+Add `hbf`, `Hbf`, `hbF` or `HbF` to a sidebar's panel and give it up to three children:
+
+```html
+<div class="mvpl-panel HbF">
+  <header class="mvpl-header">My project</header>
+  <div class="mvpl-body">…</div>
+  <footer class="mvpl-footer">Signed in as Ana Ruiz</footer>
+</div>
+```
+
+The header sits at the top, the footer at the bottom, and the body takes the space between them,
+whatever order they are written in. An upper-case letter makes that part sticky while the sidebar
+scrolls. A part that is left out takes no space. The components write the same markup: see
+[Stack a sidebar's content](cotton.md#stack-a-sidebars-content).
+
 ## Leave a sidebar empty
 
 A sidebar whose `.mvpl-panel` is empty takes no space, and its toggles hide. A block left empty is

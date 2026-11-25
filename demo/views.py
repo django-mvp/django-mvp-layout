@@ -13,11 +13,11 @@ EXAMPLE_BASE = Path(settings.BASE_DIR) / "docs" / "examples" / "base.html"
 
 EXAMPLES = [
     ("lHh LpR lff", "This site's own layout"),
-    ("hHh LpR fFf", "Header and footer stay"),
-    ("hHh lpr fff", "Only the header stays"),
-    ("hhh lpr fff", "Nothing stays"),
+    ("hHh LpR fFf", "Sticky header and footer"),
+    ("hHh lpr fff", "Sticky header"),
+    ("hhh lpr fff", "Nothing sticks"),
     ("lHr LpR lfr", "Both sidebars full height"),
-    ("hHh LpR fff", "Footer across the bottom"),
+    ("hHh LpR fff", "Full-width footer"),
 ]
 COLLAPSES = [
     ("offcanvas", "Slides away"),
@@ -36,9 +36,27 @@ BEHAVIORS = [
     ("docked", "Always beside"),
     ("overlay", "Always a drawer"),
 ]
+SIDEBAR_VIEWS = [
+    ("", "Not set"),
+    ("HbF", "Sticky header and footer"),
+    ("Hbf", "Sticky header"),
+    ("hbF", "Sticky footer"),
+    ("hbf", "Nothing sticks"),
+]
+PARTS = [("header", "Header"), ("body", "Body"), ("footer", "Footer")]
 DEFAULTS = {
-    "left": {"collapse": "icons", "breakpoint": "md", "behavior": "auto"},
-    "right": {"collapse": "offcanvas", "breakpoint": "lg", "behavior": "auto"},
+    "left": {
+        "collapse": "icons",
+        "breakpoint": "md",
+        "behavior": "auto",
+        "view": "HbF",
+    },
+    "right": {
+        "collapse": "offcanvas",
+        "breakpoint": "lg",
+        "behavior": "auto",
+        "view": "",
+    },
 }
 
 
@@ -50,7 +68,16 @@ def pick(value, choices, default):
 def sidebar_options(params, side):
     """One sidebar's options from the query string."""
     defaults = DEFAULTS[side]
+    # The form always sends the layout code, so a query without it is a first
+    # visit, and a sent form with every part unticked means no parts.
+    if "view" in params:
+        chosen = params.getlist(f"{side}_parts")
+        parts = [key for key, _ in PARTS if key in chosen]
+    else:
+        parts = [key for key, _ in PARTS]
     return {
+        "view": pick(params.get(f"{side}_view"), SIDEBAR_VIEWS, defaults["view"]),
+        "parts": parts,
         "collapse": pick(
             params.get(f"{side}_collapse"), COLLAPSES, defaults["collapse"]
         ),
@@ -63,18 +90,31 @@ def sidebar_options(params, side):
     }
 
 
+PART_TAGS = {"header": "header", "body": "div", "footer": "footer"}
+
+
 def plain_snippet(code, left, right):
     """Write the same layout as a template that doesn't use django-cotton."""
 
     def sidebar(side, opts):
+        if opts["view"]:
+            panel = (
+                f'      <div class="mvpl-panel {opts["view"]}">\n'
+                + "".join(
+                    f'        <{PART_TAGS[part]} class="mvpl-{part}">…'
+                    f"</{PART_TAGS[part]}>\n"
+                    for part in opts["parts"]
+                )
+                + "      </div>\n"
+            )
+        else:
+            panel = '      <div class="mvpl-panel">…</div>\n'
         return (
             f'    <aside {{% sidebar_attrs "{side}" collapse="{opts["collapse"]}" '
             f'breakpoint="{opts["breakpoint"]}" '
             f'behavior="{opts["behavior"]}" %}} aria-label="…">\n'
             '      <div class="mvpl-backdrop" data-mvpl-close '
-            'aria-hidden="true"></div>\n'
-            '      <div class="mvpl-panel">…</div>\n'
-            "    </aside>\n"
+            'aria-hidden="true"></div>\n' + panel + "    </aside>\n"
         )
 
     return (
@@ -98,11 +138,17 @@ def markup_snippet(code, left, right):
     """Write the same layout as components."""
 
     def sidebar(side, opts):
+        view = f' view="{opts["view"]}"' if opts["view"] else ""
+        if opts["view"]:
+            inside = "".join(
+                f"    <c-layout.{part}>…</c-layout.{part}>\n" for part in opts["parts"]
+            )
+        else:
+            inside = "    …\n"
         return (
             f'  <c-layout.sidebar side="{side}" collapse="{opts["collapse"]}" '
-            f'breakpoint="{opts["breakpoint"]}" behavior="{opts["behavior"]}">\n'
-            "    …\n"
-            "  </c-layout.sidebar>\n"
+            f'breakpoint="{opts["breakpoint"]}" behavior="{opts["behavior"]}"'
+            f"{view}>\n" + inside + "  </c-layout.sidebar>\n"
         )
 
     return (
@@ -116,83 +162,6 @@ def markup_snippet(code, left, right):
         + "  <c-layout.footer>…</c-layout.footer>\n"
         "</c-layout>"
     )
-
-
-BREAKPOINT_WIDTHS = dict(
-    sm="40rem", md="48rem", lg="64rem", xl="80rem", **{"2xl": "96rem"}
-)
-
-
-def describe(side, opts):
-    """One sentence on how a sidebar opens and closes."""
-    name = f"The {side} sidebar"
-    if opts["behavior"] == "overlay":
-        return f"{name} is a drawer over the page at every width."
-    closes = {
-        "offcanvas": "slides away when closed",
-        "icons": "shrinks to an icon rail when closed",
-        "none": "stays open, with no toggle",
-    }[opts["collapse"]]
-    if opts["behavior"] == "docked":
-        return f"{name} {closes}, and stays beside the page at every width."
-    width = BREAKPOINT_WIDTHS[opts["breakpoint"]]
-    return (
-        f"{name} {closes}. Below {width} of layout width it is a drawer over the page."
-    )
-
-
-def describe_reach(side, top, bottom):
-    """Say which of the header and the footer a sidebar runs beside.
-
-    Args:
-        side: ``left`` or ``right``.
-        top: Whether the code gives the sidebar the top corner.
-        bottom: Whether the code gives the sidebar the bottom corner.
-
-    Returns:
-        One sentence.
-    """
-    name = f"The {side} sidebar"
-    if top and bottom:
-        return f"{name} runs the full height, beside the header and the footer."
-    if top:
-        return f"{name} reaches the top, beside the header."
-    if bottom:
-        return f"{name} reaches the bottom, beside the footer."
-    return f"{name} sits between the header and the footer."
-
-
-def explain(view):
-    """Say in plain sentences what a layout code does.
-
-    Args:
-        view: The parsed layout code.
-
-    Returns:
-        The sentences, one for each sidebar and one for what stays in place.
-    """
-    top, _, bottom = view.code.split(" ")
-    lines = [
-        describe_reach("left", top[0] == "l", bottom[0] == "l"),
-        describe_reach("right", top[2] == "r", bottom[2] == "r"),
-    ]
-    fixed = [
-        name
-        for name, flag in (
-            ("the header", view.header_fixed),
-            ("the left sidebar", view.left_fixed),
-            ("the right sidebar", view.right_fixed),
-            ("the footer", view.footer_fixed),
-        )
-        if flag
-    ]
-    if not fixed:
-        return [*lines, "Everything scrolls with the page."]
-    joined = (
-        fixed[0] if len(fixed) == 1 else ", ".join(fixed[:-1]) + " and " + fixed[-1]
-    )
-    verb = "stays" if len(fixed) == 1 else "stay"
-    return [*lines, f"While the page scrolls, {joined} {verb} in place."]
 
 
 def preview_context(params):
@@ -215,13 +184,13 @@ def preview_context(params):
         "plain_snippet": plain_snippet(view.code, left, right) if view else "",
         "markup_snippet": markup_snippet(view.code, left, right) if view else "",
         "sides": [("left", left), ("right", right)],
-        "explanation": explain(view) if view else [],
-        "left_description": describe("left", left),
-        "right_description": describe("right", right),
         "examples": EXAMPLES,
+        "preset_match": code in {example for example, _ in EXAMPLES},
         "collapses": COLLAPSES,
         "breakpoints": BREAKPOINTS,
         "behaviors": BEHAVIORS,
+        "sidebar_views": SIDEBAR_VIEWS,
+        "parts": PARTS,
         "paragraphs": range(14),
         "nav": [
             ("house", "Home"),
@@ -229,6 +198,15 @@ def preview_context(params):
             ("file-text", "Documents"),
             ("chat", "Discussions"),
             ("star", "Starred"),
+            ("send", "Sent"),
+            ("folder", "Projects"),
+            ("archive", "Archive"),
+            ("trash", "Trash"),
+            ("bell", "Notifications"),
+            ("layers", "Collections"),
+            ("palette", "Appearance"),
+            ("key", "Access keys"),
+            ("shield-lock", "Security"),
             ("gear", "Settings"),
         ],
     }
@@ -257,10 +235,8 @@ class PlaygroundView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(preview_context(self.request.GET))
         # The preview gets the page's full width, so its Full setting is wider
-        # than 1024. The reference starts closed and remembers its own state.
-        context.update(
-            page_width="max-w-none", aside_persist="demo-reference", aside_closed=True
-        )
+        # than 1024.
+        context.update(page_width="max-w-none")
         return context
 
 

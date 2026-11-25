@@ -8,12 +8,13 @@
 {# @prop closed:boolean | description:"Start closed. A remembered state wins." #}
 {# @prop persist:text | description:"A name to remember its open or closed state under, across pages and visits." #}
 {# @prop label:text | description:"Its accessible name, such as Main navigation." #}
+{# @prop view:text | description:"Stack its content as a header, body and footer: hbf, Hbf, hbF or HbF, upper case makes that part sticky while the sidebar scrolls. Put the content in c-layout.header, c-layout.body and c-layout.footer." #}
 {# @prop id:text | description:"The sidebar's id. Generated when not given." #}
 {# @prop class:text | description:"Classes added to the sidebar's own." #}
 {# @prop style:text | description:"Declarations added after the sidebar's own." #}
 {# The defaults for side, collapse, breakpoint and behavior are left empty so the sidebar tag's are the only ones. #}
 {% load mvp_layout %}
-<c-vars side="" collapse="" breakpoint="" behavior="" width="" rail-width="" closed="" persist="" label="" id="" class="" style="" />
+<c-vars side="" collapse="" breakpoint="" behavior="" width="" rail-width="" closed="" persist="" label="" view="" id="" class="" style="" />
 {% if slot.strip %}
   {% if not id %}{% layout_uid "sidebar" as id %}{% endif %}
   <aside id="{{ id }}"
@@ -21,6 +22,6 @@
          {% if label %}aria-label="{{ label }}"{% endif %}
          {{ attrs }}>
     <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
-    <div class="mvpl-panel">{{ slot }}</div>
+    <div class="mvpl-panel{% if view %} {{ view }}{% endif %}">{{ slot }}</div>
   </aside>
 {% endif %}

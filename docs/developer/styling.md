@@ -75,7 +75,8 @@ element only there. See
 ## Every public name
 
 Every class, data attribute, CSS variable and cookie the package uses starts with `mvpl`, so a host
-project's own names don't collide with them.
+project's own names don't collide with them. The four classes that stack a sidebar's panel are the
+one exception, and are matched only together with `.mvpl-panel` or the parts inside them.
 
 ### Classes
 
@@ -86,6 +87,8 @@ project's own names don't collide with them.
 | `.mvpl-header`, `.mvpl-page`, `.mvpl-footer` | The areas. |
 | `.mvpl-sidebar` | A sidebar's `aside`. |
 | `.mvpl-panel` | What a sidebar holds, and what slides as a drawer. |
+| `.hbf`, `.Hbf`, `.hbF`, `.HbF` | A sidebar's panel that stacks its content as a header, a body and a footer. Upper case makes that part sticky. |
+| `.mvpl-body` | The body of a stacked panel, between its `.mvpl-header` and `.mvpl-footer`. |
 | `.mvpl-backdrop` | The shade behind an open drawer. |
 | `.mvpl-rail-hide`, `.mvpl-rail-only` | Content hidden in, or shown only in, an icon rail. |
 | `.mvpl-toggle` | A toggle the script hides when there is nothing to toggle. See [Add a toggle](plain-templates.md#add-a-toggle). |

@@ -8,8 +8,6 @@
 import pytest
 from django.urls import reverse
 
-from demo.views import describe_reach, explain
-from mvp_layout.view import LayoutView
 from tests.conftest import elements_of
 
 # Each page and the layouts it draws: the shell, then the playground's preview and
@@ -100,36 +98,6 @@ class TestPlayground:
         ids = {attrs.get("id") for _, attrs in elements_of(response.content.decode())}
         assert {"lp-layout", "lp-details"} <= ids
         assert "lp-form" not in ids
-
-
-class TestExplanation:
-    def test_each_combination_of_corners_is_told_apart(self) -> None:
-        sentences = {
-            describe_reach("left", top, bottom)
-            for top in (True, False)
-            for bottom in (True, False)
-        }
-
-        assert len(sentences) == 4
-
-    @pytest.mark.parametrize(
-        ("code", "held"),
-        [
-            ("hhh lpr fff", []),
-            ("hHh lpr fff", ["header"]),
-            ("hHh LpR fFf", ["header", "left sidebar", "right sidebar", "footer"]),
-        ],
-    )
-    def test_it_names_each_area_that_stays_in_place(
-        self, code: str, held: list[str]
-    ) -> None:
-        sentence = explain(LayoutView.parse(code))[-1]
-
-        assert [
-            area
-            for area in ("header", "left sidebar", "right sidebar", "footer")
-            if area in sentence
-        ] == held
 
 
 @pytest.mark.django_db

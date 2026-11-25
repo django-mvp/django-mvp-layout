@@ -1,33 +1,21 @@
-{# @description What the layout code does, and the same layout written in a template and with components. #}
-{# @prop view:object | description:"The parsed layout code." #}
-{# @prop explanation:object | description:"Sentences saying what the code does." #}
-{# @prop left_description:text | description:"How the left sidebar opens and closes." #}
-{# @prop right_description:text | description:"How the right sidebar opens and closes." #}
+{# @description The same layout written with components and in a plain template, as tabs. #}
 {# @prop plain_snippet:text | description:"The layout in a template without django-cotton." #}
 {# @prop markup_snippet:text | description:"The layout as components." #}
-<c-vars view="" explanation="" left_description="" right_description="" plain_snippet="" markup_snippet="" />
+<c-vars plain_snippet="" markup_snippet="" />
 {% load demo_icons %}
-<div id="lp-details" class="grid gap-6 lg:grid-cols-2">
-  <section class="flex flex-col gap-2 lg:col-span-2" aria-labelledby="lp-does">
-    <h2 id="lp-does" class="text-lg font-semibold">What <code class="font-mono">{{ view.code }}</code> does</h2>
-    <ul class="list-disc ps-5 text-base-content/80 flex flex-col gap-1">
-      {% for line in explanation %}<li>{{ line }}</li>{% endfor %}
-      <li>{{ left_description }}</li>
-      <li>{{ right_description }}</li>
-    </ul>
-  </section>
-  <section class="flex min-w-0 flex-col gap-2" aria-labelledby="lp-plain">
-    <div class="flex items-center justify-between gap-2">
-      <h2 id="lp-plain" class="text-lg font-semibold">In a template, without Cotton</h2>
-      <button type="button" class="btn btn-sm btn-ghost" data-lp-copy="lp-plain-code">{% icon "copy" "" %}<span>Copy</span></button>
-    </div>
-    <pre id="lp-plain-code" class="overflow-x-auto rounded-box bg-base-200 p-4 text-sm"><code>{{ plain_snippet }}</code></pre>
-  </section>
-  <section class="flex min-w-0 flex-col gap-2" aria-labelledby="lp-markup">
-    <div class="flex items-center justify-between gap-2">
-      <h2 id="lp-markup" class="text-lg font-semibold">With Cotton components</h2>
+<div id="lp-details" class="tabs tabs-lift">
+  <input type="radio" name="lp-tab" value="cotton" class="tab" aria-label="With django-cotton" checked />
+  <div class="tab-content min-w-0 border-base-300 bg-base-100 p-4">
+    <div class="mb-2 flex justify-end">
       <button type="button" class="btn btn-sm btn-ghost" data-lp-copy="lp-markup-code">{% icon "copy" "" %}<span>Copy</span></button>
     </div>
     <pre id="lp-markup-code" class="overflow-x-auto rounded-box bg-base-200 p-4 text-sm"><code>{{ markup_snippet }}</code></pre>
-  </section>
+  </div>
+  <input type="radio" name="lp-tab" value="plain" class="tab" aria-label="With plain Django" />
+  <div class="tab-content min-w-0 border-base-300 bg-base-100 p-4">
+    <div class="mb-2 flex justify-end">
+      <button type="button" class="btn btn-sm btn-ghost" data-lp-copy="lp-plain-code">{% icon "copy" "" %}<span>Copy</span></button>
+    </div>
+    <pre id="lp-plain-code" class="overflow-x-auto rounded-box bg-base-200 p-4 text-sm"><code>{{ plain_snippet }}</code></pre>
+  </div>
 </div>
