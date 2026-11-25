@@ -9,6 +9,7 @@ urlpatterns = [
     path("playground/", views.PlaygroundView.as_view(), name="playground"),
     path("nested/", views.NestedView.as_view(), name="nested"),
     path("without-cotton/", views.PlainView.as_view(), name="plain"),
+    path("boxes/", views.BoxesView.as_view(), name="boxes"),
     # The endpoint an open page holds to hear that something on disk changed.
     path("__reload__/", include("django_browser_reload.urls")),
 ]

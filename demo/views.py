@@ -406,3 +406,25 @@ class PlainView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["base_source"] = EXAMPLE_BASE.read_text()
         return context
+
+
+class BoxesView(TemplateView):
+    """Boxes stacked as a header, a body and a footer."""
+
+    template_name = "demo/boxes.html"
+
+    def get_context_data(self, **kwargs):
+        """Add the codes and the content the boxes are drawn with."""
+        context = super().get_context_data(**kwargs)
+        context["codes"] = ["hbf", "Hbf", "hbF", "HbF"]
+        context["rows"] = range(1, 21)
+        context["fields"] = [
+            "Display name",
+            "Email",
+            "Affiliation",
+            "Department",
+            "Website",
+            "ORCID",
+            "Phone",
+        ]
+        return context

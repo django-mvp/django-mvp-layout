@@ -1,0 +1,93 @@
+{% extends "demo/base.html" %}
+{% load demo_icons %}
+{% block content %}
+  <div class="flex flex-col gap-10">
+    <p class="max-w-prose text-base-content/80">
+      A box classed <code>hbf</code>, <code>Hbf</code>, <code>hbF</code> or <code>HbF</code> stacks a header, a body and a footer.
+      Each child names its area with <code>mvpl-header</code>, <code>mvpl-body</code> or <code>mvpl-footer</code>, an area left out takes no space, and an upper-case letter keeps that area in place while the box scrolls.
+      The navigation on this page is a sidebar with <code>view="HbF"</code>.
+    </p>
+
+    <section class="flex flex-col gap-3" aria-labelledby="bx-codes-title">
+      <h2 id="bx-codes-title" class="text-xl font-semibold">The four codes</h2>
+      <p class="max-w-prose text-sm text-base-content/70">Each box is 18rem tall and scrolls. Scroll each one to see which areas stay.</p>
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {% for code in codes %}
+          <div class="{{ code }} h-72 overflow-y-auto rounded-box border border-base-300 bg-base-100">
+            <c-layout.header class="border-b border-base-300 bg-base-200 px-4 py-3 font-semibold">Header</c-layout.header>
+            <c-layout.body class="px-4 py-3">
+              <p class="mb-2 font-mono text-sm text-primary">{{ code }}</p>
+              <ul class="flex flex-col gap-2 text-sm text-base-content/80">
+                {% for row in rows %}<li>Row {{ row }}</li>{% endfor %}
+              </ul>
+            </c-layout.body>
+            <c-layout.footer class="border-t border-base-300 bg-base-200 px-4 py-3 text-sm">Footer</c-layout.footer>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="bx-missing-title">
+      <h2 id="bx-missing-title" class="text-xl font-semibold">Areas left out</h2>
+      <p class="max-w-prose text-sm text-base-content/70">The same <code>HbF</code> class on each card. A card with no header starts with its body, and a card with no body keeps its footer at the bottom. The footer is written first in the second card's markup and is still drawn last.</p>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div class="HbF card h-56 overflow-y-auto border border-base-300 bg-base-100">
+          <c-layout.body class="card-body"><h3 class="card-title text-base">No header</h3><p class="text-sm text-base-content/70">The body starts at the top of the card.</p></c-layout.body>
+          <c-layout.footer class="card-actions justify-end border-t border-base-300 bg-base-100 px-4 py-3"><button class="btn btn-sm btn-primary">Open</button></c-layout.footer>
+        </div>
+        <div class="HbF card h-56 overflow-y-auto border border-base-300 bg-base-100">
+          <c-layout.footer class="card-actions justify-end border-t border-base-300 bg-base-100 px-4 py-3"><button class="btn btn-sm btn-primary">Open</button></c-layout.footer>
+          <c-layout.header class="border-b border-base-300 bg-base-100 px-4 py-3 font-semibold">No body</c-layout.header>
+        </div>
+        <div class="HbF card h-56 overflow-y-auto border border-base-300 bg-base-100">
+          <c-layout.header class="border-b border-base-300 bg-base-100 px-4 py-3 font-semibold">No footer</c-layout.header>
+          <c-layout.body class="card-body"><p class="text-sm text-base-content/70">The body runs to the bottom of the card.</p></c-layout.body>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="bx-dialog-title">
+      <h2 id="bx-dialog-title" class="text-xl font-semibold">A dialog</h2>
+      <p class="max-w-prose text-sm text-base-content/70">A daisyUI <code>modal-box</code> classed <code>HbF</code>. The title and the buttons stay in view while the form scrolls.</p>
+      <div>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('bx-dialog').showModal()">{% icon "gear" "" %} Open the dialog</button>
+      </div>
+      <dialog id="bx-dialog" class="modal" aria-labelledby="bx-dialog-heading">
+        <div class="HbF modal-box max-h-[min(30rem,90dvh)] p-0">
+          <c-layout.header class="flex items-center border-b border-base-300 bg-base-100 px-5 py-3">
+            <h3 id="bx-dialog-heading" class="font-semibold">Edit profile</h3>
+            <form method="dialog" class="ms-auto"><button class="btn btn-ghost btn-sm btn-square" aria-label="Close">{% icon "close" "" %}</button></form>
+          </c-layout.header>
+          <c-layout.body class="flex flex-col gap-4 px-5 py-4">
+            {% for field in fields %}
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">{{ field }}</legend>
+                <input class="input w-full" />
+              </fieldset>
+            {% endfor %}
+          </c-layout.body>
+          <c-layout.footer class="flex justify-end gap-2 border-t border-base-300 bg-base-100 px-5 py-3">
+            <form method="dialog"><button class="btn btn-ghost">Cancel</button></form>
+            <form method="dialog"><button class="btn btn-primary">Save</button></form>
+          </c-layout.footer>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>Close</button></form>
+      </dialog>
+    </section>
+
+    <section class="flex flex-col gap-3" aria-labelledby="bx-markup-title">
+      <h2 id="bx-markup-title" class="text-xl font-semibold">The markup</h2>
+      <pre class="w-fit max-w-full overflow-x-auto rounded-box bg-base-200 p-4 text-sm"><code>&lt;div class="HbF"&gt;
+  &lt;c-layout.header&gt;…&lt;/c-layout.header&gt;
+  &lt;c-layout.body&gt;…&lt;/c-layout.body&gt;
+  &lt;c-layout.footer&gt;…&lt;/c-layout.footer&gt;
+&lt;/div&gt;
+
+&lt;c-layout.sidebar side="left" view="HbF"&gt;
+  &lt;c-layout.header&gt;…&lt;/c-layout.header&gt;
+  &lt;c-layout.body&gt;…&lt;/c-layout.body&gt;
+  &lt;c-layout.footer&gt;…&lt;/c-layout.footer&gt;
+&lt;/c-layout.sidebar&gt;</code></pre>
+    </section>
+  </div>
+{% endblock content %}

@@ -31,18 +31,26 @@
           <c-layout.toggle side="right" label="On this page" class="btn btn-ghost btn-sm btn-square">{% icon "sidebar-right" %}</c-layout.toggle>
         </div>
       </c-layout.header>
-      <c-layout.sidebar side="left" collapse="icons" breakpoint="lg" persist="demo-nav" label="Navigation">
-        <div class="flex h-14 shrink-0 items-center justify-between gap-2 px-3">
+      <c-layout.sidebar side="left" collapse="icons" breakpoint="lg" persist="demo-nav" label="Navigation" view="HbF">
+        <c-layout.header class="flex h-14 items-center justify-between gap-2 px-3">
           <a href="{% url 'home' %}" class="font-semibold mvpl-rail-hide">django-mvp-layout</a>
           <c-layout.toggle side="left" label="Navigation" class="btn btn-ghost btn-sm btn-square" />
-        </div>
-        <ul class="menu w-full gap-1">
-          {% url 'home' as home_url %}{% url 'playground' as playground_url %}{% url 'nested' as nested_url %}{% url 'plain' as plain_url %}
-          <li><a href="{{ home_url }}" title="Overview" {% if request.path == home_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "house" %}<span class="mvpl-rail-hide">Overview</span></a></li>
-          <li><a href="{{ playground_url }}" title="Playground" {% if request.path == playground_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layout" %}<span class="mvpl-rail-hide">Playground</span></a></li>
-          <li><a href="{{ nested_url }}" title="Nested layouts" {% if request.path == nested_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layers" %}<span class="mvpl-rail-hide">Nested layouts</span></a></li>
-          <li><a href="{{ plain_url }}" title="Without Cotton" {% if request.path == plain_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "code" %}<span class="mvpl-rail-hide">Without Cotton</span></a></li>
-        </ul>
+        </c-layout.header>
+        <c-layout.body>
+          <ul class="menu w-full gap-1">
+            {% url 'home' as home_url %}{% url 'playground' as playground_url %}{% url 'nested' as nested_url %}{% url 'plain' as plain_url %}{% url 'boxes' as boxes_url %}
+            <li><a href="{{ home_url }}" title="Overview" {% if request.path == home_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "house" %}<span class="mvpl-rail-hide">Overview</span></a></li>
+            <li><a href="{{ playground_url }}" title="Playground" {% if request.path == playground_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layout" %}<span class="mvpl-rail-hide">Playground</span></a></li>
+            <li><a href="{{ nested_url }}" title="Nested layouts" {% if request.path == nested_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layers" %}<span class="mvpl-rail-hide">Nested layouts</span></a></li>
+            <li><a href="{{ plain_url }}" title="Without Cotton" {% if request.path == plain_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "code" %}<span class="mvpl-rail-hide">Without Cotton</span></a></li>
+            <li><a href="{{ boxes_url }}" title="Header, body and footer" {% if request.path == boxes_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "file-text" %}<span class="mvpl-rail-hide">Header, body and footer</span></a></li>
+          </ul>
+        </c-layout.body>
+        <c-layout.footer class="border-t border-base-300">
+          <ul class="menu w-full">
+            <li><a href="https://github.com/django-mvp/django-mvp-layout" title="Source on GitHub">{% icon "folder" %}<span class="mvpl-rail-hide">Source on GitHub</span></a></li>
+          </ul>
+        </c-layout.footer>
       </c-layout.sidebar>
       <c-layout.page tag="main" class="min-w-0">
         <div class="mx-auto flex {{ page_width|default:'max-w-5xl' }} flex-col gap-6 px-4 py-6 md:px-8">
