@@ -334,14 +334,8 @@ class PlaygroundView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(preview_context(self.request.GET))
         # The preview gets the page's full width, so its Full setting is wider
-        # than 1024. The settings sidebar remembers its own state, and is wider
-        # than the site's other right sidebars to fit the form.
-        context.update(
-            page_width="max-w-none",
-            aside_persist="demo-playground-settings",
-            aside_width="22rem",
-            aside_label="Layout settings",
-        )
+        # than 1024.
+        context.update(page_width="max-w-none")
         return context
 
 

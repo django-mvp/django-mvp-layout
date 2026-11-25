@@ -1,99 +1,127 @@
 {% extends "demo/base.html" %}
 {% load demo_icons %}
-{% block aside %}
-  <div class="flex flex-col gap-5 p-4">
-    <div class="flex items-center justify-between gap-2">
-      <h2 class="text-base font-semibold">Layout settings</h2>
-      <c-layout.toggle side="right" class="btn btn-ghost btn-sm btn-square" label="Close" />
-    </div>
-      <form class="flex flex-col gap-5" id="lp-form" action="{% url 'playground' %}" method="get">
-        <div class="flex flex-col gap-2">
-          <label for="lp-code" class="font-medium">Layout code</label>
-          <div class="flex flex-col gap-2">
-            <input id="lp-code"
-                   name="view"
-                   value="{{ code }}"
-                   class="input w-full font-mono tracking-widest"
-                   spellcheck="false"
-                   autocomplete="off"
-                   autocapitalize="off"
-                   maxlength="15"
-                   aria-describedby="lp-msg"
-                   {% if error %}aria-invalid="true"{% endif %} />
-            <div class="flex flex-wrap gap-2" role="group" aria-label="Examples">
-              {% for example, label in examples %}
-                <button type="button" class="btn btn-sm" data-lp-example="{{ example }}" aria-pressed="{% if example == code %}true{% else %}false{% endif %}" title="{{ example }}">{{ label }}</button>
+{% block content %}
+  <style>
+    .lp-frame { resize: horizontal; overflow: hidden; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
+    .lp-frame::after { content: ""; }
+    .lp-handle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 0.75rem; display: grid; place-items: center; pointer-events: none; }
+    .lp-handle::before { content: ""; width: 0.25rem; height: 2.5rem; border-radius: 9999px; background: var(--color-base-300); }
+  </style>
+  <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-3">
+      <form class="flex flex-col gap-2" id="lp-form" action="{% url 'playground' %}" method="get">
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="lp-code" class="sr-only">Layout code</label>
+          <input id="lp-code"
+                 name="view"
+                 value="{{ code }}"
+                 class="input w-48 font-mono tracking-widest"
+                 spellcheck="false"
+                 autocomplete="off"
+                 autocapitalize="off"
+                 maxlength="15"
+                 placeholder="Layout code"
+                 aria-describedby="lp-msg"
+                 {% if error %}aria-invalid="true"{% endif %} />
+          <select id="lp-presets" class="select w-56" aria-label="Presets">
+            <option value="">Presets</option>
+            {% for example, label in examples %}<option value="{{ example }}" {% if example == code %}selected{% endif %}>{{ label }} · {{ example }}</option>{% endfor %}
+          </select>
+          <button type="button" class="btn" onclick="document.getElementById('lp-config').showModal()">{% icon "gear" "" %} Configure</button>
+          <div class="join ms-auto" role="group" aria-label="Preview width">
+            <button type="button" class="btn join-item" data-lp-width="" aria-pressed="true">Full</button>
+            <button type="button" class="btn join-item" data-lp-width="1024" aria-pressed="false">1024</button>
+            <button type="button" class="btn join-item" data-lp-width="768" aria-pressed="false">768</button>
+            <button type="button" class="btn join-item" data-lp-width="390" aria-pressed="false">390</button>
+          </div>
+        </div>
+        <c-demo.message :error="error" />
+        <dialog id="lp-config" class="modal" aria-labelledby="lp-config-heading">
+          <div class="modal-box flex max-w-4xl flex-col gap-4">
+            <div class="flex items-center justify-between gap-2">
+              <h2 id="lp-config-heading" class="text-lg font-semibold">Configure the sidebars</h2>
+              <button type="button" class="btn btn-ghost btn-sm btn-square" aria-label="Close" onclick="this.closest('dialog').close()">{% icon "close" "" %}</button>
+            </div>
+            <div class="grid gap-4 lg:grid-cols-2">
+              {% for side, opts in sides %}
+                <fieldset class="fieldset rounded-box border border-base-300 p-4">
+                  <legend class="fieldset-legend">{{ side|capfirst }} sidebar</legend>
+                  <div class="grid gap-3 sm:grid-cols-3">
+                    <label class="flex flex-col gap-1">
+                      <span class="text-sm">When closed</span>
+                      <select name="{{ side }}_collapse" class="select select-sm">
+                        {% for key, label in collapses %}<option value="{{ key }}" {% if key == opts.collapse %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                      </select>
+                    </label>
+                    <label class="flex flex-col gap-1">
+                      <span class="text-sm">Drawer below</span>
+                      <select name="{{ side }}_breakpoint" class="select select-sm">
+                        {% for key, label in breakpoints %}<option value="{{ key }}" {% if key == opts.breakpoint %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                      </select>
+                    </label>
+                    <label class="flex flex-col gap-1">
+                      <span class="text-sm">Behaviour</span>
+                      <select name="{{ side }}_behavior" class="select select-sm">
+                        {% for key, label in behaviors %}<option value="{{ key }}" {% if key == opts.behavior %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                      </select>
+                    </label>
+                  </div>
+                  <div class="mt-2 grid gap-3 sm:grid-cols-3">
+                    <label class="flex flex-col gap-1">
+                      <span class="text-sm">View</span>
+                      <select name="{{ side }}_view" class="select select-sm">
+                        {% for key, label in sidebar_views %}<option value="{{ key }}" {% if key == opts.view %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                      </select>
+                    </label>
+                    <div class="flex flex-wrap items-end gap-x-4 gap-y-2 pb-1.5 sm:col-span-2" role="group" aria-label="{{ side|capfirst }} sidebar parts">
+                      {% for key, label in parts %}
+                        <label class="label gap-2 text-sm text-base-content">
+                          <input type="checkbox" name="{{ side }}_parts" value="{{ key }}" class="checkbox checkbox-sm" {% if key in opts.parts %}checked{% endif %} />
+                          {{ label }}
+                        </label>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </fieldset>
               {% endfor %}
             </div>
+            <div class="modal-action mt-0">
+              <button type="button" class="btn btn-primary" onclick="this.closest('dialog').close()">Done</button>
+            </div>
           </div>
-          <c-demo.message :error="error" />
-        </div>
-        <div class="flex flex-col gap-4">
-          {% for side, opts in sides %}
-            <fieldset class="fieldset rounded-box border border-base-300 p-4">
-              <legend class="fieldset-legend">{{ side|capfirst }} sidebar</legend>
-              <div class="grid grid-cols-2 gap-3">
-                <label class="flex flex-col gap-1">
-                  <span class="text-sm">When closed</span>
-                  <select name="{{ side }}_collapse" class="select select-sm">
-                    {% for key, label in collapses %}<option value="{{ key }}" {% if key == opts.collapse %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                  </select>
-                </label>
-                <label class="flex flex-col gap-1">
-                  <span class="text-sm">Drawer below</span>
-                  <select name="{{ side }}_breakpoint" class="select select-sm">
-                    {% for key, label in breakpoints %}<option value="{{ key }}" {% if key == opts.breakpoint %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                  </select>
-                </label>
-                <label class="flex flex-col gap-1">
-                  <span class="text-sm">Behaviour</span>
-                  <select name="{{ side }}_behavior" class="select select-sm">
-                    {% for key, label in behaviors %}<option value="{{ key }}" {% if key == opts.behavior %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                  </select>
-                </label>
-              </div>
-              <div class="mt-2 flex flex-col gap-3">
-                <label class="col-span-2 flex flex-col gap-1">
-                  <span class="text-sm">View</span>
-                  <select name="{{ side }}_view" class="select select-sm">
-                    {% for key, label in sidebar_views %}<option value="{{ key }}" {% if key == opts.view %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                  </select>
-                </label>
-                <div class="flex flex-wrap gap-x-4 gap-y-2" role="group" aria-label="{{ side|capfirst }} sidebar parts">
-                  {% for key, label in parts %}
-                    <label class="label gap-2 text-sm text-base-content">
-                      <input type="checkbox" name="{{ side }}_parts" value="{{ key }}" class="checkbox checkbox-sm" {% if key in opts.parts %}checked{% endif %} />
-                      {{ label }}
-                    </label>
-                  {% endfor %}
-                </div>
-              </div>
-            </fieldset>
-          {% endfor %}
-        </div>
+          <div class="modal-backdrop" onclick="this.closest('dialog').close()"></div>
+        </dialog>
       </form>
-      <div class="flex flex-col gap-2">
-        <span class="font-medium" id="lp-width-label">Preview width</span>
-        <div class="join" role="group" aria-labelledby="lp-width-label">
-          <button type="button" class="btn btn-sm join-item" data-lp-width="" aria-pressed="true">Full</button>
-          <button type="button" class="btn btn-sm join-item" data-lp-width="1024" aria-pressed="false">1024</button>
-          <button type="button" class="btn btn-sm join-item" data-lp-width="768" aria-pressed="false">768</button>
-          <button type="button" class="btn btn-sm join-item" data-lp-width="390" aria-pressed="false">390</button>
+      <section class="flex flex-col gap-2" aria-label="Preview">
+        <div id="lp-frame" class="lp-frame relative">
+          <div class="mockup-browser border border-base-300 bg-base-200">
+            <div class="mockup-browser-toolbar">
+              <div class="input">acme.example/getting-started</div>
+            </div>
+            {% if view %}<c-demo.preview-layout :view="view" :left="left" :right="right" :nav="nav" :paragraphs="paragraphs" />{% else %}<div id="lp-preview"></div>{% endif %}
+          </div>
+          <span class="lp-handle" aria-hidden="true"></span>
         </div>
-        <p id="lp-status" class="text-sm text-base-content/70" aria-live="polite"></p>
-      </div>
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <p class="text-sm text-base-content/60">Drag the window's right edge, or pick a width above it, to see the sidebars change at their breakpoints.</p>
+          <p id="lp-status" class="text-sm text-base-content/70" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+    {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div><div id="lp-explain"></div>{% endif %}
+    <c-demo.reference />
   </div>
   <script>
     (function () {
       var input = document.getElementById("lp-code");
       var frame = document.getElementById("lp-frame");
       var status = document.getElementById("lp-status");
+      var presets = document.getElementById("lp-presets");
+      // The presets show the one the code matches, or their placeholder.
       function markExamples() {
         var value = input.value.trim().replace(/\s+/g, " ");
-        document.querySelectorAll("[data-lp-example]").forEach(function (b) {
-          b.setAttribute("aria-pressed", String(b.dataset.lpExample === value));
-          b.classList.toggle("btn-primary", b.dataset.lpExample === value);
-        });
+        var match = Array.prototype.some.call(presets.options, function (o) { return o.value && o.value === value; });
+        presets.value = match ? value : "";
       }
       function describe(s) {
         if (!s.present) return "none";
@@ -108,12 +136,8 @@
         var s = window.MvpLayout.state(root);
         status.textContent = Math.round(root.getBoundingClientRect().width) + "px wide · Left: " + describe(s.left) + " · Right: " + describe(s.right);
       }
-      document.querySelectorAll("[data-lp-example]").forEach(function (b) {
-        b.addEventListener("click", function () {
-          input.value = b.dataset.lpExample;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          markExamples();
-        });
+      presets.addEventListener("change", function () {
+        if (presets.value) input.value = presets.value;
       });
       input.addEventListener("input", markExamples);
       markExamples();
@@ -177,28 +201,4 @@
       report();
     })();
   </script>
-{% endblock aside %}
-{% block content %}
-  <style>
-    .lp-frame { resize: horizontal; overflow: hidden; max-width: 100%; min-width: 18rem; padding-inline-end: 0.75rem; }
-    .lp-frame::after { content: ""; }
-    .lp-handle { position: absolute; inset-block: 0; inset-inline-end: 0; width: 0.75rem; display: grid; place-items: center; pointer-events: none; }
-    .lp-handle::before { content: ""; width: 0.25rem; height: 2.5rem; border-radius: 9999px; background: var(--color-base-300); }
-  </style>
-  <div class="flex flex-col gap-8">
-    <section class="flex flex-col gap-2" aria-label="Preview">
-      <div id="lp-frame" class="lp-frame relative">
-        <div class="mockup-browser border border-base-300 bg-base-200">
-          <div class="mockup-browser-toolbar">
-            <div class="input">acme.example/getting-started</div>
-          </div>
-          {% if view %}<c-demo.preview-layout :view="view" :left="left" :right="right" :nav="nav" :paragraphs="paragraphs" />{% else %}<div id="lp-preview"></div>{% endif %}
-        </div>
-        <span class="lp-handle" aria-hidden="true"></span>
-      </div>
-      <p class="text-sm text-base-content/60">Drag the window's right edge, or pick a width in the settings, to see the sidebars change at their breakpoints.</p>
-    </section>
-    {% if view %}<c-demo.preview-details :view="view" :explanation="explanation" :left_description="left_description" :right_description="right_description" :plain_snippet="plain_snippet" :markup_snippet="markup_snippet" />{% else %}<div id="lp-details"></div><div id="lp-explain"></div>{% endif %}
-    <c-demo.reference />
-  </div>
 {% endblock content %}

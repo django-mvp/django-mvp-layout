@@ -56,7 +56,7 @@
           {% block content %}{% endblock content %}
         </div>
       </c-layout.page>
-      <c-layout.sidebar side="right" persist="{{ aside_persist|default:'demo-aside' }}" :closed="aside_closed" width="{{ aside_width }}" label="{{ aside_label|default:'On this page' }}">{% block aside %}{% endblock aside %}</c-layout.sidebar>
+      <c-layout.sidebar side="right" persist="{{ aside_persist|default:'demo-aside' }}" :closed="aside_closed" label="On this page">{% block aside %}{% endblock aside %}</c-layout.sidebar>
       <c-layout.footer class="border-t border-base-300">
         <div class="px-4 py-3 text-sm text-base-content/60 md:px-8">django-mvp-layout demo. MIT licence.</div>
       </c-layout.footer>
