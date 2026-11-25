@@ -1,7 +1,7 @@
 # Components
 
 With [django-cotton](https://django-cotton.com) installed, a layout is written as components. This
-page covers the six components and every attribute each one takes. The components write the same
+page covers the seven components and every attribute each one takes. The components write the same
 attributes the [template tags](plain-templates.md) do, so a component layout and a plain-template
 layout behave the same.
 
@@ -84,6 +84,7 @@ sidebar, its column takes no space, and its toggles hide.
 | `closed` | off | A bare attribute. Start closed. A remembered state wins. |
 | `persist` | | A name to remember its open or closed state under, across pages and visits. |
 | `label` | | Its accessible name, such as Navigation. |
+| `view` | | Stack its content as a header, a body and a footer: `hbf`, `Hbf`, `hbF` or `HbF`. See [Stack a sidebar's content](#stack-a-sidebars-content). |
 | `id` | generated | The sidebar's id. |
 | `class` | | Classes added to the sidebar's own. |
 | `style` | | Declarations added after the sidebar's own. |
@@ -92,6 +93,42 @@ An option that is not one of its choices raises, naming the choices. The breakpo
 state and the icon rail behave as [the plain templates](plain-templates.md) describe.
 The remembered state is read from the request, so the template needs the
 `django.template.context_processors.request` context processor.
+
+### Stack a sidebar's content
+
+Give a sidebar a `view` and put its content in `<c-layout.header>`, `<c-layout.body>` and
+`<c-layout.footer>`. The header sits at the top, the footer at the bottom, and the body takes the
+space between them. An upper-case letter makes that part sticky while the sidebar scrolls:
+
+| Sticky | `view` |
+|---|---|
+| Nothing | `hbf` |
+| The header | `Hbf` |
+| The footer | `hbF` |
+| The header and the footer | `HbF` |
+
+```html
+<c-layout.sidebar side="left" label="Navigation" view="HbF">
+  <c-layout.header>My project</c-layout.header>
+  <c-layout.body><ul class="menu">…</ul></c-layout.body>
+  <c-layout.footer>Signed in as Ana Ruiz</c-layout.footer>
+</c-layout.sidebar>
+```
+
+Each part finds its own place, so the order they are written in doesn't move them. A part that is
+left out takes no space, and the footer stays at the bottom without a body above it. A sticky part
+is drawn in the sidebar's colour, so the body scrolls behind it.
+
+## `<c-layout.body>`
+
+The body of a stacked sidebar, between its header and its footer. See
+[Stack a sidebar's content](#stack-a-sidebars-content).
+
+| Attribute | Default | |
+|---|---|---|
+| `class` | | Classes added to the body's own. |
+
+Any other attribute is added to its element, a `<div>`.
 
 ## `<c-layout.toggle>`
 

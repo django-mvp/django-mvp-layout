@@ -23,8 +23,10 @@ PAGES = (
     "heavy",
     "host-rules",
     "host-colours",
-    # Not the base template: its layout code is read from the URL.
+    # Not the base template: their layout code or sidebar stacking is read
+    # from the URL.
     "code",
+    "stacked",
 )
 
 COMPONENT_PAGES = ("overview", "playground", "nested", "no-script")

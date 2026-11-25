@@ -1,0 +1,41 @@
+{% load static mvp_layout %}<!DOCTYPE html>
+{% comment %}
+  A left sidebar whose panel stacks a header, body and footer. The address
+  gives the stacking code (?stack=), the parts drawn (?parts=header,footer),
+  whether they are written footer first (?reversed=1) and whether the body is
+  taller than the sidebar (?tall=1).
+{% endcomment %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A stacked sidebar</title>
+    <link rel="stylesheet" href="{% static 'mvp_layout/layout.css' %}" />
+    <style>body { margin: 0; }</style>
+    <script src="{% static 'mvp_layout/layout.js' %}"></script>
+  </head>
+  <body>
+    <div id="app" {% layout_attrs "hHh LpR fff" %}>
+      <div class="mvpl-grid">
+        <header class="mvpl-header">Header</header>
+        <aside {% sidebar_attrs "left" behavior="docked" %} aria-label="Navigation">
+          <div class="mvpl-backdrop" data-mvpl-close aria-hidden="true"></div>
+          <div class="mvpl-panel {{ stack }}">
+            {% if reversed %}
+              {% if "footer" in parts %}<footer class="mvpl-footer">Sidebar footer</footer>{% endif %}
+              {% if "body" in parts %}<div class="mvpl-body"><div {% if tall %}style="height: 3000px"{% endif %}>Sidebar body</div></div>{% endif %}
+              {% if "header" in parts %}<header class="mvpl-header">Sidebar header</header>{% endif %}
+            {% else %}
+              {% if "header" in parts %}<header class="mvpl-header">Sidebar header</header>{% endif %}
+              {% if "body" in parts %}<div class="mvpl-body"><div {% if tall %}style="height: 3000px"{% endif %}>Sidebar body</div></div>{% endif %}
+              {% if "footer" in parts %}<footer class="mvpl-footer">Sidebar footer</footer>{% endif %}
+            {% endif %}
+          </div>
+        </aside>
+        <main class="mvpl-page">Content</main>
+        <footer class="mvpl-footer">Footer</footer>
+      </div>
+    </div>
+    <script>MvpLayout("app");</script>
+  </body>
+</html>

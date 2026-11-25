@@ -60,6 +60,9 @@ Load the stylesheet and script in the head, then write the layout:
 </c-layout>
 ```
 
+Give a sidebar `view="HbF"` and write its content in `<c-layout.header>`, `<c-layout.body>` and
+`<c-layout.footer>` to keep its header at the top and its footer at the bottom while it scrolls.
+
 ### In a plain template
 
 1. Copy

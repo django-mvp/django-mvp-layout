@@ -22,6 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A sidebar can stack its content as a header, a body and a footer. Give `<c-layout.sidebar>` a
+  `view` of `hbf`, `Hbf`, `hbF` or `HbF` and put the content in `<c-layout.header>`, the new
+  `<c-layout.body>` and `<c-layout.footer>`. An upper-case letter makes that part sticky while the
+  sidebar scrolls. In a plain template, add the same class to the sidebar's `.mvpl-panel` and give
+  its children `mvpl-header`, `mvpl-body` and `mvpl-footer`.
+
 ## [v0.1.2] - 2026-11-24
 
 ### Fixed

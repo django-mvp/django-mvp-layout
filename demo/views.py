@@ -114,9 +114,7 @@ def plain_snippet(code, left, right):
             f'breakpoint="{opts["breakpoint"]}" '
             f'behavior="{opts["behavior"]}" %}} aria-label="…">\n'
             '      <div class="mvpl-backdrop" data-mvpl-close '
-            'aria-hidden="true"></div>\n'
-            + panel
-            + "    </aside>\n"
+            'aria-hidden="true"></div>\n' + panel + "    </aside>\n"
         )
 
     return (
@@ -164,7 +162,6 @@ def markup_snippet(code, left, right):
         + "  <c-layout.footer>…</c-layout.footer>\n"
         "</c-layout>"
     )
-
 
 
 def preview_context(params):
@@ -385,4 +382,3 @@ class PlainView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["base_source"] = EXAMPLE_BASE.read_text()
         return context
-

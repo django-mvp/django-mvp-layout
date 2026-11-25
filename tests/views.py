@@ -30,6 +30,11 @@ class LayoutPage(TemplateView):
         context["tall"] = "tall" in self.request.GET
         context["narrow"] = "narrow" in self.request.GET
         context["right_behavior"] = self.request.GET.get("right")
+        context["stack"] = self.request.GET.get("stack", "")
+        context["parts"] = self.request.GET.get("parts", "header,body,footer").split(
+            ","
+        )
+        context["reversed"] = "reversed" in self.request.GET
         context["box_style"], context["layout_style"] = SIZES[
             self.request.GET.get("size", "none")
         ]

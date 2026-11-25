@@ -365,6 +365,96 @@ def panel_rect(page, side):
     )
 
 
+PANEL = '#app > .mvpl-grid > [data-mvpl-side="left"] > .mvpl-panel'
+
+
+def stacked(visit, stack, query=""):
+    """Open the stacked sidebar page and return the page and its panel's parts."""
+    page = visit("layouts-stacked", query=f"?stack={stack}{query}")
+    return page, {
+        "panel": PANEL,
+        "header": f"{PANEL} > .mvpl-header",
+        "body": f"{PANEL} > .mvpl-body",
+        "footer": f"{PANEL} > .mvpl-footer",
+    }
+
+
+def scroll_panel(page):
+    page.evaluate(f"document.querySelector('{PANEL}').scrollTop = 600")
+    settle(page, 150)
+    assert page.evaluate(f"document.querySelector('{PANEL}').scrollTop") > 0
+
+
+class TestStackedSidebar:
+    @pytest.mark.parametrize("stack", ["hbf", "Hbf", "hbF", "HbF"])
+    @pytest.mark.parametrize("order", ["", "&reversed=1"], ids=["in order", "reversed"])
+    def test_the_parts_stack_header_body_footer_whatever_order_they_are_written(
+        self, visit, stack, order
+    ) -> None:
+        page, parts = stacked(visit, stack, order)
+        a = {name: viewport_rect(page, s) for name, s in parts.items()}
+
+        assert near(a["header"]["top"], a["panel"]["top"])
+        assert near(a["body"]["top"], a["header"]["bottom"])
+        assert near(a["footer"]["top"], a["body"]["bottom"])
+        assert near(a["footer"]["bottom"], a["panel"]["bottom"])
+        for name in ("header", "body", "footer"):
+            assert near(a[name]["width"], a["panel"]["width"]), name
+
+    @pytest.mark.parametrize("stack", ["hbf", "HbF"])
+    def test_a_missing_body_leaves_the_footer_at_the_bottom(self, visit, stack) -> None:
+        page, parts = stacked(visit, stack, "&parts=header,footer")
+
+        assert near(
+            viewport_rect(page, parts["footer"])["bottom"],
+            viewport_rect(page, parts["panel"])["bottom"],
+        )
+
+    def test_a_missing_header_leaves_the_body_at_the_top(self, visit) -> None:
+        page, parts = stacked(visit, "HbF", "&parts=body,footer")
+
+        assert near(
+            viewport_rect(page, parts["body"])["top"],
+            viewport_rect(page, parts["panel"])["top"],
+        )
+
+    @pytest.mark.parametrize(
+        ("stack", "header_sticks", "footer_sticks"),
+        [
+            ("hbf", False, False),
+            ("Hbf", True, False),
+            ("hbF", False, True),
+            ("HbF", True, True),
+        ],
+    )
+    def test_an_upper_case_part_sticks_while_the_sidebar_scrolls(
+        self, visit, stack, header_sticks, footer_sticks
+    ) -> None:
+        page, parts = stacked(visit, stack, "&tall=1")
+        panel = viewport_rect(page, parts["panel"])
+
+        scroll_panel(page)
+        header = viewport_rect(page, parts["header"])
+        footer = viewport_rect(page, parts["footer"])
+
+        assert near(header["top"], panel["top"]) is header_sticks
+        assert near(footer["bottom"], panel["bottom"]) is footer_sticks
+
+    def test_a_sticky_part_is_drawn_over_the_body_it_covers(self, visit) -> None:
+        page, parts = stacked(visit, "HbF", "&tall=1")
+
+        scroll_panel(page)
+        header = viewport_rect(page, parts["header"])
+        x, y = header["left"] + 4, header["top"] + header["height"] / 2
+
+        assert page.evaluate(
+            f"document.elementFromPoint({x}, {y}).closest('.mvpl-header') !== null"
+        )
+        assert computed(page, parts["header"], "backgroundColor") != (
+            "rgba(0, 0, 0, 0)"
+        )
+
+
 class TestContainedSize:
     @pytest.mark.parametrize("tall", [False, True], ids=["short", "tall"])
     def test_with_no_height_it_is_as_tall_as_its_content(self, visit, tall) -> None:
