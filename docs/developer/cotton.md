@@ -89,7 +89,7 @@ sidebar, its column takes no space, and its toggles hide.
 | `class` | | Classes added to the sidebar's own. |
 | `style` | | Declarations added after the sidebar's own. |
 
-An option that is not one of its choices raises, naming the choices. The breakpoint, the remembered
+A `side`, `collapse`, `breakpoint` or `behavior` that is not one of its choices raises, naming the choices. The breakpoint, the remembered
 state and the icon rail behave as [the plain templates](plain-templates.md) describe.
 The remembered state is read from the request, so the template needs the
 `django.template.context_processors.request` context processor.
