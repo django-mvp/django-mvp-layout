@@ -408,15 +408,78 @@ class PlainView(TemplateView):
         return context
 
 
-class SidebarPartsView(TemplateView):
-    """Sidebars stacked as a header, a body and a footer."""
+SIDEBAR_CODES = [
+    ("HbF", "Header and footer stay"),
+    ("Hbf", "Only the header stays"),
+    ("hbF", "Only the footer stays"),
+    ("hbf", "Nothing stays"),
+]
+SIDEBAR_PARTS = [("header", "Header"), ("body", "Body"), ("footer", "Footer")]
+SIDEBAR_NAV = [
+    ("house", "Home"),
+    ("inbox", "Inbox"),
+    ("send", "Sent"),
+    ("file-text", "Documents"),
+    ("folder", "Projects"),
+    ("chat", "Discussions"),
+    ("star", "Starred"),
+    ("archive", "Archive"),
+    ("trash", "Trash"),
+    ("bell", "Notifications"),
+    ("search", "Search"),
+    ("funnel", "Filters"),
+    ("layers", "Collections"),
+    ("palette", "Appearance"),
+    ("key", "Access keys"),
+    ("shield-lock", "Security"),
+    ("gear", "Settings"),
+]
 
-    template_name = "demo/sidebar_parts.html"
+
+def sidebar_snippet(code, parts, opts):
+    """The preview's sidebar as components, with its content left out."""
+    attrs = f'side="left" view="{code}"'
+    for key, default in (("collapse", "offcanvas"), ("breakpoint", "lg")):
+        if opts[key] != default:
+            attrs += f' {key}="{opts[key]}"'
+    if opts["behavior"] != "auto":
+        attrs += f' behavior="{opts["behavior"]}"'
+    lines = [f"<c-layout.sidebar {attrs}>"]
+    for part in parts:
+        lines.append(f"  <c-layout.{part}>…</c-layout.{part}>")
+    lines.append("</c-layout.sidebar>")
+    return "\n".join(lines)
+
+
+class SidebarBehaviorView(TemplateView):
+    """Set one sidebar's header, body and footer and how it opens, and see it."""
+
+    template_name = "demo/sidebar_behavior.html"
 
     def get_context_data(self, **kwargs):
-        """Add the codes and the items the sidebars are drawn with."""
+        """Add the settings the preview is drawn with."""
         context = super().get_context_data(**kwargs)
-        context["codes"] = ["hbf", "Hbf", "hbF", "HbF"]
-        context["rows"] = range(1, 21)
-        context["short_rows"] = range(1, 4)
+        params = self.request.GET
+        code = pick(params.get("view"), SIDEBAR_CODES, SIDEBAR_CODES[0][0])
+        # A form sent with every box unticked still carries "set", so it isn't
+        # read as a first visit.
+        if params.get("set"):
+            chosen = params.getlist("parts")
+            parts = [key for key, _ in SIDEBAR_PARTS if key in chosen]
+        else:
+            parts = [key for key, _ in SIDEBAR_PARTS]
+        opts = sidebar_options(params, "left")
+        context.update(
+            code=code,
+            codes=SIDEBAR_CODES,
+            parts=parts,
+            part_choices=SIDEBAR_PARTS,
+            opts=opts,
+            collapses=COLLAPSES,
+            breakpoints=BREAKPOINTS,
+            behaviors=BEHAVIORS,
+            nav=SIDEBAR_NAV,
+            snippet=sidebar_snippet(code, parts, opts),
+            page_width="max-w-none",
+        )
         return context

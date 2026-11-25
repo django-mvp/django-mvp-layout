@@ -26,6 +26,7 @@
     --text-2xl--line-height: calc(2 / 1.5);
     --text-3xl: 1.875rem;
     --text-3xl--line-height: calc(2.25 / 1.875);
+    --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
@@ -1657,6 +1658,70 @@
       }
     }
   }
+  .radio {
+    @layer daisyui.l1.l2.l3 {
+      position: relative;
+      display: inline-block;
+      flex-shrink: 0;
+      cursor: pointer;
+      appearance: none;
+      border-radius: calc(infinity * 1px);
+      padding: 0.25rem;
+      vertical-align: middle;
+      border: var(--border) solid var(--input-color, currentColor);
+      @supports (color: color-mix(in lab, red, red)) {
+        border: var(--border) solid var(--input-color, color-mix(in srgb, currentColor 20%, #0000));
+      }
+      box-shadow: 0 1px oklch(0% 0 0 / calc(var(--depth) * 0.1)) inset;
+      --size: calc(var(--size-selector, 0.25rem) * 6);
+      width: var(--size);
+      height: var(--size);
+      color: var(--input-color, currentColor);
+      &:before {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: calc(infinity * 1px);
+        --tw-content: "";
+        content: var(--tw-content);
+        background-size: auto, calc(var(--noise) * 100%);
+        background-image: none, var(--fx-noise);
+      }
+      &:focus-visible {
+        outline: 2px solid currentColor;
+      }
+      &:checked, &[aria-checked="true"] {
+        border-color: currentcolor;
+        background-color: var(--color-base-100);
+        @media (prefers-reduced-motion: no-preference) {
+          animation: radio 0.2s ease-out;
+        }
+        &:before {
+          background-color: currentcolor;
+          box-shadow: 0 -1px oklch(0% 0 0 / calc(var(--depth) * 0.1)) inset, 0 8px 0 -4px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset, 0 1px oklch(0% 0 0 / calc(var(--depth) * 0.1));
+        }
+        @media (forced-colors: active) {
+          &:before {
+            outline-style: var(--tw-outline-style);
+            outline-width: 1px;
+            outline-offset: calc(1px * -1);
+          }
+        }
+        @media print {
+          &:before {
+            outline: 0.25rem solid;
+            outline-offset: -1rem;
+          }
+        }
+      }
+    }
+    &:disabled {
+      @layer daisyui.l1.l2 {
+        cursor: not-allowed;
+        opacity: 20%;
+      }
+    }
+  }
   .drawer {
     @layer daisyui.l1.l2.l3 {
       position: relative;
@@ -2248,8 +2313,14 @@
   .gap-x-4 {
     column-gap: calc(var(--spacing) * 4);
   }
+  .gap-x-6 {
+    column-gap: calc(var(--spacing) * 6);
+  }
   .gap-y-1 {
     row-gap: var(--spacing);
+  }
+  .gap-y-2 {
+    row-gap: calc(var(--spacing) * 2);
   }
   .truncate {
     overflow: hidden;
@@ -2490,6 +2561,10 @@
     --tw-font-weight: var(--font-weight-medium);
     font-weight: var(--font-weight-medium);
   }
+  .font-normal {
+    --tw-font-weight: var(--font-weight-normal);
+    font-weight: var(--font-weight-normal);
+  }
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
@@ -2659,6 +2734,15 @@
     &:hover {
       @media (hover: hover) {
         border-color: var(--color-primary);
+      }
+    }
+  }
+  .has-checked\:btn-primary {
+    &:has(*:checked) {
+      @layer daisyui.l1.l2 {
+        --btn-color: var(--color-primary);
+        --btn-fg: var(--color-primary-content);
+        --btn-soft-bg: initial;
       }
     }
   }
