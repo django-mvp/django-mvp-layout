@@ -38,12 +38,12 @@
         </c-layout.header>
         <c-layout.body>
           <ul class="menu w-full gap-1">
-            {% url 'home' as home_url %}{% url 'playground' as playground_url %}{% url 'nested' as nested_url %}{% url 'plain' as plain_url %}{% url 'boxes' as boxes_url %}
+            {% url 'home' as home_url %}{% url 'playground' as playground_url %}{% url 'nested' as nested_url %}{% url 'plain' as plain_url %}{% url 'sidebar_parts' as sidebar_parts_url %}
             <li><a href="{{ home_url }}" title="Overview" {% if request.path == home_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "house" %}<span class="mvpl-rail-hide">Overview</span></a></li>
             <li><a href="{{ playground_url }}" title="Playground" {% if request.path == playground_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layout" %}<span class="mvpl-rail-hide">Playground</span></a></li>
             <li><a href="{{ nested_url }}" title="Nested layouts" {% if request.path == nested_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "layers" %}<span class="mvpl-rail-hide">Nested layouts</span></a></li>
             <li><a href="{{ plain_url }}" title="Without Cotton" {% if request.path == plain_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "code" %}<span class="mvpl-rail-hide">Without Cotton</span></a></li>
-            <li><a href="{{ boxes_url }}" title="Header, body and footer" {% if request.path == boxes_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "file-text" %}<span class="mvpl-rail-hide">Header, body and footer</span></a></li>
+            <li><a href="{{ sidebar_parts_url }}" title="Sidebar header and footer" {% if request.path == sidebar_parts_url %}class="menu-active" aria-current="page"{% endif %}>{% icon "file-text" %}<span class="mvpl-rail-hide">Sidebar header and footer</span></a></li>
           </ul>
         </c-layout.body>
         <c-layout.footer class="border-t border-base-300">

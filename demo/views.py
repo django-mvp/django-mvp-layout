@@ -408,23 +408,15 @@ class PlainView(TemplateView):
         return context
 
 
-class BoxesView(TemplateView):
-    """Boxes stacked as a header, a body and a footer."""
+class SidebarPartsView(TemplateView):
+    """Sidebars stacked as a header, a body and a footer."""
 
-    template_name = "demo/boxes.html"
+    template_name = "demo/sidebar_parts.html"
 
     def get_context_data(self, **kwargs):
-        """Add the codes and the content the boxes are drawn with."""
+        """Add the codes and the items the sidebars are drawn with."""
         context = super().get_context_data(**kwargs)
         context["codes"] = ["hbf", "Hbf", "hbF", "HbF"]
         context["rows"] = range(1, 21)
-        context["fields"] = [
-            "Display name",
-            "Email",
-            "Affiliation",
-            "Department",
-            "Website",
-            "ORCID",
-            "Phone",
-        ]
+        context["short_rows"] = range(1, 4)
         return context
