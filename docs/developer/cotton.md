@@ -79,7 +79,8 @@ sidebar, its column takes no space, and its toggles hide.
 | `collapse` | `offcanvas` | How it closes beside the page. `offcanvas` slides it away, `icons` leaves an icon rail, `none` keeps it open and gives it no toggle. |
 | `breakpoint` | `lg` (left), `xl` (right) | The layout width below which it becomes a drawer over the page: `sm`, `md`, `lg`, `xl` or `2xl`. |
 | `behavior` | `auto` | `auto` follows the breakpoint. `docked` keeps it beside the page at every width. `overlay` makes it a drawer at every width. |
-| `width` | `16rem` (left), `18rem` (right) | Its width while open. |
+| `width` | `16rem` (left), `18rem` (right) | Its width while open beside the page. |
+| `drawer-width` | `20rem` | Its width as a drawer over the page. A drawer always leaves a 3.5rem strip of the page beside it. `--mvpl-drawer-w` sets it for every sidebar, see [Change a size](styling.md#change-a-size). |
 | `rail-width` | `4rem` | Its width as an icon rail. |
 | `transition` | `0.2s` beside the page, `0.25s` as a drawer | How long it takes to open and close, as a CSS time such as `300ms`. [Change how long a sidebar takes to open](styling.md#change-how-long-a-sidebar-takes-to-open) sets it for every sidebar. |
 | `closed` | off | A bare attribute. Start closed. A remembered state wins. |

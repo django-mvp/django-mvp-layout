@@ -24,6 +24,7 @@ OPTIONS = [
         id="rail width and closed",
     ),
     pytest.param('transition="300ms"', 'transition="300ms"', id="transition"),
+    pytest.param('drawer-width="22rem"', 'drawer_width="22rem"', id="drawer width"),
     pytest.param('persist="nav"', 'persist="nav"', id="persist"),
     pytest.param('side="right" class="x"', 'side="right" css_class="x"', id="class"),
 ]

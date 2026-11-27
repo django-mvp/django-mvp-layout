@@ -50,7 +50,14 @@ on a single sidebar:
 | Variable | Default | |
 |---|---|---|
 | `--mvpl-w` | `16rem` left, `18rem` right | A sidebar's open width. The `width` argument of `{% sidebar_attrs %}` sets it, and setting it on a layout or any element around it sizes every sidebar inside. |
+| `--mvpl-drawer-w` | `20rem` | A sidebar's width as a drawer over the page. The `drawer_width` argument of `{% sidebar_attrs %}` and the `drawer-width` attribute of `<c-layout.sidebar>` set it for one sidebar. A drawer always leaves a 3.5rem strip of the page beside it to tap, so on a narrow phone it is narrower. |
 | `--mvpl-rail-w` | `4rem` | An icon rail's width. The `rail_width` argument sets it. |
+
+The open width and the drawer width are separate, so a sidebar can be narrow beside the page and wide enough to tap on a phone. Set either on `:root` for every sidebar of a site:
+
+```css
+:root { --mvpl-w: 15rem; --mvpl-drawer-w: 22rem; }
+```
 
 ## Change how long a sidebar takes to open
 
@@ -142,7 +149,7 @@ one exception, and are matched only together with `.mvpl-panel` or the parts ins
 | Variable | Set by | Holds |
 |---|---|---|
 | `--mvpl-sidebar-bg`, `--mvpl-line` | You | Colours, as above. |
-| `--mvpl-w`, `--mvpl-rail-w` | You | Sizes, as above. |
+| `--mvpl-w`, `--mvpl-drawer-w`, `--mvpl-rail-w` | You | Sizes, as above. |
 | `--mvpl-transition` | You | How long a sidebar takes to open and close, as above. |
 | `--mvpl-mode` | The stylesheet | `docked` or `overlay` on a sidebar. |
 | `--mvpl-areas`, `--mvpl-left-top`, `--mvpl-left-bottom`, `--mvpl-right-top`, `--mvpl-right-bottom` | `{% layout_attrs %}` | The grid and the offsets fixed sidebars stick at. |

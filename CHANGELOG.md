@@ -28,6 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sidebar of a site, and the new `transition` attribute of `<c-layout.sidebar>` and argument of
   `{% sidebar_attrs %}` set it for one, as a CSS time such as `300ms`. The defaults stay 0.2 s
   beside the page and 0.25 s as a drawer.
+- A drawer has a width of its own. `--mvpl-drawer-w` sets it for every sidebar, and the new
+  `drawer-width` attribute of `<c-layout.sidebar>` and argument of `{% sidebar_attrs %}` set it for
+  one.
+
+### Changed
+
+- A drawer is 20rem wide by default, whatever the sidebar's width beside the page, and still leaves
+  a 3.5rem strip of the page beside it. It used to take the sidebar's open width, so a narrow
+  sidebar made a drawer too narrow to use on a phone. Set `--mvpl-drawer-w` to keep the old width.
 
 ### Fixed
 

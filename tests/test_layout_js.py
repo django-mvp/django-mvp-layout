@@ -1017,6 +1017,27 @@ class TestDrawers:
         # A drawer is not the docked state, which stays what the reader left.
         assert state_of(page, LEFT) == "open"
 
+    def test_a_drawer_is_20rem_wide_whatever_the_sidebars_width(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.evaluate(
+            f"document.querySelector('{LEFT}').style.setProperty('--mvpl-w', '12rem')"
+        )
+        page.locator("#toggle").click()
+        assert near(width_of(page, self.PANEL), 320)
+
+    def test_a_drawer_leaves_a_strip_to_tap_beside_it(self, visit) -> None:
+        page = visit("layouts-toggles", {"width": 320, "height": 700})
+        page.locator("#toggle").click()
+        assert near(width_of(page, self.PANEL), 320 - 56)
+
+    def test_the_drawer_width_variable_sets_a_drawers_width(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.evaluate(
+            "document.documentElement.style.setProperty('--mvpl-drawer-w', '18rem')"
+        )
+        page.locator("#toggle").click()
+        assert near(width_of(page, self.PANEL), 288)
+
     def test_focus_moves_into_the_drawer_and_the_other_areas_are_inert(
         self, visit
     ) -> None:

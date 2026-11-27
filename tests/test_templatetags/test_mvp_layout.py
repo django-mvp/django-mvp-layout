@@ -237,6 +237,11 @@ class TestSidebarAttrs:
 
         assert style_variables(attrs) == {"--mvpl-w": "20rem", "--mvpl-rail-w": "4rem"}
 
+    def test_a_drawer_width_is_written_as_a_variable(self):
+        attrs = render_tag('{% sidebar_attrs drawer_width="22rem" %}')
+
+        assert style_variables(attrs) == {"--mvpl-drawer-w": "22rem"}
+
     def test_a_transition_is_written_as_a_variable(self):
         attrs = render_tag('{% sidebar_attrs transition="300ms" %}')
 

@@ -113,7 +113,7 @@ sidebar of a page an id of its own when layouts are nested or a template is incl
 ## `{% sidebar_attrs %}`
 
 ```
-{% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width css_class style transition %}
+{% sidebar_attrs side collapse breakpoint behavior persist closed width rail_width css_class style transition drawer_width %}
 ```
 
 Every argument is optional and can be given by name. The tag writes the sidebar's `class` and
@@ -132,6 +132,7 @@ Every argument is optional and can be given by name. The tag writes the sidebar'
 | `css_class` | Classes added to the sidebar's own. | none |
 | `style` | Declarations added after the sidebar's own. | none |
 | `transition` | How long the sidebar takes to open and close, as a CSS time such as `300ms`. | `0.2s` beside the page, `0.25s` as a drawer |
+| `drawer_width` | Its width as a drawer over the page, as a CSS length. | `20rem` |
 
 A value outside the choices raises `LayoutOptionError`, and its message names the choices.
 

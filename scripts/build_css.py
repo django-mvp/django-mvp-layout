@@ -46,7 +46,7 @@ DRAWER = """\
   top: 0;
   bottom: 0;
   z-index: 40;
-  width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+  width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
   height: auto;
   min-height: 0;
   overflow-y: auto;
