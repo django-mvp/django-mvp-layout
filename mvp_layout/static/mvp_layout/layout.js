@@ -273,6 +273,65 @@
       "mvpl-" + name + "=" + sb.getAttribute("data-mvpl-state") + "; path=/; max-age=31536000; samesite=lax";
   }
 
+  /** @type {WeakMap<HTMLElement, () => void>} */
+  var motions = new WeakMap();
+
+  /** @param {HTMLElement} sb */
+  function settleMotion(sb) {
+    var done = motions.get(sb);
+    if (done) done();
+  }
+
+  /**
+   * Slide a docked sidebar so the page beside it moves with the panel's edge,
+   * at the cost of one layout of the page. Closing, the column gives up its
+   * width at once and the areas that moved are slid back from where they were.
+   * Opening, the column keeps no width until the panel is in, the areas after it
+   * slide along with it, and the column takes its width at the end.
+   *
+   * @param {HTMLElement} root
+   * @param {HTMLElement} sb
+   * @param {boolean} opening
+   */
+  function slide(root, sb, opening) {
+    settleMotion(sb);
+    var p = panel(sb);
+    // The panel's slide is its first transition, and its time is the motion's.
+    var first = getComputedStyle(p).transitionDuration.split(",")[0].trim();
+    var time = parseFloat(first) / (first.endsWith("ms") ? 1000 : 1) || 0;
+    if (!time) return;
+    var g = grid(root);
+    /** @type {HTMLElement[]} */
+    var areas = [];
+    if (sb.getAttribute("data-mvpl-side") === "left" && g) {
+      // The page always starts after the left sidebar; the header and footer
+      // only where the code puts the sidebar in their row.
+      var rows = (root.getAttribute("data-mvpl-view") || "").toLowerCase().split(" ");
+      Array.prototype.forEach.call(g.children, function (/** @type {HTMLElement} */ el) {
+        var row = el.classList.contains("mvpl-header") ? rows[0] : el.classList.contains("mvpl-footer") ? rows[2] : "";
+        if (el.classList.contains("mvpl-page") || (row && row.charAt(0) === "l")) areas.push(el);
+      });
+    }
+    // The areas are moved by the Web Animations API rather than by a class or a
+    // custom property, which would restyle every element inside the page.
+    var shift = p.getBoundingClientRect().width * (getComputedStyle(root).direction === "rtl" ? -1 : 1) + "px";
+    var frames = opening ? [{ translate: "0 0" }, { translate: shift + " 0" }] : [{ translate: shift + " 0" }, { translate: "0 0" }];
+    sb.setAttribute("data-mvpl-moving", opening ? "opening" : "closing");
+    var moves = areas.map(function (el) {
+      return el.animate(frames, { duration: time * 1000, easing: "ease", fill: "forwards" });
+    });
+    var timer = setTimeout(finish, time * 1000);
+    function finish() {
+      clearTimeout(timer);
+      motions.delete(sb);
+      moves.forEach(function (move) {
+        move.cancel();
+      });
+      sb.removeAttribute("data-mvpl-moving");
+    }
+    motions.set(sb, finish);
+  }
+
   /**
    * @param {HTMLElement} root
    * @param {string | null} side
@@ -285,7 +344,9 @@
       if (sb.getAttribute("data-mvpl-overlay") === "open") closeOverlay(sb, true);
       else openOverlay(sb, opener);
     } else {
-      sb.setAttribute("data-mvpl-state", sb.getAttribute("data-mvpl-state") === "open" ? "closed" : "open");
+      var opening = sb.getAttribute("data-mvpl-state") !== "open";
+      if (sb.getAttribute("data-mvpl-collapse") === "offcanvas") slide(root, sb, opening);
+      sb.setAttribute("data-mvpl-state", opening ? "open" : "closed");
       remember(sb);
     }
     sync(root);

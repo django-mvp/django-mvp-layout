@@ -785,6 +785,35 @@ def length_of(page, selector, variable):
     )
 
 
+def frames_while_toggling(page, toggle, sidebar, measure):
+    """Close and open a sidebar, measuring the column, panel and page every frame.
+
+    ``measure`` is a JavaScript function of the three bounding boxes that returns
+    a number for each frame.
+    """
+    return page.evaluate(
+        """async ([toggle, sidebar, measure]) => {
+          const column = document.querySelector(sidebar);
+          const panel = column.querySelector(":scope > .mvpl-panel");
+          const area = document.querySelector("#app > .mvpl-grid > .mvpl-page");
+          const gap = eval(measure);
+          const found = [];
+          for (let run = 0; run < 2; run++) {
+            document.querySelector(toggle).click();
+            const start = performance.now();
+            while (performance.now() - start < 400) {
+              await new Promise((done) => requestAnimationFrame(done));
+              found.push(gap(column.getBoundingClientRect(),
+                             panel.getBoundingClientRect(),
+                             area.getBoundingClientRect()));
+            }
+          }
+          return found;
+        }""",
+        [toggle, sidebar, measure],
+    )
+
+
 class TestToggles:
     def test_a_toggle_closes_and_opens_a_docked_sidebar(self, visit) -> None:
         page = visit("layouts-toggles")
@@ -802,6 +831,45 @@ class TestToggles:
         assert state_of(page, LEFT) == "open"
         assert near(width_of(page, LEFT), opened)
         assert page.locator("#toggle").get_attribute("aria-expanded") == "true"
+
+    def test_the_page_moves_with_the_left_sidebars_edge(self, visit) -> None:
+        page = visit("layouts-toggles")
+        gaps = frames_while_toggling(
+            page,
+            "#toggle",
+            LEFT,
+            "(column, panel, area) => Math.abs(area.left - panel.right)",
+        )
+        assert max(gaps) <= 1.5
+
+    def test_the_right_sidebar_never_uncovers_its_column(self, visit) -> None:
+        page = visit("layouts-toggles")
+        gaps = frames_while_toggling(
+            page,
+            "#aside-toggle",
+            RIGHT,
+            "(column, panel, area) => Math.max(0, panel.left - area.right,"
+            " Math.min(column.right, panel.left) - column.left)",
+        )
+        assert max(gaps) <= 1.5
+
+    def test_the_transition_variable_sets_how_long_a_sidebar_takes(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate(
+            "document.documentElement.style.setProperty('--mvpl-transition', '0.3s')"
+        )
+        assert computed(page, f"{LEFT} > .mvpl-panel", "transitionDuration") == "0.3s"
+        page.locator("#toggle").click()
+        assert computed(page, f"{LEFT} > .mvpl-panel", "transitionDuration") == (
+            "0.3s, 0s"
+        )
+        assert (
+            page.evaluate(
+                "document.querySelector('#app > .mvpl-grid > .mvpl-page')"
+                ".getAnimations()[0].effect.getTiming().duration"
+            )
+            == 300
+        )
 
     def test_a_toggle_names_the_sidebar_it_controls(self, visit) -> None:
         page = visit("layouts-toggles")
@@ -948,6 +1016,27 @@ class TestDrawers:
         assert page.locator("#toggle").get_attribute("aria-expanded") == "true"
         # A drawer is not the docked state, which stays what the reader left.
         assert state_of(page, LEFT) == "open"
+
+    def test_a_drawer_is_20rem_wide_whatever_the_sidebars_width(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.evaluate(
+            f"document.querySelector('{LEFT}').style.setProperty('--mvpl-w', '12rem')"
+        )
+        page.locator("#toggle").click()
+        assert near(width_of(page, self.PANEL), 320)
+
+    def test_a_drawer_leaves_a_strip_to_tap_beside_it(self, visit) -> None:
+        page = visit("layouts-toggles", {"width": 320, "height": 700})
+        page.locator("#toggle").click()
+        assert near(width_of(page, self.PANEL), 320 - 56)
+
+    def test_the_drawer_width_variable_sets_a_drawers_width(self, visit) -> None:
+        page = visit("layouts-toggles", PHONE)
+        page.evaluate(
+            "document.documentElement.style.setProperty('--mvpl-drawer-w', '18rem')"
+        )
+        page.locator("#toggle").click()
+        assert near(width_of(page, self.PANEL), 288)
 
     def test_focus_moves_into_the_drawer_and_the_other_areas_are_inert(
         self, visit

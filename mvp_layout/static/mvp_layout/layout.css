@@ -99,7 +99,7 @@
   box-sizing: border-box;
   width: var(--mvpl-sidebar-w);
   min-height: 100%;
-  transition: translate 0.2s ease;
+  transition: translate var(--mvpl-transition, 0.2s) ease;
 }
 .mvpl-grid > .mvpl-sidebar > .mvpl-backdrop { display: none; }
 
@@ -139,7 +139,7 @@
 
 /* Closed beside the page: slid away, or an icon rail. The column gives up its
    width at once, and the panel slides over the page by a transform, which costs
-   the page no layout while it moves. */
+   the page one layout, not one on every frame. */
 .mvpl-grid > .mvpl-sidebar[data-mvpl-collapse="offcanvas"] > .mvpl-panel {
   position: relative;
   z-index: 20;
@@ -149,7 +149,7 @@
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"] > .mvpl-panel {
   visibility: hidden;
-  transition: translate 0.2s ease, visibility 0s linear 0.2s;
+  transition: translate var(--mvpl-transition, 0.2s) ease, visibility 0s linear var(--mvpl-transition, 0.2s);
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"][data-mvpl-side="left"] > .mvpl-panel {
   translate: calc(-100% * var(--mvpl-dir)) 0;
@@ -157,6 +157,15 @@
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="offcanvas"][data-mvpl-side="right"] > .mvpl-panel {
   margin-inline-start: calc(var(--mvpl-sidebar-w) * -1);
   translate: calc(100% * var(--mvpl-dir)) 0;
+}
+/* While a docked sidebar slides, the script moves the page, and whatever else
+   starts after the sidebar, with the panel's edge, so it never shows an empty
+   column or moves ahead of the panel. It sets data-mvpl-moving on the sidebar for
+   as long as the slide lasts. Opening, the column takes its width only when the
+   panel is in. */
+.mvpl-grid > .mvpl-sidebar[data-mvpl-moving="opening"] { width: 0; }
+.mvpl-grid > .mvpl-sidebar[data-mvpl-moving="opening"][data-mvpl-side="right"] > .mvpl-panel {
+  margin-inline-start: calc(var(--mvpl-sidebar-w) * -1);
 }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] { width: var(--mvpl-rail-w); }
 .mvpl-grid > .mvpl-sidebar[data-mvpl-state="closed"][data-mvpl-collapse="icons"] > .mvpl-panel {
@@ -230,7 +239,7 @@
   top: 0;
   bottom: 0;
   z-index: 40;
-  width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+  width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
   height: auto;
   min-height: 0;
   overflow-y: auto;
@@ -240,7 +249,7 @@
   border-inline-width: 0;
   background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
   box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-  transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
 }
 .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-side="left"] > .mvpl-panel {
   inset-inline-start: 0;
@@ -253,7 +262,7 @@
 .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-overlay="open"] > .mvpl-panel {
   translate: 0 0;
   visibility: visible;
-  transition: translate 0.25s ease, visibility 0s;
+  transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
 }
 .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"] > .mvpl-backdrop {
   display: block;
@@ -263,7 +272,7 @@
   background: rgb(0 0 0 / 0.4);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--mvpl-transition, 0.25s) ease;
 }
 .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="overlay"][data-mvpl-overlay="open"] > .mvpl-backdrop {
   opacity: 1;
@@ -286,7 +295,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+    width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -296,7 +305,7 @@
     border-inline-width: 0;
     background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
     box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-side="left"] > .mvpl-panel {
     inset-inline-start: 0;
@@ -309,7 +318,7 @@
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-overlay="open"] > .mvpl-panel {
     translate: 0 0;
     visibility: visible;
-    transition: translate 0.25s ease, visibility 0s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"] > .mvpl-backdrop {
     display: block;
@@ -319,7 +328,7 @@
     background: rgb(0 0 0 / 0.4);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--mvpl-transition, 0.25s) ease;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="sm"][data-mvpl-overlay="open"] > .mvpl-backdrop {
     opacity: 1;
@@ -343,7 +352,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+    width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -353,7 +362,7 @@
     border-inline-width: 0;
     background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
     box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-side="left"] > .mvpl-panel {
     inset-inline-start: 0;
@@ -366,7 +375,7 @@
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-overlay="open"] > .mvpl-panel {
     translate: 0 0;
     visibility: visible;
-    transition: translate 0.25s ease, visibility 0s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"] > .mvpl-backdrop {
     display: block;
@@ -376,7 +385,7 @@
     background: rgb(0 0 0 / 0.4);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--mvpl-transition, 0.25s) ease;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="md"][data-mvpl-overlay="open"] > .mvpl-backdrop {
     opacity: 1;
@@ -400,7 +409,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+    width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -410,7 +419,7 @@
     border-inline-width: 0;
     background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
     box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-side="left"] > .mvpl-panel {
     inset-inline-start: 0;
@@ -423,7 +432,7 @@
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-overlay="open"] > .mvpl-panel {
     translate: 0 0;
     visibility: visible;
-    transition: translate 0.25s ease, visibility 0s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"] > .mvpl-backdrop {
     display: block;
@@ -433,7 +442,7 @@
     background: rgb(0 0 0 / 0.4);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--mvpl-transition, 0.25s) ease;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="lg"][data-mvpl-overlay="open"] > .mvpl-backdrop {
     opacity: 1;
@@ -457,7 +466,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+    width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -467,7 +476,7 @@
     border-inline-width: 0;
     background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
     box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-side="left"] > .mvpl-panel {
     inset-inline-start: 0;
@@ -480,7 +489,7 @@
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-overlay="open"] > .mvpl-panel {
     translate: 0 0;
     visibility: visible;
-    transition: translate 0.25s ease, visibility 0s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"] > .mvpl-backdrop {
     display: block;
@@ -490,7 +499,7 @@
     background: rgb(0 0 0 / 0.4);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--mvpl-transition, 0.25s) ease;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="xl"][data-mvpl-overlay="open"] > .mvpl-backdrop {
     opacity: 1;
@@ -514,7 +523,7 @@
     top: 0;
     bottom: 0;
     z-index: 40;
-    width: min(var(--mvpl-sidebar-w), 100% - 3.5rem);
+    width: min(var(--mvpl-drawer-w, 20rem), 100% - 3.5rem);
     height: auto;
     min-height: 0;
     overflow-y: auto;
@@ -524,7 +533,7 @@
     border-inline-width: 0;
     background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
     box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-    transition: translate 0.25s ease, visibility 0s linear 0.25s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-side="left"] > .mvpl-panel {
     inset-inline-start: 0;
@@ -537,7 +546,7 @@
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-overlay="open"] > .mvpl-panel {
     translate: 0 0;
     visibility: visible;
-    transition: translate 0.25s ease, visibility 0s;
+    transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"] > .mvpl-backdrop {
     display: block;
@@ -547,7 +556,7 @@
     background: rgb(0 0 0 / 0.4);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--mvpl-transition, 0.25s) ease;
   }
   .mvpl > .mvpl-grid > .mvpl-sidebar[data-mvpl-side][data-mvpl-behavior="auto"][data-mvpl-breakpoint="2xl"][data-mvpl-overlay="open"] > .mvpl-backdrop {
     opacity: 1;

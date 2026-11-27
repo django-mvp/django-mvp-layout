@@ -50,7 +50,34 @@ on a single sidebar:
 | Variable | Default | |
 |---|---|---|
 | `--mvpl-w` | `16rem` left, `18rem` right | A sidebar's open width. The `width` argument of `{% sidebar_attrs %}` sets it, and setting it on a layout or any element around it sizes every sidebar inside. |
+| `--mvpl-drawer-w` | `20rem` | A sidebar's width as a drawer over the page. The `drawer_width` argument of `{% sidebar_attrs %}` and the `drawer-width` attribute of `<c-layout.sidebar>` set it for one sidebar. A drawer always leaves a 3.5rem strip of the page beside it to tap, so on a narrow phone it is narrower. |
 | `--mvpl-rail-w` | `4rem` | An icon rail's width. The `rail_width` argument sets it. |
+
+The open width and the drawer width are separate, so a sidebar can be narrow beside the page and wide enough to tap on a phone. Set either on `:root` for every sidebar of a site:
+
+```css
+:root { --mvpl-w: 15rem; --mvpl-drawer-w: 22rem; }
+```
+
+## Change how long a sidebar takes to open
+
+| Variable | Default | |
+|---|---|---|
+| `--mvpl-transition` | `0.2s` beside the page, `0.25s` as a drawer | How long a sidebar takes to open and close, as a CSS time. The `transition` argument of `{% sidebar_attrs %}` and the `transition` attribute of `<c-layout.sidebar>` set it for one sidebar. |
+
+Set it on `:root` to give every sidebar of the site the same time, and on a single sidebar to give
+that one its own:
+
+```css
+:root { --mvpl-transition: 300ms; }
+```
+
+```html
+<c-layout.sidebar side="right" transition="150ms">…</c-layout.sidebar>
+```
+
+Beside the page, the page moves with the sidebar's edge over the same time. A reader who asks for
+reduced motion gets no transition at all.
 
 The header's and footer's heights are measured by the script, so a fixed sidebar sticks just below
 a fixed header whatever its height.
@@ -122,7 +149,8 @@ one exception, and are matched only together with `.mvpl-panel` or the parts ins
 | Variable | Set by | Holds |
 |---|---|---|
 | `--mvpl-sidebar-bg`, `--mvpl-line` | You | Colours, as above. |
-| `--mvpl-w`, `--mvpl-rail-w` | You | Sizes, as above. |
+| `--mvpl-w`, `--mvpl-drawer-w`, `--mvpl-rail-w` | You | Sizes, as above. |
+| `--mvpl-transition` | You | How long a sidebar takes to open and close, as above. |
 | `--mvpl-mode` | The stylesheet | `docked` or `overlay` on a sidebar. |
 | `--mvpl-areas`, `--mvpl-left-top`, `--mvpl-left-bottom`, `--mvpl-right-top`, `--mvpl-right-bottom` | `{% layout_attrs %}` | The grid and the offsets fixed sidebars stick at. |
 | `--mvpl-header-h`, `--mvpl-footer-h` | The script | The measured heights. |
@@ -137,13 +165,18 @@ See [Remember a sidebar's state](plain-templates.md#remember-a-sidebars-state).
 
 ## Change how a sidebar closes
 
-A sidebar that closes beside the page gives up its width at once, and its panel slides away with
-`translate` over 0.2 s. The page is laid out one time instead of on every frame, which keeps a
-long page smooth. An icon rail changes width at once and does not slide.
+A sidebar that closes beside the page slides its panel away with `translate`, over 0.2 s unless
+[`--mvpl-transition`](#change-how-long-a-sidebar-takes-to-open) says otherwise. The script moves
+the page with the panel's edge over the same time, so it never shows an empty column or moves
+ahead of the sidebar. Closing, the column gives up its width at once and the page slides back from
+where it was. Opening, the page slides along with the panel and the column takes its width when
+the panel is in. The page is laid out once each time, not on every frame, which keeps a long page
+smooth. An icon rail changes width at once and does not slide.
 
 To change the slide, set `transition` and `translate` on `.mvpl-sidebar[data-mvpl-state="closed"]
-> .mvpl-panel`. Your rule wins without extra specificity, because the stylesheet is in a cascade
-layer. `prefers-reduced-motion: reduce` turns the slide off.
+> .mvpl-panel`. The page follows the panel's first transition time. Your rule wins without extra
+specificity, because the stylesheet is in a cascade layer. `prefers-reduced-motion: reduce` turns
+the slide off.
 
 ## Hooks for your own rules
 
