@@ -785,6 +785,35 @@ def length_of(page, selector, variable):
     )
 
 
+def frames_while_toggling(page, toggle, sidebar, measure):
+    """Close and open a sidebar, measuring the column, panel and page every frame.
+
+    ``measure`` is a JavaScript function of the three bounding boxes that returns
+    a number for each frame.
+    """
+    return page.evaluate(
+        """async ([toggle, sidebar, measure]) => {
+          const column = document.querySelector(sidebar);
+          const panel = column.querySelector(":scope > .mvpl-panel");
+          const area = document.querySelector("#app > .mvpl-grid > .mvpl-page");
+          const gap = eval(measure);
+          const found = [];
+          for (let run = 0; run < 2; run++) {
+            document.querySelector(toggle).click();
+            const start = performance.now();
+            while (performance.now() - start < 400) {
+              await new Promise((done) => requestAnimationFrame(done));
+              found.push(gap(column.getBoundingClientRect(),
+                             panel.getBoundingClientRect(),
+                             area.getBoundingClientRect()));
+            }
+          }
+          return found;
+        }""",
+        [toggle, sidebar, measure],
+    )
+
+
 class TestToggles:
     def test_a_toggle_closes_and_opens_a_docked_sidebar(self, visit) -> None:
         page = visit("layouts-toggles")
@@ -802,6 +831,45 @@ class TestToggles:
         assert state_of(page, LEFT) == "open"
         assert near(width_of(page, LEFT), opened)
         assert page.locator("#toggle").get_attribute("aria-expanded") == "true"
+
+    def test_the_page_moves_with_the_left_sidebars_edge(self, visit) -> None:
+        page = visit("layouts-toggles")
+        gaps = frames_while_toggling(
+            page,
+            "#toggle",
+            LEFT,
+            "(column, panel, area) => Math.abs(area.left - panel.right)",
+        )
+        assert max(gaps) <= 1.5
+
+    def test_the_right_sidebar_never_uncovers_its_column(self, visit) -> None:
+        page = visit("layouts-toggles")
+        gaps = frames_while_toggling(
+            page,
+            "#aside-toggle",
+            RIGHT,
+            "(column, panel, area) => Math.max(0, panel.left - area.right,"
+            " Math.min(column.right, panel.left) - column.left)",
+        )
+        assert max(gaps) <= 1.5
+
+    def test_the_transition_variable_sets_how_long_a_sidebar_takes(self, visit) -> None:
+        page = visit("layouts-toggles")
+        page.evaluate(
+            "document.documentElement.style.setProperty('--mvpl-transition', '0.3s')"
+        )
+        assert computed(page, f"{LEFT} > .mvpl-panel", "transitionDuration") == "0.3s"
+        page.locator("#toggle").click()
+        assert computed(page, f"{LEFT} > .mvpl-panel", "transitionDuration") == (
+            "0.3s, 0s"
+        )
+        assert (
+            page.evaluate(
+                "document.querySelector('#app > .mvpl-grid > .mvpl-page')"
+                ".getAnimations()[0].effect.getTiming().duration"
+            )
+            == 300
+        )
 
     def test_a_toggle_names_the_sidebar_it_controls(self, visit) -> None:
         page = visit("layouts-toggles")

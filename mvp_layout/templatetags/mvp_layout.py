@@ -235,6 +235,7 @@ def sidebar_attrs(
     rail_width=None,
     css_class="",
     style="",
+    transition=None,
 ):
     """Write the attributes of a sidebar's ``<aside>``.
 
@@ -255,6 +256,8 @@ def sidebar_attrs(
         rail_width: The width of its icon rail, as a CSS length.
         css_class: Classes added to the sidebar's own.
         style: Declarations added after the sidebar's own.
+        transition: How long it takes to open and close, as a CSS time such
+            as ``300ms``.
 
     Returns:
         The attributes, ready to place inside a tag.
@@ -276,6 +279,7 @@ def sidebar_attrs(
         for part in (
             f"--mvpl-w: {width};" if width else "",
             f"--mvpl-rail-w: {rail_width};" if rail_width else "",
+            f"--mvpl-transition: {transition};" if transition else "",
             style.strip(),
         )
         if part

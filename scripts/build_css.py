@@ -56,7 +56,7 @@ DRAWER = """\
   border-inline-width: 0;
   background: var(--mvpl-sidebar-bg, var(--color-base-100, Canvas));
   box-shadow: 0 0 2rem rgb(0 0 0 / 0.25);
-  transition: translate 0.25s ease, visibility 0s linear 0.25s;
+  transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s linear var(--mvpl-transition, 0.25s);
 }}
 {s}[data-mvpl-side="left"] > .mvpl-panel {{
   inset-inline-start: 0;
@@ -69,7 +69,7 @@ DRAWER = """\
 {s}[data-mvpl-overlay="open"] > .mvpl-panel {{
   translate: 0 0;
   visibility: visible;
-  transition: translate 0.25s ease, visibility 0s;
+  transition: translate var(--mvpl-transition, 0.25s) ease, visibility 0s;
 }}
 {s} > .mvpl-backdrop {{
   display: block;
@@ -79,7 +79,7 @@ DRAWER = """\
   background: rgb(0 0 0 / 0.4);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--mvpl-transition, 0.25s) ease;
 }}
 {s}[data-mvpl-overlay="open"] > .mvpl-backdrop {{
   opacity: 1;

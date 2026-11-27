@@ -237,6 +237,11 @@ class TestSidebarAttrs:
 
         assert style_variables(attrs) == {"--mvpl-w": "20rem", "--mvpl-rail-w": "4rem"}
 
+    def test_a_transition_is_written_as_a_variable(self):
+        attrs = render_tag('{% sidebar_attrs transition="300ms" %}')
+
+        assert style_variables(attrs) == {"--mvpl-transition": "300ms"}
+
     def test_no_style_is_written_without_a_width(self):
         assert "style" not in render_tag("{% sidebar_attrs %}")
 

@@ -23,6 +23,7 @@ OPTIONS = [
         'collapse="icons" rail_width="3rem" closed=True',
         id="rail width and closed",
     ),
+    pytest.param('transition="300ms"', 'transition="300ms"', id="transition"),
     pytest.param('persist="nav"', 'persist="nav"', id="persist"),
     pytest.param('side="right" class="x"', 'side="right" css_class="x"', id="class"),
 ]
