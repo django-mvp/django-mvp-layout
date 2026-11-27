@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.3.0] - 2026-11-27
+
 ### Added
 
 - A sidebar's open and close time can be set. `--mvpl-transition` on `:root` sets it for every
